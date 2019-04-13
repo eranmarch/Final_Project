@@ -45,7 +45,7 @@ namespace MappingBreakDown
         /* Upon Insert to the table, allocate a new address to the register */
         private int FindAddress()
         {
-            int i = 0, x;
+            int i = 1, x;
             for (; i <= 1023; i++)
             {
                 bool found = true;
@@ -66,7 +66,7 @@ namespace MappingBreakDown
             return -1;
         }
 
-        private bool inputValidation(RegisterEntry entry, string type, string fpga, bool add, bool load)
+        private bool inputValidation(RegisterEntry entry, string type, string fpga, bool add, bool load, bool open)
         {
             int addr;
 
@@ -75,7 +75,7 @@ namespace MappingBreakDown
                 addr = FindAddress();
                 if (addr == -1)
                 {
-                    MessageBox.Show("Unable to add register, no free slot in memory");
+                    MessageBox.Show("Unable to add register " + entry.Name + " (" + entry.Address + "), no free slot in memory");
                     return false;
                 }
                 if (add)
@@ -89,18 +89,22 @@ namespace MappingBreakDown
                     return false;
                 }
 
-                using (ChooseAddressPrompt prompt = new ChooseAddressPrompt(GetRegistersArray()))
+                if (!open)
                 {
-                    if (prompt.ShowDialog() == DialogResult.OK)
+                    using (ChooseAddressPrompt prompt = new ChooseAddressPrompt(GetRegistersArray()))
                     {
-                        addr = prompt.chosen_address;
+                        if (prompt.ShowDialog() == DialogResult.OK)
+                        {
+                            addr = prompt.chosen_address;
+                            entry.Address = addr;
+                        }
                     }
                 }
             }
 
             if (!entry.IsValidLsbMsb())
             {
-                MessageBox.Show("LSB is greater then MSB");
+                MessageBox.Show("Register " + entry.Name + " (" + entry.Address + "): LSB is greater then MSB");
                 InitFields();
                 return false;
             }
@@ -111,7 +115,7 @@ namespace MappingBreakDown
                 {
                     if (item.Name.Equals(entry.Name))
                     {
-                        MessageBox.Show("Register name already in the list");
+                        MessageBox.Show("Register " + entry.Name + " (" + entry.Address + ") already in the list");
                         InitFields();
                         return false;
                     }
@@ -124,7 +128,7 @@ namespace MappingBreakDown
         {
             if (this.RegNameText.Text.Equals(""))
             {
-                MessageBox.Show("Invalid register name");
+                MessageBox.Show("Invalid register name: Empty name");
                 InitFields();
                 return;
             }
@@ -141,7 +145,7 @@ namespace MappingBreakDown
             int addr = -1;
 
             RegisterEntry entry = new RegisterEntry(name, addr, mais, lsb, msb, type, fpga, init, comment, group);
-            if (!inputValidation(entry, type, fpga, true, false))
+            if (!inputValidation(entry, type, fpga, true, false, false))
                 return;
             addEntryToTable(entry);
             InitFields();
@@ -155,7 +159,7 @@ namespace MappingBreakDown
             {
                 if (item.Equals(this.NewGroupText.Text))
                 {
-                    MessageBox.Show("Group name already exists");
+                    MessageBox.Show("Group " + NewGroupText.Text + " already exists");
                     this.NewGroupText.Text = "";
                     return;
                 }
@@ -174,27 +178,11 @@ namespace MappingBreakDown
                 //sr.Close();
                 FileValidator fv = new FileValidator(openFileDialog1.FileName);
                 this.addManyRegisters(fv.Registers.ToList());
-
-
-                //using (ChooseAddressPrompt prompt = new ChooseAddressPrompt(GetRegistersArray()))
-                //{
-                //    if (prompt.ShowDialog() == DialogResult.OK)
-                //    {
-                //        addr = int.Parse(prompt.chosen_address);
-                //    }
-                //}
             }
         }
 
         private void Load_Click(object sender, EventArgs e)
         {
-            /*RegisterEntry[] arr = new RegisterEntry[10];
-            for (int i = 0; i < arr.Length; i++)
-            {
-                arr[i] = new RegisterEntry("reg_" + i.ToString(), i + 1, 0, 0, 31, RegisterEntry.type_field.RD, RegisterEntry.fpga_field.A, "asd", "Asdasd", "sdfsdf");
-            }
-            addManyRegisters(arr.ToList());*/
-
             if (this.RegNameText.Text.Equals(""))
             {
                 MessageBox.Show("Invalid register name");
@@ -214,7 +202,7 @@ namespace MappingBreakDown
             int addr = -1;
 
             RegisterEntry entry = new RegisterEntry(name, addr, mais, lsb, msb, type, fpga, init, comment, group);
-            if (!inputValidation(entry, type, fpga, true, true))
+            if (!inputValidation(entry, type, fpga, true, true, false))
                 return;
 
             bool b = false;
@@ -302,8 +290,9 @@ namespace MappingBreakDown
 
         private void addManyRegisters(List <RegisterEntry> entries)
         {
+            //Console.WriteLine(entries);
             foreach (RegisterEntry entry in entries){
-                if (!inputValidation(entry, entry.Type.ToString("G"), entry.FPGA.ToString("G"), false, false))
+                if (!inputValidation(entry, entry.Type.ToString("G"), entry.FPGA.ToString("G"), false, false, true))
                     return;
                 addEntryToTable(entry);
                 InitFields();
@@ -531,6 +520,11 @@ namespace MappingBreakDown
         }
 
         private void RegGroupOpts_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void MappingPackageAutomation_Load(object sender, EventArgs e)
         {
 
         }

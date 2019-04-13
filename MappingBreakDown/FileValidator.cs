@@ -18,8 +18,6 @@ namespace MappingBreakDown
         private String[] field_type = { "name", "address", "MAIS", "LSB", "MSB", "type", "FPGA", "INIT" };
         private String[] valid_type = { "rd", "wr", "rd_wr", "field" };
         private String[] valid_fpga = { "g", "d", "a", "b", "c", "abc", "abcg" };
-        //private String path_to_correct = "E:\\Eran\\אוניברסיטה\\פרויקט גמר\\הפרויקט\\GUI\\WindowsFormsApplication1\\WindowsFormsApplication1\\mycorrect.txt";
-        //private String path_to_correct = "C:\\Users\\Eli Zeltser\\Desktop\\TAU\\year_4\\eeproj\\Meeting200219\\WindowsFormsApplication1\\WindowsFormsApplication1\\mycorrect.txt";
         private String path_to_correct = "mycorrect.txt";
 
         enum Cmp_mod { Start, Reg_names, Middle, Reg_entrys, End };
@@ -28,13 +26,7 @@ namespace MappingBreakDown
         public FileValidator(String path_to_file)
         {
             this.path_to_file = path_to_file;
-            if (false == IsFileValid())
-            {
-                MessageBox.Show("Somethings are wrong");
-                return;
-            }
-
-
+            IsFileValid();
         }
 
         public List<RegisterEntry> GetRegList()
@@ -83,7 +75,10 @@ namespace MappingBreakDown
                 {
                     if ((fields[i].LastIndexOf('(') != 0) ||
                         (fields[i].IndexOf('(') != (fields[i].LastIndexOf('('))))
+                    {
+                        MessageBox.Show("Register named " + fields[0] + " has invalid " + fields[i]);
                         return false;
+                    }
                     fields[i] = fields[i].TrimStart('(');
 
                 }
@@ -117,7 +112,10 @@ namespace MappingBreakDown
                 {
                     if ((fields[i].LastIndexOf(')') != fields[i].Length - 1) ||
                         (fields[i].IndexOf(')') != (fields[i].LastIndexOf(')'))))
+                    {
+                        MessageBox.Show("Register named " + fields[0] + " has invalid " + fields[i][i]);
                         return false;
+                    }
                     fields[i] = fields[i].TrimEnd(')');
                 }
             }
@@ -191,9 +189,15 @@ namespace MappingBreakDown
                     for (k = i; k < lines.Length && !lines_correct[j - 1].Equals(lines[k]); k++)
                     {
                         if (run_state == (int)Cmp_mod.Reg_names && !IsValidRegName(lines[k], ','))
+                        {
                             MessageBox.Show("Invalid register name" + lines[k] + " at line " + (k + 1).ToString());
+                            return false;
+                        }
                         if (run_state == (int)Cmp_mod.Reg_entrys && !IsValidRegEntry(lines[k]))
-                            MessageBox.Show("Invalid register entry " + lines[k] + " at line " + (k + 1).ToString());
+                        {
+                            //MessageBox.Show("Invalid register entry " + lines[k] + " at line " + (k + 1).ToString());
+                            return false;
+                        }
                     }
                     if (run_state == (int)Cmp_mod.Reg_names)
                         reg_names_length = k - i;
@@ -208,15 +212,21 @@ namespace MappingBreakDown
                     while (i < lines.Length && lines[i].Equals(""))
                         i++;
                     if (!lines_correct[j].Equals(lines[i]))
+                    {
                         MessageBox.Show("Invalid file\n" + lines[i] + "\n" + lines_correct[j]);
+                        return false;
+                    }
                     j++;
                 }
             }
             String[] Reg_names = SubArray(lines, reg_names_start, reg_names_length);
             String[] Reg_entries = SubArray(lines, reg_entries_start, reg_entries_length);
             if (ValidRegLogic(Array.FindAll<String>(Reg_names, isNotCommentMakaf).ToArray<String>(), Reg_entries))
-                MessageBox.Show("OK");
-            return true;
+            {
+                //MessageBox.Show("OK");
+                return true;
+            }
+            return false;
         }
 
         private String NameDuplicate(String[] lst)
@@ -281,6 +291,30 @@ namespace MappingBreakDown
             }
             return null;
         }
+
+        private bool FieldValidation()
+        {
+            int sum = 0;
+            bool any = false;
+            foreach (RegisterEntry entry in Registers)
+            {
+                foreach (RegisterEntry item in Registers)
+                {
+                    if (item.Address == entry.Address && item.Type == RegisterEntry.type_field.FIELD)
+                    {
+                        any = true;
+                        sum += item.MSB - item.LSB + 1;
+                    }
+                }
+                if (any && sum != entry.MSB - entry.LSB + 1)
+                {
+                    MessageBox.Show("Fields bits of register " + entry.Name + " (" + entry.Address + "), don't sum up correctly");
+                    return false;
+                }
+            }
+            return true;
+        }
+
         private bool ValidRegLogic(String[] Reg_names, String[] Reg_entries)
         {
             for (int i = 0; i < Reg_names.Length; i++)
@@ -337,6 +371,8 @@ namespace MappingBreakDown
                 MessageBox.Show("The address " + adrs_dup + " is already full");
                 return false;
             }
+            //if (!FieldValidation())
+            //    return false;
             //XMLWriter xml_writer = new XMLWriter(Registers);
             return true;
         }

@@ -14,9 +14,11 @@ namespace MappingBreakDown
     {
         //string[] reg_name_list;
         public int chosen_address { get; set; }
+        RegisterEntry[] registers;
         public ChooseAddressPrompt(RegisterEntry[] registers)
         {
             InitializeComponent();
+            this.registers = registers;
             //reg_name_list = registers.Select(x => x.GetName()).ToArray();
             this.chosen_address = 0;
             foreach (RegisterEntry reg in registers)
@@ -32,8 +34,8 @@ namespace MappingBreakDown
 
         private void OKButton_Click(object sender, EventArgs e)
         {
-            //this.chosen_address = AddressOpts.Text;
-            this.DialogResult = DialogResult.OK;
+            chosen_address = registers[AddressOpts.SelectedIndex].Address;
+            DialogResult = DialogResult.OK;
         }
 
         private void AddressOpts_SelectedIndexChanged(object sender, EventArgs e)
