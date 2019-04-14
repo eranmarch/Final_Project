@@ -45,7 +45,7 @@ namespace MappingBreakDown
 
         private void ChooseAddressPrompt_Load_1(object sender, EventArgs e)
         {
-
+            //DialogResult = DialogResult.Cancel;
         }
     }
 }

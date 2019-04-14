@@ -60,6 +60,7 @@ namespace MappingBreakDown
             this.MAIS = int.Parse(MAIS);
             this.LSB = int.Parse(LSB);
             this.MSB = int.Parse(MSB);
+            this.Type = FindTypeFromString(type);
             this.Init = Init;
             this.Comment = Comment;
             this.Group = Group;

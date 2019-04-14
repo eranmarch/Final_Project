@@ -98,7 +98,34 @@ namespace MappingBreakDown
                             addr = prompt.chosen_address;
                             entry.Address = addr;
                         }
+                        else
+                            return false;
                     }
+                }
+            }
+
+            if (open)
+            {
+                bool test = false, sec = false;
+                foreach (RegisterEntry item in RegList)
+                {
+                    if (item.Address == entry.Address)
+                    {
+                        sec = true;
+                        if (item.Name.Equals(entry.Name))
+                        {
+                            test = true;
+                            MessageBox.Show(entry.Name + ", " + entry.Address.ToString());
+                            break;
+                        }
+                    }
+                    
+                }
+                if (!test && sec)
+                {
+                    //MessageBox.Show("Address " + entry.Address + " is already in the list");
+                    //InitFields();
+                    //return false;
                 }
             }
 
@@ -111,6 +138,7 @@ namespace MappingBreakDown
 
             if (!load)
             {
+                //MessageBox.Show("CHECK");
                 foreach (RegisterEntry item in RegList)
                 {
                     if (item.Name.Equals(entry.Name))
@@ -332,14 +360,25 @@ namespace MappingBreakDown
                 MessageBox.Show("You must first add a group name");
         }
 
+        private int findIndex(string name)
+        {
+            for (int i = 0; i < RegList.Count; i++)
+            {
+                if (RegList[i].Name.Equals(name))
+                    return i;
+            }
+            return -1;
+        }
         private void Delete_Click(object sender, EventArgs e)
         {
             foreach (DataGridViewRow item in dataGridView1.SelectedRows)
             {
-                RegList.RemoveAt(item.Index);
-               // MessageBox.Show(item.ToString());
+                RegList.RemoveAt(findIndex(((RegisterEntry)item.DataBoundItem).Name));
+                //RegList.Remove((RegisterEntry)item.DataBoundItem);
+                //MessageBox.Show(((RegisterEntry)item.DataBoundItem).Address.ToString());
                 //dataGridView1.Rows.RemoveAt(item.Index);
             }
+            textBox2.Text = "";
             FileStream fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
             xs.Serialize(fs, RegList);
             fs.Close();
