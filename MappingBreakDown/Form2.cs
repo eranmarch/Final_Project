@@ -12,14 +12,12 @@ namespace MappingBreakDown
 {
     public partial class ChooseAddressPrompt : Form
     {
-        //string[] reg_name_list;
         public int chosen_address { get; set; }
         RegisterEntry[] registers;
         public ChooseAddressPrompt(RegisterEntry[] registers)
         {
             InitializeComponent();
             this.registers = registers;
-            //reg_name_list = registers.Select(x => x.GetName()).ToArray();
             this.chosen_address = 0;
             foreach (RegisterEntry reg in registers)
             {

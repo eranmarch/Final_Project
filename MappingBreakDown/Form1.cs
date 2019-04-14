@@ -11,7 +11,7 @@ using System.Xml.Serialization;
 using System.IO;
 
 namespace MappingBreakDown
-{ 
+{
     public partial class MappingPackageAutomation : Form
     {
         public XmlSerializer xs;
@@ -27,7 +27,7 @@ namespace MappingBreakDown
         }
 
         public RegisterEntry[] GetRegistersArray()
-        { 
+        {
             return RegList.ToArray();
         }
 
@@ -40,6 +40,9 @@ namespace MappingBreakDown
             this.TypeOpts.Text = "RD";
             this.FPGAOpts.Text = "G";
             this.InitText.Text = "";
+            RegNameText.Text = "";
+            CommentText.Text = "";
+            RegGroupOpts.SelectedIndex = 0;
         }
 
         /* Upon Insert to the table, allocate a new address to the register */
@@ -119,7 +122,7 @@ namespace MappingBreakDown
                             break;
                         }
                     }
-                    
+
                 }
                 if (!test && sec)
                 {
@@ -160,7 +163,7 @@ namespace MappingBreakDown
                 InitFields();
                 return;
             }
-            
+
             string name = this.RegNameText.Text;
             string mais = this.MAISOpts.Text;
             string lsb = this.LSBOpts.Text;
@@ -275,7 +278,7 @@ namespace MappingBreakDown
                 return;
             }
 
-            
+
             FileStream fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
             xs.Serialize(fs, RegList);
             fs.Close();
@@ -312,14 +315,15 @@ namespace MappingBreakDown
 
             dataGridView1.DataSource = RegList;
             fs.Close();
-            textBox2.Text = "";
+            searchBox.Text = "";
             RegShow = RegList;
         }
 
-        private void addManyRegisters(List <RegisterEntry> entries)
+        private void addManyRegisters(List<RegisterEntry> entries)
         {
             //Console.WriteLine(entries);
-            foreach (RegisterEntry entry in entries){
+            foreach (RegisterEntry entry in entries)
+            {
                 if (!inputValidation(entry, entry.Type.ToString("G"), entry.FPGA.ToString("G"), false, false, true))
                     return;
                 addEntryToTable(entry);
@@ -371,14 +375,28 @@ namespace MappingBreakDown
         }
         private void Delete_Click(object sender, EventArgs e)
         {
+            List<int> indices = new List<int>();
+            int i, addr;
             foreach (DataGridViewRow item in dataGridView1.SelectedRows)
             {
-                RegList.RemoveAt(findIndex(((RegisterEntry)item.DataBoundItem).Name));
-                //RegList.Remove((RegisterEntry)item.DataBoundItem);
-                //MessageBox.Show(((RegisterEntry)item.DataBoundItem).Address.ToString());
-                //dataGridView1.Rows.RemoveAt(item.Index);
+                i = findIndex(((RegisterEntry)item.DataBoundItem).Name);
+                if (RegList[i].Type != RegisterEntry.type_field.FIELD) {
+                    addr = ((RegisterEntry)item.DataBoundItem).Address;
+                    for (int j = 0; j < RegList.Count; j++)
+                    {
+                        if (RegList[j].Address == addr && j != i &&
+                            RegList[j].Type == RegisterEntry.type_field.FIELD && !indices.Contains(j))
+                            indices.Add(j);
+                    }
+                }
+                if (!indices.Contains(i))
+                    indices.Add(i);
+
             }
-            textBox2.Text = "";
+            foreach (int index in indices.OrderByDescending(v => v))
+                RegList.RemoveAt(index);
+
+            searchBox.Text = "";
             FileStream fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
             xs.Serialize(fs, RegList);
             fs.Close();
@@ -393,7 +411,7 @@ namespace MappingBreakDown
 
         private void textBox2_TextChanged(object sender, EventArgs e)
         {
-            String searchRes = textBox2.Text;
+            String searchRes = searchBox.Text;
             RegShow = new List<RegisterEntry>();
             foreach (RegisterEntry entry in RegList)
             {
@@ -458,7 +476,12 @@ namespace MappingBreakDown
 
         private String getString(String reg, String addr, String mais, String lsb, String msb, String type, String fpga, String init)
         {
-            String ___reg_name___ = getSpaces(16) + "(" + reg + getSpaces((56 - ((17 + reg.Length))));
+            int spaces;
+            if (type.Equals("FIELD"))
+                spaces = 4;
+            else
+                spaces = 0;
+            String ___reg_name___ = getSpaces(16) + "(" + reg + getSpaces((56 - spaces - ((17 + reg.Length))));
             String __address = getSpaces(8 - addr.Length) + addr;
             String __mais = getSpaces(3 - mais.Length) + mais;
             String __lsb__msb = getSpaces(3 - lsb.Length) + lsb + "," + getSpaces(3 - msb.Length) + msb;
@@ -513,6 +536,11 @@ namespace MappingBreakDown
                             type = l.Type.ToString();
                             fpga = l.FPGA.ToString();
                             init = l.Init;
+                            if (l.Type.Equals(RegisterEntry.type_field.FIELD))
+                            {
+                                names += "\t";
+                                prop += "\t";
+                            }
                             names += "\t\t\t\t" + reg + ",\n";
                             if (index++ != RegList.Count - 1)
                                 prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + ",\n";
@@ -550,7 +578,17 @@ namespace MappingBreakDown
                     res += line + '\n';
                 }
                 file.Close();
-                System.IO.File.WriteAllText(PathToFile.Text, res);
+                try
+                {
+                    System.IO.File.WriteAllText(PathToFile.Text, res);
+                }
+                catch
+                {
+                    if (PathToFile.Text.Equals(""))
+                        SaveAsButton_Click(sender, e);
+                    else
+                        MessageBox.Show("Invalid Path to File");
+                }
             }
             catch (IOException t)
             {
