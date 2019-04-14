@@ -1,2 +1,2 @@
-# Final_Project
-GUIs and Simon in VHDL
+# Final Project
+First GUI
