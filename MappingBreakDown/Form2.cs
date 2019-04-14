@@ -32,7 +32,14 @@ namespace MappingBreakDown
 
         private void OKButton_Click(object sender, EventArgs e)
         {
-            chosen_address = registers[AddressOpts.SelectedIndex].Address;
+            string name = (string)(AddressOpts.SelectedItem);
+            int i = 0;
+            for (; i < registers.Length; i++)
+                if (registers[i].Name.Equals(name))
+                    break;
+            //chosen_address = registers[AddressOpts.SelectedIndex].Address;
+            //MessageBox.Show(registers[i].Address.ToString());
+            chosen_address = registers[i].Address;
             DialogResult = DialogResult.OK;
         }
 

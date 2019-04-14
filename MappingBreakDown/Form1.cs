@@ -94,7 +94,7 @@ namespace MappingBreakDown
 
                 if (!open)
                 {
-                    RegisterEntry[] regArr = RegList.Where(val => !val.Equals(entry.Name)).ToArray();
+                    RegisterEntry[] regArr = RegList.Where(val => !val.Name.Equals(entry.Name)).ToArray();
                     using (ChooseAddressPrompt prompt = new ChooseAddressPrompt(regArr))
                     {
                         if (prompt.ShowDialog() == DialogResult.OK)
@@ -206,10 +206,7 @@ namespace MappingBreakDown
         {
             if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                //System.IO.StreamReader sr = new System.IO.StreamReader(openFileDialog1.FileName);
-                //MessageBox.Show(sr.ReadToEnd());
                 PathToFile.Text = openFileDialog1.FileName;
-                //sr.Close();
                 FileValidator fv = new FileValidator(openFileDialog1.FileName);
                 this.addManyRegisters(fv.Registers.ToList());
             }
@@ -251,11 +248,17 @@ namespace MappingBreakDown
                     RegisterEntry.fpga_field r;
                     Enum.TryParse(type, out t);
                     Enum.TryParse(fpga, out r);
+                    if (RegList[i].Type == RegisterEntry.type_field.FIELD && t != RegisterEntry.type_field.FIELD)
+                        RegList[i].Address = FindAddress();
+                    else
+                        RegList[i].Address = entry.Address;
+                    //MessageBox.Show("new address: " + RegList[i].Address);
                     RegList[i].Type = t;
                     RegList[i].FPGA = r;
                     RegList[i].Init = init;
                     RegList[i].Comment = comment;
                     RegList[i].Group = group;
+                    
                     for (int j = 0; j < RegShow.Count; j++)
                     {
                         if (RegShow[j].Name.Equals(name))
@@ -268,6 +271,7 @@ namespace MappingBreakDown
                             RegShow[j].Init = init;
                             RegShow[j].Comment = comment;
                             RegShow[j].Group = group;
+                            RegShow[j].Address = RegList[i].Address;
                         }
                     }
                     b = true;
@@ -281,19 +285,9 @@ namespace MappingBreakDown
                 return;
             }
 
-
             FileStream fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
             xs.Serialize(fs, RegList);
             fs.Close();
-
-            //fs = new FileStream(@"jack.txt", FileMode.Open, FileAccess.Read);
-            //RegList = (List<RegisterEntry>)xs.Deserialize(fs);
-
-            //dataGridView1.DataSource = RegList;
-            //fs.Close();
-            //textBox2.Text = "";
-            //RegShow = RegList;
-            //InitFields();
 
             fs = new FileStream(@"show.txt", FileMode.Create, FileAccess.Write);
             xs.Serialize(fs, RegShow);
@@ -335,7 +329,6 @@ namespace MappingBreakDown
 
         private void SaveAsButton_Click(object sender, EventArgs e)
         {
-            //Stream myStream;
             SaveFileDialog saveFileDialog1 = new SaveFileDialog();
 
             saveFileDialog1.Filter = "txt files (*.txt)|*.txt";
@@ -346,12 +339,6 @@ namespace MappingBreakDown
             {
                 PathToFile.Text = saveFileDialog1.FileName;
                 SaveButton_Click(sender, e);
-                //button5_Click(sender, e);
-                /*if ((myStream = saveFileDialog1.OpenFile()) != null)
-                {
-                    // Code to write the stream goes here.
-                    myStream.Close();
-                }*/
             }
         }
 
