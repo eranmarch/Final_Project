@@ -94,7 +94,8 @@ namespace MappingBreakDown
 
                 if (!open)
                 {
-                    using (ChooseAddressPrompt prompt = new ChooseAddressPrompt(GetRegistersArray()))
+                    RegisterEntry[] regArr = RegList.Where(val => !val.Equals(entry.Name)).ToArray();
+                    using (ChooseAddressPrompt prompt = new ChooseAddressPrompt(regArr))
                     {
                         if (prompt.ShowDialog() == DialogResult.OK)
                         {
@@ -155,6 +156,7 @@ namespace MappingBreakDown
             return true;
         }
 
+        /* Insert register to the table */
         private void InsertButton_Click(object sender, EventArgs e)
         {
             if (this.RegNameText.Text.Equals(""))
@@ -182,6 +184,7 @@ namespace MappingBreakDown
             InitFields();
         }
 
+        /* Add a new group */
         private void button1_Click(object sender, EventArgs e)
         {
             if (this.NewGroupText.Text.Equals(""))
@@ -321,7 +324,6 @@ namespace MappingBreakDown
 
         private void addManyRegisters(List<RegisterEntry> entries)
         {
-            //Console.WriteLine(entries);
             foreach (RegisterEntry entry in entries)
             {
                 if (!inputValidation(entry, entry.Type.ToString("G"), entry.FPGA.ToString("G"), false, false, true))
@@ -373,6 +375,7 @@ namespace MappingBreakDown
             }
             return -1;
         }
+
         private void Delete_Click(object sender, EventArgs e)
         {
             List<int> indices = new List<int>();
@@ -391,7 +394,6 @@ namespace MappingBreakDown
                 }
                 if (!indices.Contains(i))
                     indices.Add(i);
-
             }
             foreach (int index in indices.OrderByDescending(v => v))
                 RegList.RemoveAt(index);
@@ -468,6 +470,7 @@ namespace MappingBreakDown
         {
             return String.Concat(Enumerable.Repeat(" ", x));
         }
+
         private bool isNum(String s)
         {
             double num;
