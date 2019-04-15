@@ -294,22 +294,27 @@ namespace MappingBreakDown
 
         private bool FieldValidation()
         {
-            int sum = 0;
-            bool any = false;
+            int sum;
+            bool any;
             foreach (RegisterEntry entry in Registers)
             {
-                foreach (RegisterEntry item in Registers)
+                sum = 0;
+                any = false;
+                if (entry.Type != RegisterEntry.type_field.FIELD)
                 {
-                    if (item.Address == entry.Address && item.Type == RegisterEntry.type_field.FIELD)
+                    foreach (RegisterEntry item in Registers)
                     {
-                        any = true;
-                        sum += item.MSB - item.LSB + 1;
+                        if (item.Address == entry.Address && item.Type == RegisterEntry.type_field.FIELD)
+                        {
+                            any = true;
+                            sum += item.MSB - item.LSB + 1;
+                        }
                     }
-                }
-                if (any && sum != entry.MSB - entry.LSB + 1)
-                {
-                    MessageBox.Show("Fields bits of register " + entry.Name + " (" + entry.Address + "), don't sum up correctly");
-                    return false;
+                    if (any && sum != entry.MSB - entry.LSB + 1)
+                    {
+                        MessageBox.Show("Fields bits of register " + entry.Name + " (" + entry.Address + "), don't sum up correctly");
+                        return false;
+                    }
                 }
             }
             return true;
@@ -371,9 +376,8 @@ namespace MappingBreakDown
                 MessageBox.Show("The address " + adrs_dup + " is already full");
                 return false;
             }
-            //if (!FieldValidation())
-            //    return false;
-            //XMLWriter xml_writer = new XMLWriter(Registers);
+            if (!FieldValidation())
+                return false;
             return true;
         }
     }
