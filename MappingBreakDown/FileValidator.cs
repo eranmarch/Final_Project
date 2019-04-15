@@ -300,13 +300,19 @@ namespace MappingBreakDown
             {
                 sum = 0;
                 any = false;
+                List<Interval> fieldsIntervals = null;
                 if (entry.Type != RegisterEntry.type_field.FIELD)
                 {
                     foreach (RegisterEntry item in Registers)
                     {
                         if (item.Address == entry.Address && item.Type == RegisterEntry.type_field.FIELD)
                         {
-                            any = true;
+                            if (!any)
+                            {
+                                any = true;
+                                fieldsIntervals = new List<Interval>();
+                            }
+                            fieldsIntervals.Add(new Interval(item.Name, item.LSB, item.MSB));
                             sum += item.MSB - item.LSB + 1;
                         }
                     }
@@ -314,6 +320,16 @@ namespace MappingBreakDown
                     {
                         MessageBox.Show("Fields bits of register " + entry.Name + " (" + entry.Address + "), don't sum up correctly");
                         return false;
+                    }
+                    if (any)
+                    {
+                        Tuple<string, string> inter = Interval.IsIntersectList(fieldsIntervals);
+                        string field1 = inter.Item1, field2 = inter.Item2;
+                        if (!(field1.Equals("") && field2.Equals("")))
+                        {
+                            MessageBox.Show("Fields " + field1 + " and " + field2 + " intersect in register " + entry.Name + " (" + entry.Address + ")");
+                            return false;
+                        }
                     }
                 }
             }

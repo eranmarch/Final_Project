@@ -334,7 +334,8 @@ namespace MappingBreakDown
             saveFileDialog1.Filter = "txt files (*.txt)|*.txt";
             saveFileDialog1.FilterIndex = 2;
             saveFileDialog1.RestoreDirectory = true;
-
+            
+            //DialogResult.
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 PathToFile.Text = saveFileDialog1.FileName;
@@ -487,12 +488,27 @@ namespace MappingBreakDown
 
         private void SaveButton_Click(object sender, EventArgs e)
         {
+            if (PathToFile.Text.Equals(""))
+            {
+                SaveAsButton_Click(sender, e);
+                return;
+            }
             System.IO.StreamReader file;
             try
             {
                 file = new System.IO.StreamReader("mycorrect.txt");
                 string line;
                 String res = "";
+                string title = Path.GetFileNameWithoutExtension(PathToFile.Text);
+                String introDec = "Original path: " + PathToFile.Text + "</br>The following is a documentation for " + title + ". The table " +
+                    "contains the registers created using the GUI."; 
+                //MessageBox.Show(Path.GetFileNameWithoutExtension(PathToFile.Text));
+                string doc = "<html><head><title>" + title + " Documentation" + "</title>";
+                doc += "<style>table, th, td { border: 1px solid black; } th, td {padding: 5px; text-align: center;}" + "</style></head><body>";
+                doc += "<h1><font face = 'arial'><u>Documentation For " + title + "</h1></u>";
+                doc += "<h2>" + introDec + "</h2>";
+                doc += "<table style='width: 100 %'>";
+                doc += "<tr><th>Name</th><th>Group</th><th>Address</th><th>Mais</th><th>LSB</th><th>MSB</th><th>TYPE</th><th>FPGA</th><th>Init</th><th>Comment</th></tr>";
                 while ((line = file.ReadLine()) != null)
                 {
                     if (line.Length == 0)
@@ -507,7 +523,7 @@ namespace MappingBreakDown
                         break;
                     res += line + "\n";
                 }
-                String reg, addr, mais, lsb, msb, type, fpga, init;
+                String reg, addr, mais, lsb, msb, type, fpga, init, comment;
                 String prop = "", names = "";
                 int index = 0;
                 foreach (string group in RegGroupOpts.Items)
@@ -526,6 +542,7 @@ namespace MappingBreakDown
                             type = l.Type.ToString();
                             fpga = l.FPGA.ToString();
                             init = l.Init;
+                            comment = l.Comment;
                             if (l.Type.Equals(RegisterEntry.type_field.FIELD))
                             {
                                 names += "\t";
@@ -533,12 +550,15 @@ namespace MappingBreakDown
                             }
                             names += "\t\t\t\t" + reg + ",\n";
                             if (index++ != RegList.Count - 1)
-                                prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + ",\n";
+                                prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + ",\t" + comment + "\n";
                             else
-                                prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + "\n";
+                                prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + "\t" + comment + "\n";
+                            doc += "<tr><td>" + reg + "</td><td>" + l.Group + "</td><td>" + addr + "</td><td>" + mais + "</td><td>" + lsb + "</td><td>" + msb + "</td><td>" + type + "</td>";
+                            doc += "<td>" + fpga + "</td><td>" + init + "</td><td>" + comment + "</td></tr>";
                         }
                     }
                 }
+                doc += "</table></font></body></html>";
                 res += names;
                 while ((line = file.ReadLine()) != null)
                 {
@@ -571,13 +591,13 @@ namespace MappingBreakDown
                 try
                 {
                     System.IO.File.WriteAllText(PathToFile.Text, res);
+                    //MessageBox.Show(Path.GetDirectoryName(PathToFile.Text) + "\\" + title + "_doc.txt");
+                    System.IO.File.WriteAllText(Path.GetDirectoryName(PathToFile.Text) + "\\" + title + "_doc.html", doc);
+                    
                 }
                 catch
                 {
-                    if (PathToFile.Text.Equals(""))
-                        SaveAsButton_Click(sender, e);
-                    else
-                        MessageBox.Show("Invalid Path to File");
+                    MessageBox.Show("Invalid Path to File");
                 }
             }
             catch (IOException t)
