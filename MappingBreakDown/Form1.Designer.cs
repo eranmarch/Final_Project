@@ -54,7 +54,7 @@
             this.Load = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.NewGroupText = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.AddGroupButton = new System.Windows.Forms.Button();
             this.RegGroupOpts = new System.Windows.Forms.ComboBox();
             this.searchBox = new System.Windows.Forms.TextBox();
             this.LSBOpts = new System.Windows.Forms.ComboBox();
@@ -63,6 +63,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.label10 = new System.Windows.Forms.Label();
+            this.RestoreButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -343,16 +344,16 @@
             this.NewGroupText.Size = new System.Drawing.Size(463, 38);
             this.NewGroupText.TabIndex = 30;
             // 
-            // button1
+            // AddGroupButton
             // 
-            this.button1.Location = new System.Drawing.Point(619, 529);
-            this.button1.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(200, 55);
-            this.button1.TabIndex = 31;
-            this.button1.Text = "Add group";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.AddGroupButton.Location = new System.Drawing.Point(623, 532);
+            this.AddGroupButton.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
+            this.AddGroupButton.Name = "AddGroupButton";
+            this.AddGroupButton.Size = new System.Drawing.Size(200, 55);
+            this.AddGroupButton.TabIndex = 31;
+            this.AddGroupButton.Text = "Add Group";
+            this.AddGroupButton.UseVisualStyleBackColor = true;
+            this.AddGroupButton.Click += new System.EventHandler(this.button1_Click);
             // 
             // RegGroupOpts
             // 
@@ -485,6 +486,7 @@
             // panel2
             // 
             this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel2.Controls.Add(this.RestoreButton);
             this.panel2.Controls.Add(this.InsertButton);
             this.panel2.Controls.Add(this.Load);
             this.panel2.Controls.Add(this.Delete);
@@ -505,10 +507,22 @@
             this.label10.TabIndex = 39;
             this.label10.Text = "Search";
             // 
+            // RestoreButton
+            // 
+            this.RestoreButton.Location = new System.Drawing.Point(27, 21);
+            this.RestoreButton.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
+            this.RestoreButton.Name = "RestoreButton";
+            this.RestoreButton.Size = new System.Drawing.Size(200, 55);
+            this.RestoreButton.TabIndex = 28;
+            this.RestoreButton.Text = "Restore";
+            this.RestoreButton.UseVisualStyleBackColor = true;
+            this.RestoreButton.Click += new System.EventHandler(this.Button2_Click_1);
+            // 
             // MappingPackageAutomation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(16F, 31F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(2133, 1145);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.panel2);
@@ -517,7 +531,7 @@
             this.Controls.Add(this.LSBOpts);
             this.Controls.Add(this.searchBox);
             this.Controls.Add(this.RegGroupOpts);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.AddGroupButton);
             this.Controls.Add(this.NewGroupText);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.label9);
@@ -575,7 +589,7 @@
         private System.Windows.Forms.Button Load;
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.TextBox NewGroupText;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button AddGroupButton;
         private System.Windows.Forms.ComboBox RegGroupOpts;
         private System.Windows.Forms.TextBox searchBox;
         private System.Windows.Forms.ComboBox LSBOpts;
@@ -584,6 +598,7 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Button RestoreButton;
         //private System.Windows.Forms.OpenFileDialog openFileDialog1;
     }
 }

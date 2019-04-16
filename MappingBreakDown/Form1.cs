@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using System.IO;
 
 namespace MappingBreakDown
 {
@@ -231,9 +227,9 @@ namespace MappingBreakDown
             string comment = this.CommentText.Text;
             string group = this.RegGroupOpts.Text;
             int addr = -1;
-
+  
             RegisterEntry entry = new RegisterEntry(name, addr, mais, lsb, msb, type, fpga, init, comment, group);
-            if (!inputValidation(entry, type, fpga, true, true, false))
+            if (!inputValidation(entry, type, fpga, false, true, false))
                 return;
 
             bool b = false;
@@ -248,11 +244,10 @@ namespace MappingBreakDown
                     RegisterEntry.fpga_field r;
                     Enum.TryParse(type, out t);
                     Enum.TryParse(fpga, out r);
+                    MessageBox.Show("After: " + t + ", Before: " + RegList[i].Type + ", " + RegisterEntry.type_field.FIELD);
                     if (RegList[i].Type == RegisterEntry.type_field.FIELD && t != RegisterEntry.type_field.FIELD)
                         RegList[i].Address = FindAddress();
-                    else
-                        RegList[i].Address = entry.Address;
-                    //MessageBox.Show("new address: " + RegList[i].Address);
+                    MessageBox.Show("new address for " + RegList[i].Name + ": " + RegList[i].Address);
                     RegList[i].Type = t;
                     RegList[i].FPGA = r;
                     RegList[i].Init = init;
@@ -285,7 +280,7 @@ namespace MappingBreakDown
                 return;
             }
 
-            FileStream fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
+            /*FileStream fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
             xs.Serialize(fs, RegList);
             fs.Close();
 
@@ -297,13 +292,54 @@ namespace MappingBreakDown
             RegShow = (List<RegisterEntry>)xs.Deserialize(fs);
 
             dataGridView1.DataSource = RegShow;
-            fs.Close();
+            fs.Close();*/
+            updateXML(false, true, false, false, false);
+        }
+
+        private void updateXML(bool insert, bool load, bool delete, bool serach, bool restore)
+        {
+            FileStream fs;
+            RegList = RegList.OrderBy(y => y.Group).ThenBy(y => y.Address).ToList();
+            RegShow = RegShow.OrderBy(y => y.Group).ThenBy(y => y.Address).ToList();
+            if (insert || load || delete)
+            {
+                fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
+                xs.Serialize(fs, RegList);
+                fs.Close();
+            }
+            if (insert || delete || restore)
+            {
+                fs = new FileStream(@"jack.txt", FileMode.Open, FileAccess.Read);
+                RegList = (List<RegisterEntry>)xs.Deserialize(fs);
+                fs.Close();
+                if (insert || delete)
+                {
+                    RegShow = RegList;
+                    dataGridView1.DataSource = RegList;
+                    fs = new FileStream(@"show.txt", FileMode.Create, FileAccess.Write);
+                    xs.Serialize(fs, RegShow);
+                    fs.Close();
+                }
+            }
+            if (load || serach)
+            {
+                fs = new FileStream(@"show.txt", FileMode.Create, FileAccess.Write);
+                xs.Serialize(fs, RegShow);
+                fs.Close();
+            }
+            if (load || serach || restore)
+            {
+                fs = new FileStream(@"show.txt", FileMode.Open, FileAccess.Read);
+                RegShow = (List<RegisterEntry>)xs.Deserialize(fs);
+                fs.Close();
+                dataGridView1.DataSource = RegShow;
+            }
         }
 
         private void addEntryToTable(RegisterEntry entry)
         {
-            FileStream fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
             RegList.Add(entry);
+            /*FileStream fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
             xs.Serialize(fs, RegList);
             fs.Close();
 
@@ -313,7 +349,8 @@ namespace MappingBreakDown
             dataGridView1.DataSource = RegList;
             fs.Close();
             searchBox.Text = "";
-            RegShow = RegList;
+            RegShow = RegList;*/
+            updateXML(true, false, false, false, false);
         }
 
         private void addManyRegisters(List<RegisterEntry> entries)
@@ -334,8 +371,7 @@ namespace MappingBreakDown
             saveFileDialog1.Filter = "txt files (*.txt)|*.txt";
             saveFileDialog1.FilterIndex = 2;
             saveFileDialog1.RestoreDirectory = true;
-            
-            //DialogResult.
+
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 PathToFile.Text = saveFileDialog1.FileName;
@@ -387,7 +423,7 @@ namespace MappingBreakDown
                 RegList.RemoveAt(index);
 
             searchBox.Text = "";
-            FileStream fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
+            /*FileStream fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
             xs.Serialize(fs, RegList);
             fs.Close();
 
@@ -396,7 +432,8 @@ namespace MappingBreakDown
 
             dataGridView1.DataSource = RegList;
             fs.Close();
-            RegShow = RegList;
+            RegShow = RegList;*/
+            updateXML(false, false, true, false, false);
         }
 
         private void textBox2_TextChanged(object sender, EventArgs e)
@@ -408,7 +445,7 @@ namespace MappingBreakDown
                 if (entry.Name.StartsWith(searchRes))
                     RegShow.Add(entry);
             }
-            FileStream fs = new FileStream(@"show.txt", FileMode.Create, FileAccess.Write);
+            /*FileStream fs = new FileStream(@"show.txt", FileMode.Create, FileAccess.Write);
             xs.Serialize(fs, RegShow);
             fs.Close();
 
@@ -416,7 +453,8 @@ namespace MappingBreakDown
             RegShow = (List<RegisterEntry>)xs.Deserialize(fs);
 
             dataGridView1.DataSource = RegShow;
-            fs.Close();
+            fs.Close();*/
+            updateXML(false, false, false, true, false);
         }
 
         private void dataGridView1_SelectionChanged(object sender, EventArgs e)
@@ -614,6 +652,21 @@ namespace MappingBreakDown
         private void MappingPackageAutomation_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void Button2_Click_1(object sender, EventArgs e)
+        {
+            /*FileStream fs = new FileStream(@"jack.txt", FileMode.Open, FileAccess.Read);
+            RegList = (List<RegisterEntry>)xs.Deserialize(fs);
+            fs.Close();
+
+
+            fs = new FileStream(@"show.txt", FileMode.Open, FileAccess.Read);
+            RegShow = (List<RegisterEntry>)xs.Deserialize(fs);
+            fs.Close();
+
+            dataGridView1.DataSource = RegShow;*/
+            updateXML(false, false, false, false, true);
         }
     }
 }
