@@ -204,6 +204,7 @@ namespace MappingBreakDown
             {
                 PathToFile.Text = openFileDialog1.FileName;
                 FileValidator fv = new FileValidator(openFileDialog1.FileName);
+                fv.IsFileValid();
                 this.addManyRegisters(fv.Registers.ToList());
             }
         }
@@ -244,10 +245,10 @@ namespace MappingBreakDown
                     RegisterEntry.fpga_field r;
                     Enum.TryParse(type, out t);
                     Enum.TryParse(fpga, out r);
-                    MessageBox.Show("After: " + t + ", Before: " + RegList[i].Type + ", " + RegisterEntry.type_field.FIELD);
+                    //MessageBox.Show("After: " + t + ", Before: " + RegList[i].Type + ", " + RegisterEntry.type_field.FIELD);
                     if (RegList[i].Type == RegisterEntry.type_field.FIELD && t != RegisterEntry.type_field.FIELD)
                         RegList[i].Address = FindAddress();
-                    MessageBox.Show("new address for " + RegList[i].Name + ": " + RegList[i].Address);
+                    //MessageBox.Show("new address for " + RegList[i].Name + ": " + RegList[i].Address);
                     RegList[i].Type = t;
                     RegList[i].FPGA = r;
                     RegList[i].Init = init;

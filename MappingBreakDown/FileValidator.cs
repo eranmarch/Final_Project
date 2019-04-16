@@ -26,7 +26,7 @@ namespace MappingBreakDown
         public FileValidator(String path_to_file)
         {
             this.path_to_file = path_to_file;
-            IsFileValid();
+            //IsFileValid();
         }
 
         public List<RegisterEntry> GetRegList()
@@ -152,7 +152,7 @@ namespace MappingBreakDown
             return !str.StartsWith("--");
         }
 
-        private bool IsFileValid()
+        public bool IsFileValid()
         {
             String[] lines_correct = File.ReadAllLines(path_to_correct);
             String[] lines = File.ReadAllLines(path_to_file);
