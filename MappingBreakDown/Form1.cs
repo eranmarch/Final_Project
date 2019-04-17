@@ -65,6 +65,7 @@ namespace MappingBreakDown
             return -1;
         }
 
+        /* Check the a register can be added to the chart */
         private bool inputValidation(RegisterEntry entry, string type, string fpga, bool add, bool load, bool open, List<RegisterEntry> lst = null)
         {
             int addr;
@@ -121,6 +122,7 @@ namespace MappingBreakDown
                         {
                             addr = prompt.chosen_address;
                             entry.Address = addr;
+                            //MessageBox.Show("Address: " + entry.Address);
                         }
                         else
                             return false;
@@ -197,6 +199,7 @@ namespace MappingBreakDown
             this.NewGroupText.Text = "";
         }
 
+        /* Open a file */
         private void OpenButton_Click(object sender, EventArgs e)
         {
             if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -204,10 +207,11 @@ namespace MappingBreakDown
                 PathToFile.Text = openFileDialog1.FileName;
                 FileValidator fv = new FileValidator(openFileDialog1.FileName);
                 fv.IsFileValid();
-                this.addManyRegisters(fv.Registers.ToList());
+                this.addManyRegisters(fv.GetRegList(), fv.getGroups());
             }
         }
 
+        /* Edit a register */
         private void Load_Click(object sender, EventArgs e)
         {
             if (this.RegNameText.Text.Equals(""))
@@ -247,6 +251,8 @@ namespace MappingBreakDown
                     //MessageBox.Show("After: " + t + ", Before: " + RegList[i].Type + ", " + RegisterEntry.type_field.FIELD);
                     if (RegList[i].Type == RegisterEntry.type_field.FIELD && t != RegisterEntry.type_field.FIELD)
                         RegList[i].Address = FindAddress();
+                    else if (t == RegisterEntry.type_field.FIELD)
+                        RegList[i].Address = entry.Address;
                     //MessageBox.Show("new address for " + RegList[i].Name + ": " + RegList[i].Address);
                     RegList[i].Type = t;
                     RegList[i].FPGA = r;
@@ -283,6 +289,7 @@ namespace MappingBreakDown
             updateXML(false, true, false, false, false);
         }
 
+        /* Update inner files */
         private void updateXML(bool insert, bool load, bool delete, bool serach, bool restore)
         {
             FileStream fs;
@@ -329,7 +336,7 @@ namespace MappingBreakDown
             updateXML(true, false, false, false, false);
         }
 
-        private void addManyRegisters(List<RegisterEntry> entries)
+        private void addManyRegisters(List<RegisterEntry> entries, List<string> groups)
         {
             if (!inputValidation(null, "", "", false, false, true, entries))
             {
@@ -338,10 +345,11 @@ namespace MappingBreakDown
             }
             foreach (RegisterEntry entry in entries)
             {
-                //if (!inputValidation(entry, entry.Type.ToString("G"), entry.FPGA.ToString("G"), false, false, true))
-                //    return;
                 addEntryToTable(entry);
             }
+            foreach (string group in groups)
+                if (!RegGroupOpts.Items.Contains(group))
+                    RegGroupOpts.Items.Add(group);
         }
 
         private void SaveAsButton_Click(object sender, EventArgs e)

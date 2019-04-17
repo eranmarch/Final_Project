@@ -357,7 +357,7 @@ namespace MappingBreakDown
             {
                 if (!isNotCommentMakaf(Reg_entries[i]))
                 {
-                    group = Reg_entries[i].Trim('-');
+                    group = Reg_entries[i].Trim('-', ' ', '\t');
                     continue;
                 }
                 Registers[j] = RegisterEntry.RegEntryParse(Reg_entries[i], group);

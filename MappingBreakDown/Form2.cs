@@ -39,8 +39,15 @@ namespace MappingBreakDown
                     break;
             //chosen_address = registers[AddressOpts.SelectedIndex].Address;
             //MessageBox.Show(registers[i].Address.ToString());
-            chosen_address = registers[i].Address;
-            DialogResult = DialogResult.OK;
+            try
+            {
+                chosen_address = registers[i].Address;
+                DialogResult = DialogResult.OK;
+            }
+            catch (System.IndexOutOfRangeException)
+            {
+                MessageBox.Show("Please choose a register from the list");
+            }
         }
 
         private void AddressOpts_SelectedIndexChanged(object sender, EventArgs e)
