@@ -11,6 +11,7 @@ namespace MappingBreakDown
     class FileValidator
     {
         public RegisterEntry[] Registers { get; set; }
+        private List<string> Groups;
 
         private String path_to_file;
         private char[] charsToTrimGlobal = { ' ', '\t' };
@@ -26,12 +27,16 @@ namespace MappingBreakDown
         public FileValidator(String path_to_file)
         {
             this.path_to_file = path_to_file;
-            //IsFileValid();
         }
 
         public List<RegisterEntry> GetRegList()
         {
             return this.Registers.ToList();
+        }
+
+        public List<string> getGroups()
+        {
+            return Groups;
         }
 
         private String TrimAndLower(String str)
@@ -143,10 +148,12 @@ namespace MappingBreakDown
                     return false;
             return true;
         }
+
         private bool isNotComment(String str)
         {
             return !str.StartsWith("#");
         }
+
         private bool isNotCommentMakaf(String str)
         {
             return !str.StartsWith("--");
@@ -342,6 +349,7 @@ namespace MappingBreakDown
                 Reg_names[i] = Reg_names[i].Trim(',');
             int reg_count = Array.FindAll<String>(Reg_entries, isNotCommentMakaf).ToArray<String>().Length;
             Registers = new RegisterEntry[reg_count];
+            Groups = new List<string>();
             String[] entries_names = new String[reg_count];
             String group = "";
             int j = 0;
@@ -353,6 +361,8 @@ namespace MappingBreakDown
                     continue;
                 }
                 Registers[j] = RegisterEntry.RegEntryParse(Reg_entries[i], group);
+                if (!Groups.Contains(group))
+                    Groups.Add(group);
                 entries_names[j] = Registers[j].GetName();
                 if (!Registers[j].IsValidAddress())
                 {

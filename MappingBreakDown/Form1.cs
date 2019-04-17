@@ -65,9 +65,33 @@ namespace MappingBreakDown
             return -1;
         }
 
-        private bool inputValidation(RegisterEntry entry, string type, string fpga, bool add, bool load, bool open)
+        private bool inputValidation(RegisterEntry entry, string type, string fpga, bool add, bool load, bool open, List<RegisterEntry> lst = null)
         {
             int addr;
+            if (open)
+            {
+                bool test = false;
+                foreach (RegisterEntry new_entry in lst)
+                {
+                    int addr_new = new_entry.Address;
+                    foreach (RegisterEntry item in RegList)
+                    {
+                        if (item.Address == addr_new)
+                        {
+                            test = true;
+                            break;
+                        }
+
+                    }
+                    if (test)
+                    {
+                        MessageBox.Show("Address " + addr_new + " is already in the list");
+                        InitFields();
+                        return false;
+                    }
+                }
+                return true;
+            }
 
             if (!type.Equals("FIELD"))
             {
@@ -104,34 +128,9 @@ namespace MappingBreakDown
                 }
             }
 
-            if (open)
-            {
-                bool test = false, sec = false;
-                foreach (RegisterEntry item in RegList)
-                {
-                    if (item.Address == entry.Address)
-                    {
-                        sec = true;
-                        if (item.Name.Equals(entry.Name))
-                        {
-                            test = true;
-                            MessageBox.Show(entry.Name + ", " + entry.Address.ToString());
-                            break;
-                        }
-                    }
-
-                }
-                if (!test && sec)
-                {
-                    //MessageBox.Show("Address " + entry.Address + " is already in the list");
-                    //InitFields();
-                    //return false;
-                }
-            }
-
             if (!entry.IsValidLsbMsb())
             {
-                MessageBox.Show("Register " + entry.Name + " (" + entry.Address + "): LSB is greater then MSB");
+                MessageBox.Show("Register " + entry.Name + " (" + entry.Address + "): LSB is greater than MSB");
                 InitFields();
                 return false;
             }
@@ -143,7 +142,7 @@ namespace MappingBreakDown
                 {
                     if (item.Name.Equals(entry.Name))
                     {
-                        MessageBox.Show("Register " + entry.Name + " (" + entry.Address + ") already in the list");
+                        MessageBox.Show("Register " + entry.Name + " (" + item.Address + ") is already in the list");
                         InitFields();
                         return false;
                     }
@@ -281,19 +280,6 @@ namespace MappingBreakDown
                 return;
             }
 
-            /*FileStream fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
-            xs.Serialize(fs, RegList);
-            fs.Close();
-
-            fs = new FileStream(@"show.txt", FileMode.Create, FileAccess.Write);
-            xs.Serialize(fs, RegShow);
-            fs.Close();
-
-            fs = new FileStream(@"show.txt", FileMode.Open, FileAccess.Read);
-            RegShow = (List<RegisterEntry>)xs.Deserialize(fs);
-
-            dataGridView1.DataSource = RegShow;
-            fs.Close();*/
             updateXML(false, true, false, false, false);
         }
 
@@ -340,28 +326,21 @@ namespace MappingBreakDown
         private void addEntryToTable(RegisterEntry entry)
         {
             RegList.Add(entry);
-            /*FileStream fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
-            xs.Serialize(fs, RegList);
-            fs.Close();
-
-            fs = new FileStream(@"jack.txt", FileMode.Open, FileAccess.Read);
-            RegList = (List<RegisterEntry>)xs.Deserialize(fs);
-
-            dataGridView1.DataSource = RegList;
-            fs.Close();
-            searchBox.Text = "";
-            RegShow = RegList;*/
             updateXML(true, false, false, false, false);
         }
 
         private void addManyRegisters(List<RegisterEntry> entries)
         {
+            if (!inputValidation(null, "", "", false, false, true, entries))
+            {
+                InitFields();
+                return;
+            }
             foreach (RegisterEntry entry in entries)
             {
-                if (!inputValidation(entry, entry.Type.ToString("G"), entry.FPGA.ToString("G"), false, false, true))
-                    return;
+                //if (!inputValidation(entry, entry.Type.ToString("G"), entry.FPGA.ToString("G"), false, false, true))
+                //    return;
                 addEntryToTable(entry);
-                InitFields();
             }
         }
 
@@ -424,16 +403,6 @@ namespace MappingBreakDown
                 RegList.RemoveAt(index);
 
             searchBox.Text = "";
-            /*FileStream fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
-            xs.Serialize(fs, RegList);
-            fs.Close();
-
-            fs = new FileStream(@"jack.txt", FileMode.Open, FileAccess.Read);
-            RegList = (List<RegisterEntry>)xs.Deserialize(fs);
-
-            dataGridView1.DataSource = RegList;
-            fs.Close();
-            RegShow = RegList;*/
             updateXML(false, false, true, false, false);
         }
 
@@ -446,15 +415,6 @@ namespace MappingBreakDown
                 if (entry.Name.StartsWith(searchRes))
                     RegShow.Add(entry);
             }
-            /*FileStream fs = new FileStream(@"show.txt", FileMode.Create, FileAccess.Write);
-            xs.Serialize(fs, RegShow);
-            fs.Close();
-
-            fs = new FileStream(@"show.txt", FileMode.Open, FileAccess.Read);
-            RegShow = (List<RegisterEntry>)xs.Deserialize(fs);
-
-            dataGridView1.DataSource = RegShow;
-            fs.Close();*/
             updateXML(false, false, false, true, false);
         }
 
@@ -657,16 +617,6 @@ namespace MappingBreakDown
 
         private void Button2_Click_1(object sender, EventArgs e)
         {
-            /*FileStream fs = new FileStream(@"jack.txt", FileMode.Open, FileAccess.Read);
-            RegList = (List<RegisterEntry>)xs.Deserialize(fs);
-            fs.Close();
-
-
-            fs = new FileStream(@"show.txt", FileMode.Open, FileAccess.Read);
-            RegShow = (List<RegisterEntry>)xs.Deserialize(fs);
-            fs.Close();
-
-            dataGridView1.DataSource = RegShow;*/
             updateXML(false, false, false, false, true);
         }
     }
