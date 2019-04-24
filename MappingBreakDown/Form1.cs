@@ -557,9 +557,18 @@ namespace MappingBreakDown
                             }
                             names += "\t\t\t\t" + reg + ",\n";
                             if (index++ != RegList.Count - 1)
-                                prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + ",\t" + comment + "\n";
+                            {
+                                if (comment.Equals(""))
+                                    prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + ",\n";
+                                else
+                                    prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + ",\t--" + comment + "\n";
+                            }
+                            else { 
+                            if (comment.Equals(""))
+                                prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + "\n";
                             else
-                                prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + "\t" + comment + "\n";
+                                prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + "\t--" + comment + "\n";
+                            }
                             doc += "<tr><td>" + reg + "</td><td>" + l.Group + "</td><td>" + addr + "</td><td>" + mais + "</td><td>" + lsb + "</td><td>" + msb + "</td><td>" + type + "</td>";
                             doc += "<td>" + fpga + "</td><td>" + init + "</td><td>" + comment + "</td></tr>";
                         }
