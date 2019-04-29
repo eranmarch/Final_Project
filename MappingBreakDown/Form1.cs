@@ -99,7 +99,7 @@ namespace MappingBreakDown
                 addr = FindAddress();
                 if (addr == -1)
                 {
-                    MessageBox.Show("Unable to add register " + entry.Name + " (" + entry.Address + "), no free slot in memory");
+                    MessageBox.Show("Unable to add register " + entry.Name + ", no free slot in memory");
                     return false;
                 }
                 if (add)
@@ -293,8 +293,8 @@ namespace MappingBreakDown
         private void updateXML(bool insert, bool load, bool delete, bool serach, bool restore)
         {
             FileStream fs;
-            RegList = RegList.OrderBy(y => y.Group).ThenBy(y => y.Address).ToList();
-            RegShow = RegShow.OrderBy(y => y.Group).ThenBy(y => y.Address).ToList();
+            RegList = RegList.OrderBy(y => y.Group).ThenBy(y => y.Address).ThenBy(y => y.Type).ThenBy(y => y.LSB).ToList();
+            RegShow = RegShow.OrderBy(y => y.Group).ThenBy(y => y.Address).ThenBy(y => y.Type).ThenBy(y => y.LSB).ToList();
             if (insert || load || delete)
             {
                 fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
@@ -557,9 +557,9 @@ namespace MappingBreakDown
                             }
                             names += "\t\t\t\t" + reg + ",\n";
                             if (index++ != RegList.Count - 1)
-                                prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + ",\t" + comment + "\n";
+                                prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + ",\t" + "-- " + comment + "\n";
                             else
-                                prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + "\t" + comment + "\n";
+                                prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + "\t" + "-- " + comment + "\n";
                             doc += "<tr><td>" + reg + "</td><td>" + l.Group + "</td><td>" + addr + "</td><td>" + mais + "</td><td>" + lsb + "</td><td>" + msb + "</td><td>" + type + "</td>";
                             doc += "<td>" + fpga + "</td><td>" + init + "</td><td>" + comment + "</td></tr>";
                         }
