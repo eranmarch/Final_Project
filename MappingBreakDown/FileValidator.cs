@@ -5,13 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Text.RegularExpressions;
+
 
 namespace MappingBreakDown
 {
     class FileValidator
     {
-        public RegisterEntry[] Registers { get; set; }
+        private List<RegisterEntry> Registers { get; set; }
         private List<string> Groups;
+        private List<string> names;
 
         private String path_to_file;
         private char[] charsToTrimGlobal = { ' ', '\t' };
@@ -31,7 +34,7 @@ namespace MappingBreakDown
 
         public List<RegisterEntry> GetRegList()
         {
-            return this.Registers.ToList();
+            return this.Registers;
         }
 
         public List<string> getGroups()
@@ -39,6 +42,7 @@ namespace MappingBreakDown
             return Groups;
         }
 
+        /* Need to delete */
         private String TrimAndLower(String str)
         {
             str = str.Trim(charsToTrimGlobal);
@@ -66,89 +70,6 @@ namespace MappingBreakDown
             return res;
         }
 
-        private bool IsValidRegEntry(String entry)
-        {
-            entry = RemoveComment(entry);
-            if (entry.Equals(""))
-                return true;
-            String[] fields = entry.Split(',');
-            int numeric_field_value = -1;
-            for (int i = 0; i < fields.Length; i++)
-            {
-                fields[i] = fields[i].Trim(charsToTrimGlobal);
-                if (i == 0) //name field
-                {
-                    if ((fields[i].LastIndexOf('(') != 0) ||
-                        (fields[i].IndexOf('(') != (fields[i].LastIndexOf('('))))
-                    {
-                        MessageBox.Show("Register named " + fields[0] + " has invalid " + fields[i]);
-                        return false;
-                    }
-                    fields[i] = fields[i].TrimStart('(');
-
-                }
-                // numeric field
-                if ((i > 0 && i < 5) && !Int32.TryParse(fields[i], out numeric_field_value))
-                {
-                    MessageBox.Show("Register named " + fields[0] + " has invalid " + field_type[i]);
-                    return false;
-                }
-                if (i == 5) //type field
-                {
-                    int j;
-                    for (j = 0; j < valid_type.Length && !fields[i].Equals(valid_type[j]); j++) { }
-                    if (j == valid_type.Length)
-                    {
-                        MessageBox.Show("Register named " + fields[0] + " has invalid " + field_type[i]);
-                        return false;
-                    }
-                }
-                if (i == 6) //fpga field
-                {
-                    int j;
-                    for (j = 0; j < valid_fpga.Length && !fields[i].Equals(valid_fpga[j]); j++) { }
-                    if (j == valid_fpga.Length)
-                    {
-                        MessageBox.Show("Register named " + fields[0] + " has invalid " + field_type[i]);
-                        return false;
-                    }
-                }
-                if (i == 7) //init field
-                {
-                    if ((fields[i].LastIndexOf(')') != fields[i].Length - 1) ||
-                        (fields[i].IndexOf(')') != (fields[i].LastIndexOf(')'))))
-                    {
-                        MessageBox.Show("Register named " + fields[0] + " has invalid " + fields[i][i]);
-                        return false;
-                    }
-                    fields[i] = fields[i].TrimEnd(')');
-                }
-            }
-            return true;
-
-        }
-
-        private bool IsValidRegName(String reg_name, char stop)
-        {
-            reg_name = RemoveComment(reg_name);
-            if (reg_name.Equals(""))
-                return true;
-            String trimmed_regname = reg_name.TrimStart(charsToTrimGlobal);
-            if (!Char.IsLetter(trimmed_regname[0]))
-                return false;
-            if (reg_name.LastIndexOf(',') != reg_name.Length - 1 || reg_name.IndexOf(',') != reg_name.LastIndexOf(','))
-                return false;
-            int i;
-            for (i = 1; i < trimmed_regname.Length - 1; i++)
-                if (!(Char.IsLetter(trimmed_regname[i]) || Char.IsDigit(trimmed_regname[i]) || trimmed_regname[i] == '_' || trimmed_regname[i] == '-'))
-                    return false;
-            String sliced = trimmed_regname.Substring(0, trimmed_regname.Length - 1).Trim(charsToTrimGlobal);
-            foreach (String keyword in keywords)
-                if (keyword.Equals(sliced))
-                    return false;
-            return true;
-        }
-
         private bool isNotComment(String str)
         {
             return !str.StartsWith("#");
@@ -157,6 +78,21 @@ namespace MappingBreakDown
         private bool isNotCommentMakaf(String str)
         {
             return !str.StartsWith("--");
+        }
+
+        /* Need to delete */
+
+        private bool IsValidRegName(String reg_name)
+        {
+            string pattern = @"^[ \t]*([a-zA-Z][a-zA-Z0-9]*)[ \t]*,[ \t]*";
+            Match result = Regex.Match(reg_name, pattern);
+            if (result.Success)
+            {
+                string[] substrings = Regex.Split(reg_name, pattern);
+                names.Add(substrings[1]);
+                return true;
+            }
+            return false;
         }
 
         public bool IsFileValid()
@@ -187,7 +123,6 @@ namespace MappingBreakDown
                 }
                 if (run_state == (int)Cmp_mod.Reg_names || run_state == (int)Cmp_mod.Reg_entrys)
                 {
-
                     if (run_state == (int)Cmp_mod.Reg_names)
                         reg_names_start = i;
                     else
@@ -195,15 +130,19 @@ namespace MappingBreakDown
                     int k;
                     for (k = i; k < lines.Length && !lines_correct[j - 1].Equals(lines[k]); k++)
                     {
-                        if (run_state == (int)Cmp_mod.Reg_names && !IsValidRegName(lines[k], ','))
+                        if (run_state == (int)Cmp_mod.Reg_names)
                         {
-                            MessageBox.Show("Invalid register name" + lines[k] + " at line " + (k + 1).ToString());
-                            return false;
+                            if (!IsValidRegName(lines[k]))
+                            {
+                                MessageBox.Show("Parsing error at line " + (k + 1));
+                                return false;
+                            }
                         }
-                        if (run_state == (int)Cmp_mod.Reg_entrys && !IsValidRegEntry(lines[k]))
+                        else if (run_state == (int)Cmp_mod.Reg_entrys)
                         {
-                            //MessageBox.Show("Invalid register entry " + lines[k] + " at line " + (k + 1).ToString());
-                            return false;
+                            RegisterEntry entry = RegisterEntry.RegEntryParse(lines[k], "");
+                            if (entry != null)
+                                Registers.Add(entry);
                         }
                     }
                     if (run_state == (int)Cmp_mod.Reg_names)
@@ -252,30 +191,25 @@ namespace MappingBreakDown
             return null;
         }
 
-        private int AddressDuplicate(RegisterEntry[] lst)
+        private bool AddressDuplicate()
         {
-            int i, j;
-            for (i = 0; i < lst.Length; i++)
-            {
-                if (lst[i].GetRegType() == RegisterEntry.type_field.FIELD)
-                    continue;
-                for (j = 0; j < lst.Length; j++)
+            for (int i = 1; i < Registers.Length; i++)
+                for (int j = 0; j < i; j++)
                 {
-                    if (lst[j].GetRegType() == RegisterEntry.type_field.FIELD)
-                        continue;
-                    if ((i != j) &&
-                        (lst[i].GetFPGA() == lst[j].GetFPGA()) &&
-                        (lst[i].GetAddress() == lst[j].GetAddress()))
-                        break;
+                    if (Registers[i].GetAddress() == Registers[j].GetAddress())
+                    {
+                        Registers[i].SetReason("Register " + Registers[i].GetName() + " has the same address as register " + Registers[j].GetName());
+                        Registers[i].SetValid(false);
+                        //return false;
+                    }
+                    if (Registers[i].GetName().Equals(Registers[j].GetName()))
+                    {
+                        Registers[i].SetReason("Register " + Registers[i].GetName() + "(" + Registers[i].GetAddress() + ")" + " appears at address " + Registers[j].GetAddress() + " already");
+                        Registers[i].SetValid(false);
+                        //return false;
+                    }
                 }
-                if (j != lst.Length)
-                    break;
-            }
-            if (i == lst.Length)
-                return -1;
-            Registers[i].isValid = false;
-            return i;
-            //return (i == lst.Length) ? -1 : i;
+            return true;
         }
 
         private String NamesCrossValid(String[] reg_names, String[] reg_entries_names)
@@ -314,47 +248,11 @@ namespace MappingBreakDown
 
         private bool FieldValidation()
         {
-            int sum;
-            bool any;
             foreach (RegisterEntry entry in Registers)
-            {
-                sum = 0;
-                any = false;
-                List<Interval> fieldsIntervals = null;
-                if (entry.Type != RegisterEntry.type_field.FIELD)
+                if (!entry.FieldValidation())
                 {
-                    foreach (RegisterEntry item in Registers)
-                    {
-                        if (item.Address == entry.Address && item.Type == RegisterEntry.type_field.FIELD)
-                        {
-                            if (!any)
-                            {
-                                any = true;
-                                fieldsIntervals = new List<Interval>();
-                            }
-                            fieldsIntervals.Add(new Interval(item.Name, item.LSB, item.MSB));
-                            sum += item.MSB - item.LSB + 1;
-                        }
-                    }
-                    if (any && sum != entry.MSB - entry.LSB + 1)
-                    {
-                        MessageBox.Show("Fields bits of register " + entry.Name + " (" + entry.Address + "), don't sum up correctly");
-                        entry.isValid = false;
-                        return false;
-                    }
-                    if (any)
-                    {
-                        Tuple<string, string> inter = Interval.IsIntersectList(fieldsIntervals);
-                        string field1 = inter.Item1, field2 = inter.Item2;
-                        if (!(field1.Equals("") && field2.Equals("")))
-                        {
-                            MessageBox.Show("Fields " + field1 + " and " + field2 + " intersect in register " + entry.Name + " (" + entry.Address + ")");
-                            entry.isValid = false;
-                            return false;
-                        }
-                    }
+                    //return false;
                 }
-            }
             return true;
         }
 
@@ -393,19 +291,6 @@ namespace MappingBreakDown
                 }
                 j++;
             }
-            String dup = NameDuplicate(Reg_names);
-            if (dup != null)
-            {
-                MessageBox.Show("The register " + dup + " is refrenced more than once in the declerations segment");
-                return false;
-            }
-
-            dup = NameDuplicate(entries_names);
-            if (dup != null)
-            {
-                MessageBox.Show("The register " + dup + " is refrenced more than once in the entries segment");
-                return false;
-            }
 
             String not_cross_name = NamesCrossValid(Reg_names, entries_names);
             if (null != not_cross_name)
@@ -413,14 +298,8 @@ namespace MappingBreakDown
                 MessageBox.Show("The register " + not_cross_name + " is refrenced in only one list");
                 return false;
             }
-            int adrs_dup = AddressDuplicate(Registers);
-            if (-1 != adrs_dup)
-            {
-                MessageBox.Show("The address " + adrs_dup + " is already full");
-                return false;
-            }
-            if (!FieldValidation())
-                return false;
+            AddressDuplicate();
+            FieldValidation();
             return true;
         }
     }
