@@ -243,7 +243,10 @@ namespace MappingBreakDown
                 for (int j = 0; j < lst.Length; j++)
                 {
                     if (j != i && lst[j].Equals(lst[i]))
+                    {
+                        Registers[j].isValid = false;
                         return lst[j];
+                    }
                 }
             }
             return null;
@@ -268,7 +271,11 @@ namespace MappingBreakDown
                 if (j != lst.Length)
                     break;
             }
-            return (i == lst.Length) ? -1 : i;
+            if (i == lst.Length)
+                return -1;
+            Registers[i].isValid = false;
+            return i;
+            //return (i == lst.Length) ? -1 : i;
         }
 
         private String NamesCrossValid(String[] reg_names, String[] reg_entries_names)
@@ -282,7 +289,10 @@ namespace MappingBreakDown
                         break;
                 }
                 if (j == reg_entries_names.Length)
+                {
+                    Registers[i].isValid = false;
                     return reg_names[i];
+                }
             }
 
             for (int i = 0; i < reg_entries_names.Length; i++)
@@ -294,7 +304,10 @@ namespace MappingBreakDown
                         break;
                 }
                 if (j == reg_names.Length)
+                {
+                    Registers[i].isValid = false;
                     return reg_entries_names[i];
+                }
             }
             return null;
         }
@@ -326,6 +339,7 @@ namespace MappingBreakDown
                     if (any && sum != entry.MSB - entry.LSB + 1)
                     {
                         MessageBox.Show("Fields bits of register " + entry.Name + " (" + entry.Address + "), don't sum up correctly");
+                        entry.isValid = false;
                         return false;
                     }
                     if (any)
@@ -335,6 +349,7 @@ namespace MappingBreakDown
                         if (!(field1.Equals("") && field2.Equals("")))
                         {
                             MessageBox.Show("Fields " + field1 + " and " + field2 + " intersect in register " + entry.Name + " (" + entry.Address + ")");
+                            entry.isValid = false;
                             return false;
                         }
                     }
@@ -367,11 +382,13 @@ namespace MappingBreakDown
                 if (!Registers[j].IsValidAddress())
                 {
                     MessageBox.Show("The register " + Registers[j].GetName() + " has invalid address " + Registers[j].GetAddress());
+                    Registers[j].isValid = false;
                     return false;
                 }
                 if (!Registers[j].IsValiMAIS())
                 {
                     MessageBox.Show("The register " + Registers[j].GetName() + " has invalid MAIS field " + Registers[j].GetMAIS());
+                    Registers[j].isValid = false;
                     return false;
                 }
                 j++;

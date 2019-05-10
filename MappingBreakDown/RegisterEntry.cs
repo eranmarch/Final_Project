@@ -27,6 +27,7 @@ namespace MappingBreakDown
         public string Init { get; set; }
         public string Comment { get; set; }
         public string Group { get; set; }
+        public bool isValid = true;
 
         public RegisterEntry()
         {

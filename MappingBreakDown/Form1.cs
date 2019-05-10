@@ -326,7 +326,9 @@ namespace MappingBreakDown
                 fs = new FileStream(@"show.txt", FileMode.Open, FileAccess.Read);
                 RegShow = (List<RegisterEntry>)xs.Deserialize(fs);
                 fs.Close();
+                
                 dataGridView1.DataSource = RegShow;
+                
             }
         }
 
@@ -345,8 +347,12 @@ namespace MappingBreakDown
             }
             foreach (RegisterEntry entry in entries)
             {
+                //if (!entry.isValid)
                 addEntryToTable(entry);
             }
+            for (int i = 0; i < RegShow.Count; i++)
+                if (RegShow[i].isValid)
+                    dataGridView1.Rows[i].Cells[0].Style.BackColor = System.Drawing.Color.Red;
             foreach (string group in groups)
                 if (!RegGroupOpts.Items.Contains(group))
                     RegGroupOpts.Items.Add(group);
@@ -420,7 +426,7 @@ namespace MappingBreakDown
             RegShow = new List<RegisterEntry>();
             foreach (RegisterEntry entry in RegList)
             {
-                if (entry.Name.StartsWith(searchRes))
+                if (entry.Name.Contains(searchRes))
                     RegShow.Add(entry);
             }
             updateXML(false, false, false, true, false);
@@ -625,7 +631,10 @@ namespace MappingBreakDown
 
         private void Button2_Click_1(object sender, EventArgs e)
         {
-            updateXML(false, false, false, false, true);
+            //updateXML(false, false, false, false, true);
+            dataGridView1.SelectAll();
+            Delete_Click(sender, e);
+
         }
     }
 }

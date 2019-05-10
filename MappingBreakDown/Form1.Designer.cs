@@ -62,8 +62,8 @@
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.ClearButton = new System.Windows.Forms.Button();
             this.label10 = new System.Windows.Forms.Label();
-            this.RestoreButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -486,7 +486,7 @@
             // panel2
             // 
             this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel2.Controls.Add(this.RestoreButton);
+            this.panel2.Controls.Add(this.ClearButton);
             this.panel2.Controls.Add(this.InsertButton);
             this.panel2.Controls.Add(this.Load);
             this.panel2.Controls.Add(this.Delete);
@@ -495,6 +495,17 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(570, 167);
             this.panel2.TabIndex = 38;
+            // 
+            // ClearButton
+            // 
+            this.ClearButton.Location = new System.Drawing.Point(27, 21);
+            this.ClearButton.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
+            this.ClearButton.Name = "ClearButton";
+            this.ClearButton.Size = new System.Drawing.Size(200, 55);
+            this.ClearButton.TabIndex = 28;
+            this.ClearButton.Text = "Clear";
+            this.ClearButton.UseVisualStyleBackColor = true;
+            this.ClearButton.Click += new System.EventHandler(this.Button2_Click_1);
             // 
             // label10
             // 
@@ -506,17 +517,6 @@
             this.label10.Size = new System.Drawing.Size(125, 39);
             this.label10.TabIndex = 39;
             this.label10.Text = "Search";
-            // 
-            // RestoreButton
-            // 
-            this.RestoreButton.Location = new System.Drawing.Point(27, 21);
-            this.RestoreButton.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
-            this.RestoreButton.Name = "RestoreButton";
-            this.RestoreButton.Size = new System.Drawing.Size(200, 55);
-            this.RestoreButton.TabIndex = 28;
-            this.RestoreButton.Text = "Restore";
-            this.RestoreButton.UseVisualStyleBackColor = true;
-            this.RestoreButton.Click += new System.EventHandler(this.Button2_Click_1);
             // 
             // MappingPackageAutomation
             // 
@@ -598,7 +598,7 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.Button RestoreButton;
+        private System.Windows.Forms.Button ClearButton;
         //private System.Windows.Forms.OpenFileDialog openFileDialog1;
     }
 }
