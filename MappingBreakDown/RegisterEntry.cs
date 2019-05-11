@@ -27,7 +27,7 @@ namespace MappingBreakDown
         private int MAIS { get; set; }
         private int LSB { get; set; }
         private int MSB { get; set; }
-        private type_field Type { get; set; }
+        private type_field GetType { get; set; }
         private fpga_field FPGA { get; set; }
         private string Init { get; set; }
         private string Comment { get; set; }
@@ -36,7 +36,8 @@ namespace MappingBreakDown
         private bool isValid = true;
         private string reason = "";
 
-        public static string pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124]+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z]+)[ \t]*,[ \t]*([a-zA-Z]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*,[ \t]*(--[ \t]*([a-zA-Z]*)[ \t]*)*";
+        public static string pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124]+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*,[ \t]*(--[ \t]*([a-zA-Z]*)[ \t]*)*";
+        public static string final_pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124]+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*(--[ \t]*([a-zA-Z]*)[ \t]*)*";
 
         /* Constructors */
         public RegisterEntry() : this("", -1, 0, 0, 31, type_field.RD, fpga_field.G, "", "", "") { }
@@ -49,7 +50,7 @@ namespace MappingBreakDown
             this.MAIS = MAIS;
             this.LSB = LSB;
             this.MSB = MSB;
-            this.Type = type;
+            this.GetType = type;
             this.FPGA = FPGA;
             this.Init = Init;
             this.Comment = Comment;
@@ -78,6 +79,11 @@ namespace MappingBreakDown
         public int GetAddress()
         {
             return Address;
+        }
+
+        public void SetAddress(int Address)
+        {
+            this.Address = Address;
         }
 
         public int GetMAIS()
@@ -112,12 +118,12 @@ namespace MappingBreakDown
 
         public type_field GetRegType()
         {
-            return Type;
+            return GetType;
         }
 
         public void SetRegType(type_field Type)
         {
-            this.Type = Type;
+            this.GetType = Type;
         }
 
         public void SetRegType(string Type)
@@ -243,6 +249,42 @@ namespace MappingBreakDown
             return true;
         }
 
+        public bool IsValidLSB()
+        {
+            return LSB >= 0 && LSB < 32;
+        }
+
+        public bool IsValidMSB()
+        {
+            return MSB >= 0 && MSB < 32;
+        }
+
+        public static bool IsValidType(string Type)
+        {
+            try
+            {
+                type_field t = (type_field)Enum.Parse(typeof(type_field), Type, true);
+            }
+            catch (System.ArgumentException e)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public static bool IsValidFPGA(string fpga)
+        {
+            try
+            {
+                fpga_field t = (fpga_field)Enum.Parse(typeof(fpga_field), fpga, true);
+            }
+            catch (System.ArgumentException e)
+            {
+                return false;
+            }
+            return true;
+        }
+        
         /* Output Functions */
         // Returns x spaces
         private string getSpaces(int x)
@@ -250,14 +292,19 @@ namespace MappingBreakDown
             return string.Concat(Enumerable.Repeat(" ", x));
         }
 
-        public static RegisterEntry RegEntryParse(String str_entry, String group)
+        public static RegisterEntry RegEntryParse(String str_entry, String group, bool last)
         {
-            string[] fields = Regex.Split(str_entry, pattern);
+            string actual = pattern;
+            if (last)
+                actual = final_pattern;
+            string[] fields = Regex.Split(str_entry, actual);
             if (fields.Length > 1)
             {
                 string comment = "";
                 if (fields.Length == 12)
                     comment = fields[10];
+                if (!IsValidType(fields[6]) || !IsValidFPGA(fields[7]))
+                    return null;
                 return new RegisterEntry(fields[1], Int32.Parse(fields[2]), fields[3], fields[4], fields[5], fields[6], fields[7], fields[8], comment, group);
             }
             return null;
@@ -266,14 +313,14 @@ namespace MappingBreakDown
         override
         public string ToString()
         {
-            string addr = Address.ToString();
+            string addr = GetAddress().ToString();
             string mais = MAIS.ToString();
             string lsb = LSB.ToString();
             string msb = MSB.ToString();
-            string type = valid_type[(int)Type];
+            string type = valid_type[(int)GetType];
             string fpga = valid_fpga[(int)FPGA];
             int spaces;
-            if (Type.Equals(type_field.FIELD))
+            if (GetType.Equals(type_field.FIELD))
                 spaces = 4;
             else
                 spaces = 0;

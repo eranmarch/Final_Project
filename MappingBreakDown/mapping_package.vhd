@@ -1188,7 +1188,7 @@ constant    avalon_fields_table     : fields_table_type :=  (
         		(test_register_6						,	  358,  0,  0, 31, RD_WR, G   ,    0),        		
         		(test_register_7						,	  359,  0,  0, 31, RD_WR, G   ,    0),        		
         		(test_register_8						,	  360,  0,  0, 31, RD_WR, G   ,    0),        		
-        		(max_image_lines_in_buffer              ,     500,  0,  0, 15, RD   , ABC ,    0)        		
+        		(max_image_lines_in_buffer              ,     500,  0,  0, 15, RD   , ABC ,    0)   -- asdsad     		
                 );
 
 function    address_of      (port_name  : avalon_map_defenition) return Integer ;

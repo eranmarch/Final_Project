@@ -21,8 +21,8 @@ namespace MappingBreakDown
             this.chosen_address = 0;
             foreach (RegisterEntry reg in registers)
             {
-                if (!reg.Type.Equals(RegisterEntry.type_field.FIELD))
-                    AddressOpts.Items.Add(reg.Name);
+                if (!reg.GetRegType().Equals(RegisterEntry.type_field.FIELD))
+                    AddressOpts.Items.Add(reg.GetName());
             }
         }
         private void ChooseAddressPrompt_Load(object sender,EventArgs e)
@@ -35,13 +35,13 @@ namespace MappingBreakDown
             string name = (string)(AddressOpts.SelectedItem);
             int i = 0;
             for (; i < registers.Length; i++)
-                if (registers[i].Name.Equals(name))
+                if (registers[i].GetName().Equals(name))
                     break;
             //chosen_address = registers[AddressOpts.SelectedIndex].Address;
             //MessageBox.Show(registers[i].Address.ToString());
             try
             {
-                chosen_address = registers[i].Address;
+                chosen_address = registers[i].GetAddress();
                 DialogResult = DialogResult.OK;
             }
             catch (System.IndexOutOfRangeException)
