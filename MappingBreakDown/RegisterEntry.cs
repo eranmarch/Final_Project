@@ -27,7 +27,7 @@ namespace MappingBreakDown
         public int MAIS { get; set; }
         public int LSB { get; set; }
         public int MSB { get; set; }
-        public type_field GetType { get; set; }
+        public type_field Type { get; set; }
         public fpga_field FPGA { get; set; }
         public string Init { get; set; }
         public string Comment { get; set; }
@@ -50,7 +50,7 @@ namespace MappingBreakDown
             this.MAIS = MAIS;
             this.LSB = LSB;
             this.MSB = MSB;
-            this.GetType = type;
+            this.Type = type;
             this.FPGA = FPGA;
             this.Init = Init;
             this.Comment = Comment;
@@ -119,12 +119,12 @@ namespace MappingBreakDown
 
         public type_field GetRegType()
         {
-            return GetType;
+            return Type;
         }
 
         public void SetRegType(type_field Type)
         {
-            this.GetType = Type;
+            this.Type = Type;
         }
 
         public void SetRegType(string Type)
@@ -318,10 +318,10 @@ namespace MappingBreakDown
             string mais = MAIS.ToString();
             string lsb = LSB.ToString();
             string msb = MSB.ToString();
-            string type = valid_type[(int)GetType];
+            string type = valid_type[(int)Type];
             string fpga = valid_fpga[(int)FPGA];
             int spaces;
-            if (GetType.Equals(type_field.FIELD))
+            if (Type.Equals(type_field.FIELD))
                 spaces = 4;
             else
                 spaces = 0;
