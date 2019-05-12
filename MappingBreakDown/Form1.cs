@@ -182,7 +182,7 @@ namespace MappingBreakDown
         }
 
         /* Add a new group */
-        private void button1_Click(object sender, EventArgs e)
+        private void AddGroupButton_Click(object sender, EventArgs e)
         {
             if (this.NewGroupText.Text.Equals(""))
                 return;
