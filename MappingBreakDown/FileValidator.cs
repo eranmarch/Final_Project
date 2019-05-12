@@ -160,7 +160,7 @@ namespace MappingBreakDown
                                 entry = RegisterEntry.RegEntryParse(lines[k], curr_group, false);
                             if (entry != null)
                             {
-                                string type = entry.GetType().ToString();
+                                string type = entry.GetRegType().ToString();
                                 if (type.Equals("FIELD") || type.Equals("field"))
                                 {
                                     int address = entry.GetAddress();
@@ -257,38 +257,47 @@ namespace MappingBreakDown
             return null;
         }
 
+        private void ValidEntry(RegisterEntry entry)
+        {
+            if (!entry.IsValidAddress())
+            {
+                entry.SetReason("The register " + entry.GetName() + " has invalid address: " + entry.GetAddress());
+                entry.SetValid(false);
+            }
+            if (!entry.IsValidMAIS())
+            {
+                entry.SetReason("The register " + entry.GetName() + " has invalid MAIS field: " + entry.GetMAIS());
+                entry.SetValid(false);
+            }
+            if (!entry.IsValidLSB())
+            {
+                entry.SetReason("The register " + entry.GetName() + "(" + entry.GetAddress() + ") has LSB out of range [0, 32)");
+                entry.SetValid(false);
+            }
+            if (!entry.IsValidLSB())
+            {
+                entry.SetReason("The register " + entry.GetName() + "(" + entry.GetAddress() + ") has MSB out of range [0, 32)");
+                entry.SetValid(false);
+            }
+            if (!entry.IsValidLsbMsb())
+            {
+                entry.SetReason("The register " + entry.GetName() + "(" + entry.GetAddress() + ") has MSB < LSB");
+                entry.SetValid(false);
+            }
+        }
+
         private void ValidRegLogic()
         {
             int n = Registers.Count;
             //String[] entries_names = new String[n];
+            RegisterEntry entry;
             for (int j = 0; j < n; j++)
             {
                 //entries_names[j] = Registers[j].GetName();
-                if (!Registers[j].IsValidAddress())
-                {
-                    Registers[j].SetReason("The register " + Registers[j].GetName() + " has invalid address: " + Registers[j].GetAddress());
-                    Registers[j].SetValid(false);
-                }
-                if (!Registers[j].IsValidMAIS())
-                {
-                    Registers[j].SetReason("The register " + Registers[j].GetName() + " has invalid MAIS field: " + Registers[j].GetMAIS());
-                    Registers[j].SetValid(false);
-                }
-                if (!Registers[j].IsValidLSB())
-                {
-                    Registers[j].SetReason("The register " + Registers[j].GetName() + "(" + Registers[j].GetAddress() + ") has LSB out of range [0, 32)");
-                    Registers[j].SetValid(false);
-                }
-                if (!Registers[j].IsValidLSB())
-                {
-                    Registers[j].SetReason("The register " + Registers[j].GetName() + "(" + Registers[j].GetAddress() + ") has MSB out of range [0, 32)");
-                    Registers[j].SetValid(false);
-                }
-                if (!Registers[j].IsValidLsbMsb())
-                {
-                    Registers[j].SetReason("The register " + Registers[j].GetName() + "(" + Registers[j].GetAddress() + ") has MSB < LSB");
-                    Registers[j].SetValid(false);
-                }
+                entry = Registers[j];
+                ValidEntry(entry);
+                foreach (RegisterEntry field in entry.GetFields())
+                    ValidEntry(field);
                 Registers[j].FieldValidation();
             }
             //NamesCrossValid(names.ToArray(), entries_names);

@@ -20,7 +20,26 @@ namespace MappingBreakDown
             RegList = new List<RegisterEntry>();
             RegShow = new List<RegisterEntry>();
             xs = new XmlSerializer(typeof(List<RegisterEntry>));
-            updateXML(false, false, false, false, true);
+            //updateXML(false, false, false, false, true);
+            initData();
+        }
+
+        public void initData()
+        {
+            dataGridView1.ColumnCount = 10;
+            dataGridView1.Columns[0].Name = "Name";
+            dataGridView1.Columns[1].Name = "Address";
+            dataGridView1.Columns[2].Name = "MAIS";
+            dataGridView1.Columns[3].Name = "LSB";
+            dataGridView1.Columns[4].Name = "MSB";
+            dataGridView1.Columns[5].Name = "TYPE";
+            dataGridView1.Columns[6].Name = "FPGA";
+            dataGridView1.Columns[7].Name = "Init";
+            dataGridView1.Columns[8].Name = "Comment";
+            dataGridView1.Columns[9].Name = "Group";
+
+            string[] row = new string[] { "reg1", "1", "2", "0", "15", "RD", "G", "", "example", "g1" };
+            dataGridView1.Rows.Add(row);
         }
 
         public RegisterEntry[] GetRegistersArray()
@@ -181,33 +200,43 @@ namespace MappingBreakDown
             InitFields();
         }
 
-        /* Add a new group */
-        private void button1_Click(object sender, EventArgs e)
+        private void PrintToConsole(List<RegisterEntry> lst)
         {
-            if (this.NewGroupText.Text.Equals(""))
+            Console.WriteLine(lst.Count + " ---------------------------------------------------");
+            foreach (RegisterEntry entry in lst)
+                Console.WriteLine(entry);
+        }
+
+        /* Add a new group */
+        private void AddGroupButton_Click(object sender, EventArgs e)
+        {
+            if (NewGroupText.Text.Equals(""))
                 return;
-            foreach (string item in this.RegGroupOpts.Items)
+            foreach (string item in RegGroupOpts.Items)
             {
-                if (item.Equals(this.NewGroupText.Text))
+                if (item.Equals(NewGroupText.Text))
                 {
                     MessageBox.Show("Group " + NewGroupText.Text + " already exists");
-                    this.NewGroupText.Text = "";
+                    NewGroupText.Text = "";
                     return;
                 }
             }
-            this.RegGroupOpts.Items.Add(this.NewGroupText.Text);
-            this.NewGroupText.Text = "";
+            RegGroupOpts.Items.Add(NewGroupText.Text);
+            NewGroupText.Text = "";
         }
 
         /* Open a file */
         private void OpenButton_Click(object sender, EventArgs e)
         {
-            if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 PathToFile.Text = openFileDialog1.FileName;
                 FileValidator fv = new FileValidator(openFileDialog1.FileName);
                 if (fv.IsFileValid())
-                    this.addManyRegisters(fv.GetRegList(), fv.GetGroups());
+                {
+                    PrintToConsole(fv.GetRegList());
+                    //addManyRegisters(fv.GetRegList(), fv.GetGroups());
+                }
             }
         }
 
@@ -293,10 +322,11 @@ namespace MappingBreakDown
         private void updateXML(bool insert, bool load, bool delete, bool serach, bool restore)
         {
             FileStream fs;
-            RegList = RegList.OrderBy(y => y.GetGroup()).ThenBy(y => y.GetAddress()).ThenBy(y => y.GetType()).ThenBy(y => y.GetLSB()).ToList();
-            RegShow = RegShow.OrderBy(y => y.GetGroup()).ThenBy(y => y.GetAddress()).ThenBy(y => y.GetType()).ThenBy(y => y.GetLSB()).ToList();
+            //RegList = RegList.OrderBy(y => y.GetGroup()).ThenBy(y => y.GetAddress()).ThenBy(y => y.GetType()).ThenBy(y => y.GetLSB()).ToList();
+            //RegShow = RegShow.OrderBy(y => y.GetGroup()).ThenBy(y => y.GetAddress()).ThenBy(y => y.GetType()).ThenBy(y => y.GetLSB()).ToList();
             if (insert || load || delete)
             {
+                //PrintToConsole(RegList);
                 fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
                 xs.Serialize(fs, RegList);
                 fs.Close();
@@ -335,7 +365,8 @@ namespace MappingBreakDown
         private void addEntryToTable(RegisterEntry entry)
         {
             RegList.Add(entry);
-            updateXML(true, false, false, false, false);
+            PrintToConsole(RegList);
+            //updateXML(true, false, false, false, false);
         }
 
         private void addManyRegisters(List<RegisterEntry> entries, List<string> groups)
@@ -362,7 +393,7 @@ namespace MappingBreakDown
         {
             SaveFileDialog saveFileDialog1 = new SaveFileDialog();
 
-            saveFileDialog1.Filter = "txt files (*.txt)|*.txt";
+            saveFileDialog1.Filter = "vhd files (*.vhd)|*.vhd";
             saveFileDialog1.FilterIndex = 2;
             saveFileDialog1.RestoreDirectory = true;
 
@@ -565,10 +596,10 @@ namespace MappingBreakDown
                             names += "\t\t\t\t" + reg + ",\n";
                             if (index++ != RegList.Count - 1)
                                 prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + ",\t" + "-- " + comment + "\n";
-                                //prop += l.ToString();
+                            //prop += l.ToString();
                             else
                                 prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + "\t" + "-- " + comment + "\n";
-                                doc += "<tr><td>" + reg + "</td><td>" + l.GetGroup() + "</td><td>" + addr + "</td><td>" + mais + "</td><td>" + lsb + "</td><td>" + msb + "</td><td>" + type + "</td>";
+                            doc += "<tr><td>" + reg + "</td><td>" + l.GetGroup() + "</td><td>" + addr + "</td><td>" + mais + "</td><td>" + lsb + "</td><td>" + msb + "</td><td>" + type + "</td>";
                             doc += "<td>" + fpga + "</td><td>" + init + "</td><td>" + comment + "</td></tr>";
                         }
                     }

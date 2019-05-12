@@ -27,7 +27,7 @@ namespace MappingBreakDown
         private int MAIS { get; set; }
         private int LSB { get; set; }
         private int MSB { get; set; }
-        private type_field GetType { get; set; }
+        private type_field Type { get; set; }
         private fpga_field FPGA { get; set; }
         private string Init { get; set; }
         private string Comment { get; set; }
@@ -36,8 +36,8 @@ namespace MappingBreakDown
         private bool isValid = true;
         private string reason = "";
 
-        public static string pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124]+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*,[ \t]*(--[ \t]*([a-zA-Z]*)[ \t]*)*";
-        public static string final_pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124]+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*(--[ \t]*([a-zA-Z]*)[ \t]*)*";
+        public static string pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124]+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w*)[ \t]*\)[ \t]*,[ \t]*(--[ \t]*([a-zA-Z0-9]*)[ \t]*)*";
+        public static string final_pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124]+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w*)[ \t]*\)[ \t]*(--[ \t]*([a-zA-Z0-9]*)[ \t]*)*";
 
         /* Constructors */
         public RegisterEntry() : this("", -1, 0, 0, 31, type_field.RD, fpga_field.G, "", "", "") { }
@@ -50,7 +50,7 @@ namespace MappingBreakDown
             this.MAIS = MAIS;
             this.LSB = LSB;
             this.MSB = MSB;
-            this.GetType = type;
+            this.Type = type;
             this.FPGA = FPGA;
             this.Init = Init;
             this.Comment = Comment;
@@ -118,12 +118,12 @@ namespace MappingBreakDown
 
         public type_field GetRegType()
         {
-            return GetType;
+            return Type;
         }
 
         public void SetRegType(type_field Type)
         {
-            this.GetType = Type;
+            this.Type = Type;
         }
 
         public void SetRegType(string Type)
@@ -317,10 +317,10 @@ namespace MappingBreakDown
             string mais = MAIS.ToString();
             string lsb = LSB.ToString();
             string msb = MSB.ToString();
-            string type = valid_type[(int)GetType];
+            string type = valid_type[(int)Type];
             string fpga = valid_fpga[(int)FPGA];
             int spaces;
-            if (GetType.Equals(type_field.FIELD))
+            if (Type.Equals(type_field.FIELD))
                 spaces = 4;
             else
                 spaces = 0;
