@@ -20,7 +20,7 @@ namespace MappingBreakDown
             RegList = new List<RegisterEntry>();
             RegShow = new List<RegisterEntry>();
             xs = new XmlSerializer(typeof(List<RegisterEntry>));
-            updateXML(false, false, false, false, true);
+            //updateXML(false, false, false, false, true);
         }
 
         public RegisterEntry[] GetRegistersArray()
@@ -293,8 +293,8 @@ namespace MappingBreakDown
         private void updateXML(bool insert, bool load, bool delete, bool serach, bool restore)
         {
             FileStream fs;
-            RegList = RegList.OrderBy(y => y.GetGroup()).ThenBy(y => y.GetAddress()).ThenBy(y => y.GetType()).ThenBy(y => y.GetLSB()).ToList();
-            RegShow = RegShow.OrderBy(y => y.GetGroup()).ThenBy(y => y.GetAddress()).ThenBy(y => y.GetType()).ThenBy(y => y.GetLSB()).ToList();
+            //RegList = RegList.OrderBy(y => y.GetGroup()).ThenBy(y => y.GetAddress()).ThenBy(y => y.GetType()).ThenBy(y => y.GetLSB()).ToList();
+            //RegShow = RegShow.OrderBy(y => y.GetGroup()).ThenBy(y => y.GetAddress()).ThenBy(y => y.GetType()).ThenBy(y => y.GetLSB()).ToList();
             if (insert || load || delete)
             {
                 fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
@@ -334,7 +334,21 @@ namespace MappingBreakDown
 
         private void addEntryToTable(RegisterEntry entry)
         {
-            RegList.Add(entry);
+            if (entry.GetRegType() == RegisterEntry.type_field.FIELD)
+            {
+                int i = -1;
+                RegisterEntry entf = null;
+                foreach (RegisterEntry ent in RegList)
+                    if (ent.Address == entry.Address)
+                    {
+                        i = ent.Address;
+                        entf = ent;
+                        break;
+                    }
+                entf.AddField(entry);
+            }
+            else
+                RegList.Add(entry);
             updateXML(true, false, false, false, false);
         }
 
@@ -565,10 +579,10 @@ namespace MappingBreakDown
                             names += "\t\t\t\t" + reg + ",\n";
                             if (index++ != RegList.Count - 1)
                                 prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + ",\t" + "-- " + comment + "\n";
-                                //prop += l.ToString();
+                            //prop += l.ToString();
                             else
                                 prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + "\t" + "-- " + comment + "\n";
-                                doc += "<tr><td>" + reg + "</td><td>" + l.GetGroup() + "</td><td>" + addr + "</td><td>" + mais + "</td><td>" + lsb + "</td><td>" + msb + "</td><td>" + type + "</td>";
+                            doc += "<tr><td>" + reg + "</td><td>" + l.GetGroup() + "</td><td>" + addr + "</td><td>" + mais + "</td><td>" + lsb + "</td><td>" + msb + "</td><td>" + type + "</td>";
                             doc += "<td>" + fpga + "</td><td>" + init + "</td><td>" + comment + "</td></tr>";
                         }
                     }

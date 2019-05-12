@@ -22,17 +22,17 @@ namespace MappingBreakDown
         public static string[] valid_fpga_lower = { "g", "d", "a", "b", "c", "abc", "abcg" };
 
         /* Class fields */
-        private string Name { get; set; }
-        private int Address { get; set; }
-        private int MAIS { get; set; }
-        private int LSB { get; set; }
-        private int MSB { get; set; }
-        private type_field GetType { get; set; }
-        private fpga_field FPGA { get; set; }
-        private string Init { get; set; }
-        private string Comment { get; set; }
-        private string Group { get; set; }
-        private List<RegisterEntry> Fields = new List<RegisterEntry>();
+        public string Name { get; set; }
+        public int Address { get; set; }
+        public int MAIS { get; set; }
+        public int LSB { get; set; }
+        public int MSB { get; set; }
+        public type_field GetType { get; set; }
+        public fpga_field FPGA { get; set; }
+        public string Init { get; set; }
+        public string Comment { get; set; }
+        public string Group { get; set; }
+        public List<RegisterEntry> Fields { get; set; }
         private bool isValid = true;
         private string reason = "";
 
@@ -55,6 +55,7 @@ namespace MappingBreakDown
             this.Init = Init;
             this.Comment = Comment;
             this.Group = Group;
+            this.Fields = new List<RegisterEntry>();
         }
 
         public RegisterEntry(string Name, int Address, string MAIS, string LSB, string MSB,
