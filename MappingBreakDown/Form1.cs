@@ -21,7 +21,7 @@ namespace MappingBreakDown
             RegList = new List<RegisterEntry>();
             RegShow = new List<RegisterEntry>();
             xs = new XmlSerializer(typeof(List<RegisterEntry>));
-            updateXML(false, false, false, false, true);
+            UpdateXML(false, false, false, false, true);
         }
 
         public RegisterEntry[] GetRegistersArray()
@@ -213,17 +213,19 @@ namespace MappingBreakDown
         {
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                PathToFile.Text = openFileDialog1.FileName;
                 FileValidator fv = new FileValidator(openFileDialog1.FileName);
                 if (fv.IsFileValid())
+                {
+                    PathToFile.Text = openFileDialog1.FileName;
                     addManyRegisters(fv.GetRegList(), fv.GetGroups());
+                }
             }
         }
 
         /* Edit a register */
         private void Load_Click(object sender, EventArgs e)
         {
-            if (this.RegNameText.Text.Equals(""))
+            if (RegNameText.Text.Equals(""))
             {
                 MessageBox.Show("Invalid register name");
                 InitFields();
@@ -295,11 +297,24 @@ namespace MappingBreakDown
                 return;
             }
 
-            updateXML(false, true, false, false, false);
+            UpdateXML(false, true, false, false, false);
+        }
+
+        public void FlattenList()
+        {
+            int i = 0;
+            foreach (RegisterEntry reg in RegShow)
+            {
+                i++;
+                foreach (RegisterEntry field in reg.GetFields())
+                {
+                    RegShow.Insert(i++, field);
+                }
+            }
         }
 
         /* Update inner files */
-        private void updateXML(bool insert, bool load, bool delete, bool serach, bool restore)
+        private void UpdateXML(bool insert, bool load, bool delete, bool serach, bool restore)
         {
             FileStream fs;
             //RegList = RegList.OrderBy(y => y.GetGroup()).ThenBy(y => y.GetAddress()).ThenBy(y => y.GetRegType()).ThenBy(y => y.GetLSB()).ToList();
@@ -318,10 +333,12 @@ namespace MappingBreakDown
                 if (insert || delete)
                 {
                     RegShow = RegList;
+                    FlattenList();
                     dataGridView1.DataSource = RegList;
                     fs = new FileStream(@"show.txt", FileMode.Create, FileAccess.Write);
                     xs.Serialize(fs, RegShow);
                     fs.Close();
+                    //dataGridView1.DataBindings;
                 }
             }
             if (load || serach)
@@ -335,7 +352,8 @@ namespace MappingBreakDown
                 fs = new FileStream(@"show.txt", FileMode.Open, FileAccess.Read);
                 RegShow = (List<RegisterEntry>)xs.Deserialize(fs);
                 fs.Close();
-
+                FlattenList();
+                //for (int i = 0; i < RegShow.Count)
                 dataGridView1.DataSource = RegShow;
 
             }
@@ -358,7 +376,7 @@ namespace MappingBreakDown
             }
             else
                 RegList.Add(entry);
-            updateXML(true, false, false, false, false);
+            UpdateXML(true, false, false, false, false);
         }
 
         private void addManyRegisters(List<RegisterEntry> entries, List<string> groups)
@@ -370,12 +388,14 @@ namespace MappingBreakDown
             }
             foreach (RegisterEntry entry in entries)
             {
-                //if (!entry.isValid)
                 addEntryToTable(entry);
             }
             for (int i = 0; i < RegShow.Count; i++)
-                if (RegShow[i].GetValid())
-                    dataGridView1.Rows[i].Cells[0].Style.BackColor = System.Drawing.Color.Red;
+                for (int j = 0; j < dataGridView1.ColumnCount; j++)
+                    if (!RegShow[i].GetValid())
+                        dataGridView1.Rows[i].Cells[j].Style.BackColor = System.Drawing.Color.Red;
+                    else
+                        dataGridView1.Rows[i].Cells[j].Style.BackColor = System.Drawing.Color.White;
             foreach (string group in groups)
                 if (!RegGroupOpts.Items.Contains(group))
                     RegGroupOpts.Items.Add(group);
@@ -441,7 +461,7 @@ namespace MappingBreakDown
                 RegList.RemoveAt(index);
 
             searchBox.Text = "";
-            updateXML(false, false, true, false, false);
+            UpdateXML(false, false, true, false, false);
         }
 
         private void textBox2_TextChanged(object sender, EventArgs e)
@@ -453,7 +473,7 @@ namespace MappingBreakDown
                 if (entry.GetName().Contains(searchRes))
                     RegShow.Add(entry);
             }
-            updateXML(false, false, false, true, false);
+            UpdateXML(false, false, false, true, false);
         }
 
         private void dataGridView1_SelectionChanged(object sender, EventArgs e)
@@ -477,6 +497,18 @@ namespace MappingBreakDown
                     TypeOpts.SelectedIndex = TypeOpts.FindStringExact(re.GetRegType().ToString());
                     FPGAOpts.SelectedIndex = FPGAOpts.FindStringExact(re.GetFPGA().ToString());
                     RegGroupOpts.SelectedIndex = RegGroupOpts.FindStringExact(re.GetGroup());
+
+                    /*re.Show = re.Show ? false : true;
+                    foreach (RegisterEntry field in re.GetFields())
+                    {
+                        //dataGridView1.Rows.Add(field.TranslateToTable());
+                        if (re.Show)
+                            RegShow.Add(field);
+                        else
+                            RegShow.Remove(field);
+                        
+                    }
+                    UpdateXML(true, false, false, false, false);*/
                 }
                 //else
                 //   MessageBox.Show("FAIL");

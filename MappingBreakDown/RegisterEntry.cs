@@ -33,29 +33,33 @@ namespace MappingBreakDown
         public string Comment { get; set; }
         public string Group { get; set; }
         public List<RegisterEntry> Fields { get; set; }
-        private bool isValid = true;
-        private string reason = "";
+        public bool IsValid { get; set; }
+        public string Reason { get; set; }
+        //public bool Show { get; set; }
 
-        public static string pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124]+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*,[ \t]*(--[ \t]*([a-zA-Z]*)[ \t]*)*";
-        public static string final_pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124]+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*(--[ \t]*([a-zA-Z]*)[ \t]*)*";
+        public static string pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124]+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w*)[ \t]*\)[ \t]*,[ \t]*(--[ \t]*([a-zA-Z]*)[ \t]*)*";
+        public static string final_pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124]+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w*)[ \t]*\)[ \t]*(--[ \t]*([a-zA-Z]*)[ \t]*)*";
 
         /* Constructors */
         public RegisterEntry() : this("", -1, 0, 0, 31, type_field.RD, fpga_field.G, "", "", "") { }
 
         public RegisterEntry(string Name, int Address, int MAIS, int LSB, int MSB,
-            type_field type, fpga_field FPGA, string Init, string Comment, string Group)
+            type_field Type, fpga_field FPGA, string Init, string Comment, string Group)
         {
             this.Name = Name;
             this.Address = Address;
             this.MAIS = MAIS;
             this.LSB = LSB;
             this.MSB = MSB;
-            this.Type = type;
+            this.Type = Type;
             this.FPGA = FPGA;
             this.Init = Init;
             this.Comment = Comment;
             this.Group = Group;
-            this.Fields = new List<RegisterEntry>();
+            Fields = new List<RegisterEntry>();
+            IsValid = true;
+            Reason = "";
+            //Show = false;
         }
 
         public RegisterEntry(string Name, int Address, string MAIS, string LSB, string MSB,
@@ -194,22 +198,22 @@ namespace MappingBreakDown
 
         public string GetReason()
         {
-            return reason;
+            return Reason;
         }
 
         public void SetReason(string reason)
         {
-            this.reason = reason;
+            this.Reason = reason;
         }
 
         public bool GetValid()
         {
-            return isValid;
+            return IsValid;
         }
 
         public void SetValid(bool valid)
         {
-            isValid = valid;
+            IsValid = valid;
         }
 
         /* Validation Functions */
@@ -217,6 +221,7 @@ namespace MappingBreakDown
         {
             // if (Type == type_field.FIELD)
             //     return true;
+            Console.WriteLine("Valditaing MSB >= LSB: " + MSB + " >= " + LSB);
             return MSB >= LSB;
         }
 
@@ -242,8 +247,8 @@ namespace MappingBreakDown
                 string field1 = inter.Item1, field2 = inter.Item2;
                 if (!(field1.Equals("") && field2.Equals("")))
                 {
-                    reason = "Field bits " + field1 + " and " + field2 + " of register " + GetName() + " (" + Address + ") intersect";
-                    isValid = false;
+                    Reason = "Field bits " + field1 + " and " + field2 + " of register " + GetName() + " (" + Address + ") intersect";
+                    IsValid = false;
                     return false;
                 }
             }
@@ -309,6 +314,12 @@ namespace MappingBreakDown
                 return new RegisterEntry(fields[1], Int32.Parse(fields[2]), fields[3], fields[4], fields[5], fields[6], fields[7], fields[8], comment, group);
             }
             return null;
+        }
+
+        public string[] TranslateToTable()
+        {
+            return new string[] {Name, Address.ToString(), MAIS.ToString(), LSB.ToString(), MSB.ToString(), valid_type[(int)Type],
+            valid_fpga[(int)FPGA], Init, Comment, Group, IsValid.ToString(), Reason};
         }
 
         override

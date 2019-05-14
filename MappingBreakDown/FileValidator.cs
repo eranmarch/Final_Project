@@ -295,6 +295,8 @@ namespace MappingBreakDown
             {
                 //entries_names[j] = Registers[j].GetName();
                 entry = Registers[j];
+                //Console.WriteLine(entry);
+                //Console.WriteLine("LSB: " + entry.LSB + ", MSB: " + entry.MSB);
                 ValidEntry(entry);
                 foreach (RegisterEntry field in entry.GetFields())
                     ValidEntry(field);
