@@ -13,6 +13,7 @@ namespace MappingBreakDown
     public partial class ChooseAddressPrompt : Form
     {
         public int chosen_address { get; set; }
+        public int index { get; set; }
         RegisterEntry[] registers;
         public ChooseAddressPrompt(RegisterEntry[] registers)
         {
@@ -42,6 +43,7 @@ namespace MappingBreakDown
             try
             {
                 chosen_address = registers[i].GetAddress();
+                index = i;
                 DialogResult = DialogResult.OK;
             }
             catch (System.IndexOutOfRangeException)

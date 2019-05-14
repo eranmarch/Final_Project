@@ -337,8 +337,8 @@
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.Size = new System.Drawing.Size(2069, 484);
             this.dataGridView1.TabIndex = 28;
-            this.dataGridView1.SelectionChanged += new System.EventHandler(this.dataGridView1_SelectionChanged);
-            this.dataGridView1.KeyUp += new System.Windows.Forms.KeyEventHandler(this.dataGridView1_KeyUp);
+            this.dataGridView1.SelectionChanged += new System.EventHandler(this.DataGridView1_SelectionChanged);
+            this.dataGridView1.KeyUp += new System.Windows.Forms.KeyEventHandler(this.DataGridView1_KeyUp);
             // 
             // NewGroupText
             // 
@@ -382,7 +382,7 @@
             this.searchBox.Name = "searchBox";
             this.searchBox.Size = new System.Drawing.Size(561, 38);
             this.searchBox.TabIndex = 33;
-            this.searchBox.TextChanged += new System.EventHandler(this.textBox2_TextChanged);
+            this.searchBox.TextChanged += new System.EventHandler(this.TextBox2_TextChanged);
             // 
             // LSBOpts
             // 

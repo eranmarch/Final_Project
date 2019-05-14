@@ -293,7 +293,7 @@ namespace MappingBreakDown
         
         /* Output Functions */
         // Returns x spaces
-        private string getSpaces(int x)
+        public static string getSpaces(int x)
         {
             return string.Concat(Enumerable.Repeat(" ", x));
         }
@@ -314,6 +314,18 @@ namespace MappingBreakDown
                 return new RegisterEntry(fields[1], Int32.Parse(fields[2]), fields[3], fields[4], fields[5], fields[6], fields[7], fields[8], comment, group);
             }
             return null;
+        }
+
+        public void EditRegister(string mais, string lsb, string msb, type_field t, fpga_field r, string init, string comment, string group)
+        {
+            MAIS = Int32.Parse(mais);
+            LSB = Int32.Parse(lsb);
+            MSB = Int32.Parse(msb);
+            Type = t;
+            FPGA = r;
+            Init = init;
+            Comment = comment;
+            Group = group;
         }
 
         public string[] TranslateToTable()

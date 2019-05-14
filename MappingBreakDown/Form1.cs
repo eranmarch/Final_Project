@@ -22,6 +22,7 @@ namespace MappingBreakDown
             RegShow = new List<RegisterEntry>();
             xs = new XmlSerializer(typeof(List<RegisterEntry>));
             UpdateXML(false, false, false, false, true);
+            //ColorInValid();
         }
 
         public RegisterEntry[] GetRegistersArray()
@@ -41,6 +42,7 @@ namespace MappingBreakDown
             RegNameText.Text = "";
             CommentText.Text = "";
             RegGroupOpts.SelectedIndex = 0;
+            searchBox.Text = "";
         }
 
         /* Upon Insert to the table, allocate a new address to the register */
@@ -84,90 +86,95 @@ namespace MappingBreakDown
             NewGroupText.Text = "";
         }
 
-        /* Check the a register can be added to the chart */
-        private bool inputValidation(RegisterEntry entry, string type, string fpga, bool add, bool load, bool open, List<RegisterEntry> lst = null)
+        private bool OpenValidation(List<RegisterEntry> lst = null)
         {
-            int addr;
-            if (open)
+            bool test = false;
+            foreach (RegisterEntry new_entry in lst)
             {
-                bool test = false;
-                foreach (RegisterEntry new_entry in lst)
+                int addr_new = new_entry.GetAddress();
+                foreach (RegisterEntry item in RegList)
                 {
-                    int addr_new = new_entry.GetAddress();
-                    foreach (RegisterEntry item in RegList)
+                    if (item.GetAddress() == addr_new && !item.GetName().Equals(new_entry.GetName()))
                     {
-                        if (item.GetAddress() == addr_new)
-                        {
-                            test = true;
-                            break;
-                        }
-
+                        test = true;
+                        break;
                     }
-                    if (test)
+                    if (item.GetAddress() != addr_new && item.GetName().Equals(new_entry.GetName()))
                     {
-                        MessageBox.Show("Address " + addr_new + " is already in the list");
-                        InitFields();
+                        test = true;
+                        break;
+                    }
+
+                }
+                if (test)
+                {
+                    //MessageBox.Show("Address " + addr_new + " is already in the list");
+                    new_entry.SetReason("Address " + addr_new + " is already in the list");
+                    new_entry.SetValid(false);
+                    InitFields();
+                    //return false;
+                }
+            }
+            return true;
+        }
+
+        /* Check the a register can be added to the chart */
+        private bool InputValidation(RegisterEntry entry, bool add)
+        {
+            if (add)
+            {
+                if (entry.GetRegType() != RegisterEntry.type_field.FIELD)
+                {
+                    int index = FindIndex(entry.GetName(), true);
+                    if (index != -1)
+                    {
+                        MessageBox.Show("Register " + entry.GetName() + " (" + RegList[index].GetAddress() + ") is already in the list");
                         return false;
                     }
-                }
-                return true;
-            }
-
-            if (!type.Equals("FIELD"))
-            {
-                addr = FindAddress();
-                if (addr == -1)
-                {
-                    MessageBox.Show("Unable to add register " + entry.GetName() + ", no free slot in memory");
-                    return false;
-                }
-                if (add)
+                    int addr = FindAddress();
+                    if (addr == -1)
+                    {
+                        MessageBox.Show("Unable to add register " + entry.GetName() + ", no free slot in memory");
+                        return false;
+                    }
                     entry.SetAddress(addr);
-            }
-            else
-            {
-                if (RegList.Count == 0)
-                {
-                    MessageBox.Show("There are no registers in the list");
-                    return false;
                 }
-
-                if (!open)
+                else
                 {
-                    RegisterEntry[] regArr = RegList.Where(val => !val.GetName().Equals(entry.GetName())).ToArray();
-                    using (ChooseAddressPrompt prompt = new ChooseAddressPrompt(regArr))
+                    if (RegList.Count == 0)
+                    {
+                        MessageBox.Show("There are no registers in the list");
+                        return false;
+                    }
+                    //RegisterEntry[] regArr = RegList.Where(val => !val.GetName().Equals(entry.GetName())).ToArray();
+                    int addr = -1;
+                    RegisterEntry item;
+                    using (ChooseAddressPrompt prompt = new ChooseAddressPrompt(RegList.ToArray()))
                     {
                         if (prompt.ShowDialog() == DialogResult.OK)
                         {
                             addr = prompt.chosen_address;
-                            entry.SetAddress(addr);
+                            item = RegList[prompt.index];
                             //MessageBox.Show("Address: " + entry.Address);
                         }
                         else
                             return false;
                     }
+                    List<RegisterEntry> fields = item.GetFields();
+                    foreach (RegisterEntry field in fields)
+                        if (field.GetName().Equals(entry.GetName()))
+                        {
+                            MessageBox.Show("Field " + entry.GetName() + " (" + item.GetAddress() + ") is already in the list of " + item.GetName());
+                            return false;
+                        }
+                    entry.SetAddress(addr);
                 }
             }
 
             if (!entry.IsValidLsbMsb())
             {
-                MessageBox.Show("Register " + entry.GetName() + " (" + entry.GetAddress() + "): LSB is greater than MSB");
-                InitFields();
+                MessageBox.Show("Can't insert register " + entry.GetName() + " with LSB greater than MSB");
                 return false;
-            }
-
-            if (!load)
-            {
-                //MessageBox.Show("CHECK");
-                foreach (RegisterEntry item in RegList)
-                {
-                    if (item.GetName().Equals(entry.GetName()))
-                    {
-                        MessageBox.Show("Register " + entry.GetName() + " (" + item.GetAddress() + ") is already in the list");
-                        InitFields();
-                        return false;
-                    }
-                }
             }
             return true;
         }
@@ -175,37 +182,18 @@ namespace MappingBreakDown
         /* Insert register to the table */
         private void InsertButton_Click(object sender, EventArgs e)
         {
-            if (this.RegNameText.Text.Equals(""))
+            if (RegNameText.Text.Equals(""))
             {
                 MessageBox.Show("Invalid register name: Empty name");
                 InitFields();
                 return;
             }
 
-            string name = this.RegNameText.Text;
-            string mais = this.MAISOpts.Text;
-            string lsb = this.LSBOpts.Text;
-            string msb = this.MSBOpts.Text;
-            string type = this.TypeOpts.Text;
-            string fpga = this.FPGAOpts.Text;
-            string init = this.InitText.Text;
-            string comment = this.CommentText.Text;
-            string group = this.RegGroupOpts.Text;
-            int addr = -1;
-
-            try
-            {
-                RegisterEntry entry = new RegisterEntry(name, addr, mais, lsb, msb, type, fpga, init, comment, group);
-                if (!inputValidation(entry, type, fpga, true, false, false))
-                    return;
-                addEntryToTable(entry);
-                InitFields();
-            }
-            catch (ArgumentException ex)
-            {
-                Console.WriteLine("{0}: {1}", ex.GetType().Name, ex.Message);
-            }
-
+            RegisterEntry entry = new RegisterEntry(RegNameText.Text, -1, MAISOpts.Text, LSBOpts.Text, MSBOpts.Text, TypeOpts.Text, FPGAOpts.Text, InitText.Text, CommentText.Text, RegGroupOpts.Text);
+            if (!InputValidation(entry, true))
+                return;
+            AddEntryToTable(entry);
+            InitFields();
         }
 
         /* Open a file */
@@ -217,7 +205,7 @@ namespace MappingBreakDown
                 if (fv.IsFileValid())
                 {
                     PathToFile.Text = openFileDialog1.FileName;
-                    addManyRegisters(fv.GetRegList(), fv.GetGroups());
+                    AddManyRegisters(fv.GetRegList(), fv.GetGroups());
                 }
             }
         }
@@ -232,74 +220,42 @@ namespace MappingBreakDown
                 return;
             }
 
-            string name = this.RegNameText.Text;
-            string mais = this.MAISOpts.Text;
-            string lsb = this.LSBOpts.Text;
-            string msb = this.MSBOpts.Text;
-            string type = this.TypeOpts.Text;
-            string fpga = this.FPGAOpts.Text;
-            string init = this.InitText.Text;
-            string comment = this.CommentText.Text;
-            string group = this.RegGroupOpts.Text;
+            string name = RegNameText.Text;
+            string mais = MAISOpts.Text;
+            string lsb = LSBOpts.Text;
+            string msb = MSBOpts.Text;
+            string type = TypeOpts.Text;
+            string fpga = FPGAOpts.Text;
+            string init = InitText.Text;
+            string comment = CommentText.Text;
+            string group = RegGroupOpts.Text;
             int addr = -1;
 
             RegisterEntry entry = new RegisterEntry(name, addr, mais, lsb, msb, type, fpga, init, comment, group);
-            if (!inputValidation(entry, type, fpga, false, true, false))
-                return;
-
-            bool b = false;
-            for (int i = 0; i < RegList.Count; i++)
-            {
-                if (RegList[i].GetName().Equals(name))
-                {
-                    RegList[i].SetMAIS(Int32.Parse(mais));
-                    RegList[i].SetLSB(Int32.Parse(lsb));
-                    RegList[i].SetMSB(Int32.Parse(msb));
-                    RegisterEntry.type_field t;
-                    RegisterEntry.fpga_field r;
-                    Enum.TryParse(type, out t);
-                    Enum.TryParse(fpga, out r);
-                    //MessageBox.Show("After: " + t + ", Before: " + RegList[i].Type + ", " + RegisterEntry.type_field.FIELD);
-                    if (RegList[i].GetRegType() == RegisterEntry.type_field.FIELD && t != RegisterEntry.type_field.FIELD)
-                        RegList[i].SetAddress(FindAddress());
-                    else if (t == RegisterEntry.type_field.FIELD)
-                        RegList[i].SetAddress(entry.GetAddress());
-                    //MessageBox.Show("new address for " + RegList[i].Name + ": " + RegList[i].Address);
-                    RegList[i].SetRegType(t);
-                    RegList[i].SetFPGA(r);
-                    RegList[i].SetInit(init);
-                    RegList[i].SetComment(comment);
-                    RegList[i].SetGroup(group);
-
-                    for (int j = 0; j < RegShow.Count; j++)
-                    {
-                        if (RegShow[j].GetName().Equals(name))
-                        {
-                            RegShow[j].SetMAIS(Int32.Parse(mais));
-                            RegShow[j].SetLSB(Int32.Parse(lsb));
-                            RegShow[j].SetMSB(Int32.Parse(msb));
-                            RegShow[j].SetRegType(t);
-                            RegShow[j].SetFPGA(r);
-                            RegShow[j].SetInit(init);
-                            RegShow[j].SetComment(comment);
-                            RegShow[j].SetGroup(group);
-                            RegShow[j].SetAddress(RegList[i].GetAddress());
-                        }
-                    }
-                    b = true;
-                    break;
-                }
-            }
-
-            if (!b)
+            int i = FindIndex(name, true);
+            if (i == -1)
             {
                 MessageBox.Show("No such register " + name);
+                InitFields();
                 return;
             }
-
+            Enum.TryParse(type, out RegisterEntry.type_field t);
+            if ((RegList[i].GetRegType() == RegisterEntry.type_field.FIELD && t != RegisterEntry.type_field.FIELD) || t == RegisterEntry.type_field.FIELD)
+            {
+                MessageBox.Show("Can't edit a field or create one using Load");
+                InitFields();
+                return;
+            }
+            if (!InputValidation(entry, false))
+                return;
+            Enum.TryParse(fpga, out RegisterEntry.fpga_field r);
+            RegList[i].EditRegister(mais, lsb, msb, t, r, init, comment, group);
+            i = FindIndex(name, false);
+            RegShow[i].EditRegister(mais, lsb, msb, t, r, init, comment, group);
             UpdateXML(false, true, false, false, false);
         }
 
+        /* PROBLEM HERE */
         public void FlattenList()
         {
             int i = 0;
@@ -312,6 +268,17 @@ namespace MappingBreakDown
                 }
             }
         }
+
+        private void ColorInValid()
+        {
+            for (int i = 0; i < RegShow.Count; i++)
+                for (int j = 0; j < dataGridView1.ColumnCount; j++)
+                    if (!RegShow[i].GetValid())
+                        dataGridView1.Rows[i].Cells[j].Style.BackColor = System.Drawing.Color.Red;
+                    else
+                        dataGridView1.Rows[i].Cells[j].Style.BackColor = System.Drawing.Color.White;
+        }
+        /* PROBLEM HERE */
 
         /* Update inner files */
         private void UpdateXML(bool insert, bool load, bool delete, bool serach, bool restore)
@@ -333,12 +300,12 @@ namespace MappingBreakDown
                 if (insert || delete)
                 {
                     RegShow = RegList;
-                    FlattenList();
+                    //FlattenList();
+                    //ColorInValid();
                     dataGridView1.DataSource = RegList;
                     fs = new FileStream(@"show.txt", FileMode.Create, FileAccess.Write);
                     xs.Serialize(fs, RegShow);
                     fs.Close();
-                    //dataGridView1.DataBindings;
                 }
             }
             if (load || serach)
@@ -351,15 +318,15 @@ namespace MappingBreakDown
             {
                 fs = new FileStream(@"show.txt", FileMode.Open, FileAccess.Read);
                 RegShow = (List<RegisterEntry>)xs.Deserialize(fs);
+                //ColorInValid();
                 fs.Close();
-                FlattenList();
-                //for (int i = 0; i < RegShow.Count)
+                //FlattenList();
                 dataGridView1.DataSource = RegShow;
 
             }
         }
 
-        private void addEntryToTable(RegisterEntry entry)
+        private void AddEntryToTable(RegisterEntry entry)
         {
             if (entry.GetRegType() == RegisterEntry.type_field.FIELD)
             {
@@ -379,23 +346,18 @@ namespace MappingBreakDown
             UpdateXML(true, false, false, false, false);
         }
 
-        private void addManyRegisters(List<RegisterEntry> entries, List<string> groups)
+        private void AddManyRegisters(List<RegisterEntry> entries, List<string> groups)
         {
-            if (!inputValidation(null, "", "", false, false, true, entries))
+            if (!OpenValidation(entries))
             {
                 InitFields();
                 return;
             }
             foreach (RegisterEntry entry in entries)
             {
-                addEntryToTable(entry);
+                AddEntryToTable(entry);
             }
-            for (int i = 0; i < RegShow.Count; i++)
-                for (int j = 0; j < dataGridView1.ColumnCount; j++)
-                    if (!RegShow[i].GetValid())
-                        dataGridView1.Rows[i].Cells[j].Style.BackColor = System.Drawing.Color.Red;
-                    else
-                        dataGridView1.Rows[i].Cells[j].Style.BackColor = System.Drawing.Color.White;
+
             foreach (string group in groups)
                 if (!RegGroupOpts.Items.Contains(group))
                     RegGroupOpts.Items.Add(group);
@@ -427,11 +389,14 @@ namespace MappingBreakDown
                 MessageBox.Show("You must first add a group name");
         }
 
-        private int findIndex(string name)
+        private int FindIndex(string name, bool real)
         {
-            for (int i = 0; i < RegList.Count; i++)
+            List<RegisterEntry> search = RegList;
+            if (!real)
+                search = RegShow;
+            for (int i = 0; i < search.Count; i++)
             {
-                if (RegList[i].GetName().Equals(name))
+                if (search[i].GetName().Equals(name))
                     return i;
             }
             return -1;
@@ -443,7 +408,7 @@ namespace MappingBreakDown
             int i, addr;
             foreach (DataGridViewRow item in dataGridView1.SelectedRows)
             {
-                i = findIndex(((RegisterEntry)item.DataBoundItem).GetName());
+                i = FindIndex(((RegisterEntry)item.DataBoundItem).GetName(), true);
                 if (RegList[i].GetRegType() != RegisterEntry.type_field.FIELD)
                 {
                     addr = ((RegisterEntry)item.DataBoundItem).GetAddress();
@@ -464,9 +429,10 @@ namespace MappingBreakDown
             UpdateXML(false, false, true, false, false);
         }
 
-        private void textBox2_TextChanged(object sender, EventArgs e)
+        private void TextBox2_TextChanged(object sender, EventArgs e)
         {
             String searchRes = searchBox.Text;
+            //RegShow.Clear();
             RegShow = new List<RegisterEntry>();
             foreach (RegisterEntry entry in RegList)
             {
@@ -476,11 +442,11 @@ namespace MappingBreakDown
             UpdateXML(false, false, false, true, false);
         }
 
-        private void dataGridView1_SelectionChanged(object sender, EventArgs e)
+        private void DataGridView1_SelectionChanged(object sender, EventArgs e)
         {
-            RegisterEntry re = null;
             if (RegShow != null && RegShow.Count() != 0)
             {
+                RegisterEntry re = null;
                 foreach (DataGridViewRow item in dataGridView1.SelectedRows)
                 {
                     re = RegShow[item.Index];
@@ -491,27 +457,35 @@ namespace MappingBreakDown
                     RegNameText.Text = re.GetName();
                     CommentText.Text = re.GetComment();
                     InitText.Text = re.GetInit();
-                    LSBOpts.SelectedIndex = LSBOpts.FindStringExact(re.GetLSB().ToString());
-                    MSBOpts.SelectedIndex = MSBOpts.FindStringExact(re.GetMSB().ToString());
-                    MAISOpts.SelectedIndex = MAISOpts.FindStringExact(re.GetMAIS().ToString());
-                    TypeOpts.SelectedIndex = TypeOpts.FindStringExact(re.GetRegType().ToString());
-                    FPGAOpts.SelectedIndex = FPGAOpts.FindStringExact(re.GetFPGA().ToString());
+                    int index = LSBOpts.FindStringExact(re.GetLSB().ToString());
+                    if (index == -1)
+                        index = 0;
+                    LSBOpts.SelectedIndex = index;
+                    index = LSBOpts.FindStringExact(re.GetLSB().ToString());
+                    if (index == -1)
+                        index = 31;
+                    LSBOpts.SelectedIndex = index;
+                    index = MSBOpts.FindStringExact(re.GetMSB().ToString());
+                    if (index == -1)
+                        index = 0;
+                    MSBOpts.SelectedIndex = index;
+                    index = MAISOpts.FindStringExact(re.GetMAIS().ToString());
+                    if (index == -1)
+                        index = 0;
+                    MAISOpts.SelectedIndex = index;
+                    index = TypeOpts.FindStringExact(re.GetRegType().ToString());
+                    if (index == -1)
+                        index = 0;
+                    TypeOpts.SelectedIndex = index;
+                    index = FPGAOpts.FindStringExact(re.GetFPGA().ToString());
+                    if (index == -1)
+                        index = 0;
+                    FPGAOpts.SelectedIndex = index;
                     RegGroupOpts.SelectedIndex = RegGroupOpts.FindStringExact(re.GetGroup());
 
-                    /*re.Show = re.Show ? false : true;
-                    foreach (RegisterEntry field in re.GetFields())
-                    {
-                        //dataGridView1.Rows.Add(field.TranslateToTable());
-                        if (re.Show)
-                            RegShow.Add(field);
-                        else
-                            RegShow.Remove(field);
-                        
-                    }
-                    UpdateXML(true, false, false, false, false);*/
+                    if (!re.GetValid())
+                        MessageBox.Show(re.GetReason());
                 }
-                //else
-                //   MessageBox.Show("FAIL");
             }
         }
 
@@ -520,7 +494,7 @@ namespace MappingBreakDown
 
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void Button2_Click(object sender, EventArgs e)
         {
 
         }
@@ -530,13 +504,13 @@ namespace MappingBreakDown
             return String.Concat(Enumerable.Repeat(" ", x));
         }
 
-        private bool isNum(String s)
+        private bool IsNum(String s)
         {
             double num;
             return double.TryParse(s, out num);
         }
 
-        private string getString(string reg, string addr, string mais, string lsb, string msb, string type, string fpga, string init)
+        private string GetString(string reg, string addr, string mais, string lsb, string msb, string type, string fpga, string init)
         {
             int spaces;
             if (type.Equals("FIELD"))
@@ -550,7 +524,7 @@ namespace MappingBreakDown
             string _type__ = " " + type + getSpaces(5 - type.Length);
             string _fpga__ = " " + fpga + getSpaces(4 - fpga.Length);
             string __init;
-            if (isNum(init))
+            if (IsNum(init))
                 __init = getSpaces(5 - init.Length) + init;
             else
                 __init = init;
@@ -621,10 +595,10 @@ namespace MappingBreakDown
                             }
                             names += "\t\t\t\t" + reg + ",\n";
                             if (index++ != RegList.Count - 1)
-                                prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + ",\t" + "-- " + comment + "\n";
+                                prop += GetString(reg, addr, mais, lsb, msb, type, fpga, init) + ",\t" + "-- " + comment + "\n";
                             //prop += l.ToString();
                             else
-                                prop += getString(reg, addr, mais, lsb, msb, type, fpga, init) + "\t" + "-- " + comment + "\n";
+                                prop += GetString(reg, addr, mais, lsb, msb, type, fpga, init) + "\t" + "-- " + comment + "\n";
                             doc += "<tr><td>" + reg + "</td><td>" + l.GetGroup() + "</td><td>" + addr + "</td><td>" + mais + "</td><td>" + lsb + "</td><td>" + msb + "</td><td>" + type + "</td>";
                             doc += "<td>" + fpga + "</td><td>" + init + "</td><td>" + comment + "</td></tr>";
                         }
@@ -719,7 +693,7 @@ namespace MappingBreakDown
                 InsertButton_Click(sender, e);
         }
 
-        private void dataGridView1_KeyUp(object sender, KeyEventArgs e)
+        private void DataGridView1_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Delete)
                 Delete_Click(sender, e);
