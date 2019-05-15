@@ -12,14 +12,14 @@ namespace MappingBreakDown
 {
     public partial class ChooseAddressPrompt : Form
     {
-        public int chosen_address { get; set; }
-        public int index { get; set; }
+        public int Chosen_address { get; set; }
+        public int Index { get; set; }
         RegisterEntry[] registers;
         public ChooseAddressPrompt(RegisterEntry[] registers)
         {
             InitializeComponent();
             this.registers = registers;
-            this.chosen_address = 0;
+            this.Chosen_address = 0;
             foreach (RegisterEntry reg in registers)
             {
                 if (!reg.GetRegType().Equals(RegisterEntry.type_field.FIELD))
@@ -42,8 +42,8 @@ namespace MappingBreakDown
             //MessageBox.Show(registers[i].Address.ToString());
             try
             {
-                chosen_address = registers[i].GetAddress();
-                index = i;
+                Chosen_address = registers[i].GetAddress();
+                Index = i;
                 DialogResult = DialogResult.OK;
             }
             catch (System.IndexOutOfRangeException)

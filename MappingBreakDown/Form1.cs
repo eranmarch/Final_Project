@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 
@@ -18,8 +19,6 @@ namespace MappingBreakDown
         {
             InitializeComponent();
             InitFields();
-            RegList = new List<RegisterEntry>();
-            RegShow = new List<RegisterEntry>();
             xs = new XmlSerializer(typeof(List<RegisterEntry>));
             UpdateXML(false, false, false, false, true);
         }
@@ -92,25 +91,26 @@ namespace MappingBreakDown
             NewGroupText.Text = "";
         }
 
-        private void OpenValidation(List<RegisterEntry> lst)
+        private bool CheckDup(RegisterEntry new_entry)
         {
-            bool test;
-            foreach (RegisterEntry new_entry in lst)
-            {
-                int addr_new = new_entry.GetAddress();
-                string name_new = new_entry.GetName();
-                test = false;
-                foreach (RegisterEntry item in RegList)
-                    if (item.GetAddress() == addr_new || item.GetName().Equals(name_new))
-                    {
-                        test = true;
-                        break;
-                    }
-                if (test)
+            int addr_new = new_entry.GetAddress();
+            string name_new = new_entry.GetName();
+            foreach (RegisterEntry item in RegList)
+                if (item.GetAddress() == addr_new || item.GetName().Equals(name_new))
                 {
                     new_entry.SetReason("Address " + addr_new + " is already in the list");
                     new_entry.SetValid(false);
+                    return false;
                 }
+            return true;
+        }
+
+        /* Validate Opened file */
+        private void OpenValidation(List<RegisterEntry> lst)
+        {
+            foreach (RegisterEntry new_entry in lst)
+            {
+                CheckDup(new_entry);
             }
         }
 
@@ -142,16 +142,14 @@ namespace MappingBreakDown
                         MessageBox.Show("There are no registers in the list");
                         return false;
                     }
-                    //RegisterEntry[] regArr = RegList.Where(val => !val.GetName().Equals(entry.GetName())).ToArray();
                     int addr = -1;
                     RegisterEntry item;
                     using (ChooseAddressPrompt prompt = new ChooseAddressPrompt(RegList.ToArray()))
                     {
                         if (prompt.ShowDialog() == DialogResult.OK)
                         {
-                            addr = prompt.chosen_address;
-                            item = RegList[prompt.index];
-                            //MessageBox.Show("Address: " + entry.Address);
+                            addr = prompt.Chosen_address;
+                            item = RegList[prompt.Index];
                         }
                         else
                             return false;
@@ -165,6 +163,15 @@ namespace MappingBreakDown
                         }
                     entry.SetAddress(addr);
                 }
+            }
+            else
+            {
+                /*RegisterEntry tmp = FindAtAddress(entry.GetAddress(), true);
+                if (index != -1)
+                {
+                    entry.SetReason("Register " + entry.GetName() + " (" + RegList[index].GetAddress() + ") is already in the list");
+                    return false;
+                }*/
             }
 
             if (!entry.IsValidLsbMsb())
@@ -248,20 +255,23 @@ namespace MappingBreakDown
             RegList[i].EditRegister(mais, lsb, msb, t, r, init, comment, group);
             i = FindIndex(name, false);
             RegShow[i].EditRegister(mais, lsb, msb, t, r, init, comment, group);
+            RegShow[i].SetValid(true);
+            RegShow[i].SetReason("");
             UpdateXML(false, true, false, false, false);
         }
 
         /* PROBLEM HERE */
         public void FlattenList()
         {
-            int i = 0;
-            foreach (RegisterEntry reg in RegShow)
+            //IEnumerable<RegisterEntry> jack = RegShow.SelectMany(val => val.GetFields());
+            //List<RegisterEntry> onlyFIELDS = jack.ToList();
+            List<RegisterEntry> res = new List<RegisterEntry>();
+            var xml = XElement.Parse(@"show.txt");
+
+            foreach (RegisterEntry reg in RegList)
             {
-                i++;
-                foreach (RegisterEntry field in reg.GetFields())
-                {
-                    RegShow.Insert(i++, field);
-                }
+                res.Add(reg);
+                res.Concat(reg.GetFields());
             }
         }
         /* PROBLEM HERE */
@@ -276,46 +286,62 @@ namespace MappingBreakDown
                         dataGridView1.Rows[i].Cells[j].Style.BackColor = System.Drawing.Color.White;
         }
 
-        /* Update inner files */
-        private void UpdateXML(bool insert, bool load, bool delete, bool serach, bool restore)
+        private void UpdateDataBase()
         {
-            FileStream fs;
+            FileStream fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
+            xs.Serialize(fs, RegList);
+            fs.Close();
+        }
+
+        private void ReadDataBase()
+        {
+            FileStream fs = new FileStream(@"jack.txt", FileMode.Open, FileAccess.Read);
+            RegList = (List<RegisterEntry>)xs.Deserialize(fs);
+            fs.Close();
+        }
+
+        private void UpdateShow()
+        {
+            FileStream fs = new FileStream(@"show.txt", FileMode.Create, FileAccess.Write);
+            xs.Serialize(fs, RegShow);
+            fs.Close();
+        }
+
+        private void ReadShow()
+        {
+            FileStream fs = new FileStream(@"show.txt", FileMode.Open, FileAccess.Read);
+            RegShow = (List<RegisterEntry>)xs.Deserialize(fs);
+            fs.Close();
+        }
+
+        /* Update inner files */
+        private void UpdateXML(bool insert, bool load, bool delete, bool search, bool restore)
+        {
             //RegList = RegList.OrderBy(y => y.GetGroup()).ThenBy(y => y.GetAddress()).ThenBy(y => y.GetRegType()).ThenBy(y => y.GetLSB()).ToList();
             //RegShow = RegShow.OrderBy(y => y.GetGroup()).ThenBy(y => y.GetAddress()).ThenBy(y => y.GetRegType()).ThenBy(y => y.GetLSB()).ToList();
             if (insert || load || delete)
             {
-                fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
-                xs.Serialize(fs, RegList);
-                fs.Close();
+                UpdateDataBase();
             }
             if (insert || delete || restore)
             {
-                fs = new FileStream(@"jack.txt", FileMode.Open, FileAccess.Read);
-                RegList = (List<RegisterEntry>)xs.Deserialize(fs);
-                fs.Close();
+                ReadDataBase();
                 if (insert || delete)
                 {
                     RegShow = RegList;
                     //FlattenList();
                     dataGridView1.DataSource = RegList;
-
-                    fs = new FileStream(@"show.txt", FileMode.Create, FileAccess.Write);
-                    xs.Serialize(fs, RegShow);
-                    fs.Close();
+                    ColorInValid();
+                    UpdateShow();
                 }
-                ColorInValid();
             }
-            if (load || serach)
+            if (load || search)
             {
-                fs = new FileStream(@"show.txt", FileMode.Create, FileAccess.Write);
-                xs.Serialize(fs, RegShow);
-                fs.Close();
+                UpdateShow();
             }
-            if (load || serach || restore)
+            if (load || search || restore)
             {
-                fs = new FileStream(@"show.txt", FileMode.Open, FileAccess.Read);
-                RegShow = (List<RegisterEntry>)xs.Deserialize(fs);
-                fs.Close();
+                ReadShow();
                 //FlattenList();
                 dataGridView1.DataSource = RegShow;
                 ColorInValid();
@@ -424,10 +450,9 @@ namespace MappingBreakDown
             UpdateXML(false, false, false, true, false);
         }
 
-        bool handle;
         private void DataGridView1_SelectionChanged(object sender, EventArgs e)
         {
-            if (handle && RegShow != null && RegShow.Count() != 0)
+            if (RegShow != null && RegShow.Count() != 0)
             {
                 RegisterEntry re = null;
                 foreach (DataGridViewRow item in dataGridView1.SelectedRows)
@@ -446,11 +471,11 @@ namespace MappingBreakDown
                     LSBOpts.SelectedIndex = index;
                     index = LSBOpts.FindStringExact(re.GetLSB().ToString());
                     if (index == -1)
-                        index = 31;
+                        index = 0;
                     LSBOpts.SelectedIndex = index;
                     index = MSBOpts.FindStringExact(re.GetMSB().ToString());
                     if (index == -1)
-                        index = 0;
+                        index = 31;
                     MSBOpts.SelectedIndex = index;
                     index = MAISOpts.FindStringExact(re.GetMAIS().ToString());
                     if (index == -1)
@@ -647,10 +672,10 @@ namespace MappingBreakDown
 
         private void Clear_Click(object sender, EventArgs e)
         {
-            handle = false;
             dataGridView1.SelectAll();
             Delete_Click(sender, e);
-            handle = true;
+            RegList.Clear();
+            //UpdateXML()
             InitFields();
         }
 

@@ -217,9 +217,6 @@ namespace MappingBreakDown
         /* Validation Functions */
         public bool IsValidLsbMsb()
         {
-            // if (Type == type_field.FIELD)
-            //     return true;
-            Console.WriteLine("Valditaing MSB >= LSB: " + MSB + " >= " + LSB);
             return MSB >= LSB;
         }
 
