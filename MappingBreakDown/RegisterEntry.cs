@@ -269,7 +269,7 @@ namespace MappingBreakDown
             {
                 type_field t = (type_field)Enum.Parse(typeof(type_field), Type, true);
             }
-            catch (System.ArgumentException e)
+            catch (ArgumentException)
             {
                 return false;
             }
@@ -282,7 +282,7 @@ namespace MappingBreakDown
             {
                 fpga_field t = (fpga_field)Enum.Parse(typeof(fpga_field), fpga, true);
             }
-            catch (System.ArgumentException e)
+            catch (ArgumentException)
             {
                 return false;
             }

@@ -68,7 +68,7 @@ type        fields_table_type   is array(1 to number_of_fields) of field_type ;
 constant    avalon_fields_table     : fields_table_type :=  (
 --               field name or port name                ,ADDRESS,MAIS,LSB,MSB, TYPE , FPGA,INIT
 		 -- 
-                (reg1                                   ,       1,  4,  0, 31, RD   , G   ,),	-- dsfsf
+                (reg1                                   ,       1,  4,  0, 31, RD   , G   , algo),	-- dsfsf
 					(reg1_F								,		1,	2,	4,	23,	FIELD,	A, init),	-- field_111
 				(reg2									,		2,	0,	45,	456,	WR,	ABC,	init)	-- field_wrong
                 );

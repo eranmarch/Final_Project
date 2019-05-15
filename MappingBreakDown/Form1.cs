@@ -22,12 +22,6 @@ namespace MappingBreakDown
             RegShow = new List<RegisterEntry>();
             xs = new XmlSerializer(typeof(List<RegisterEntry>));
             UpdateXML(false, false, false, false, true);
-            //ColorInValid();
-        }
-
-        public RegisterEntry[] GetRegistersArray()
-        {
-            return RegList.ToArray();
         }
 
         /* Default values for each register */
@@ -68,6 +62,18 @@ namespace MappingBreakDown
             return -1;
         }
 
+        /* Find Register entry at a given address */
+        private RegisterEntry FindAtAddress(int address, bool real)
+        {
+            List<RegisterEntry> search = RegList;
+            if (!real)
+                search = RegShow;
+            foreach (RegisterEntry entry in search)
+                if (entry.GetAddress() == address)
+                    return entry;
+            return null;
+        }
+
         /* Add a new group */
         private void AddGroupButton_Click(object sender, EventArgs e)
         {
@@ -86,36 +92,26 @@ namespace MappingBreakDown
             NewGroupText.Text = "";
         }
 
-        private bool OpenValidation(List<RegisterEntry> lst = null)
+        private void OpenValidation(List<RegisterEntry> lst)
         {
-            bool test = false;
+            bool test;
             foreach (RegisterEntry new_entry in lst)
             {
                 int addr_new = new_entry.GetAddress();
+                string name_new = new_entry.GetName();
+                test = false;
                 foreach (RegisterEntry item in RegList)
-                {
-                    if (item.GetAddress() == addr_new && !item.GetName().Equals(new_entry.GetName()))
+                    if (item.GetAddress() == addr_new || item.GetName().Equals(name_new))
                     {
                         test = true;
                         break;
                     }
-                    if (item.GetAddress() != addr_new && item.GetName().Equals(new_entry.GetName()))
-                    {
-                        test = true;
-                        break;
-                    }
-
-                }
                 if (test)
                 {
-                    //MessageBox.Show("Address " + addr_new + " is already in the list");
                     new_entry.SetReason("Address " + addr_new + " is already in the list");
                     new_entry.SetValid(false);
-                    InitFields();
-                    //return false;
                 }
             }
-            return true;
         }
 
         /* Check the a register can be added to the chart */
@@ -268,6 +264,7 @@ namespace MappingBreakDown
                 }
             }
         }
+        /* PROBLEM HERE */
 
         private void ColorInValid()
         {
@@ -278,7 +275,6 @@ namespace MappingBreakDown
                     else
                         dataGridView1.Rows[i].Cells[j].Style.BackColor = System.Drawing.Color.White;
         }
-        /* PROBLEM HERE */
 
         /* Update inner files */
         private void UpdateXML(bool insert, bool load, bool delete, bool serach, bool restore)
@@ -301,12 +297,13 @@ namespace MappingBreakDown
                 {
                     RegShow = RegList;
                     //FlattenList();
-                    //ColorInValid();
                     dataGridView1.DataSource = RegList;
+
                     fs = new FileStream(@"show.txt", FileMode.Create, FileAccess.Write);
                     xs.Serialize(fs, RegShow);
                     fs.Close();
                 }
+                ColorInValid();
             }
             if (load || serach)
             {
@@ -318,11 +315,10 @@ namespace MappingBreakDown
             {
                 fs = new FileStream(@"show.txt", FileMode.Open, FileAccess.Read);
                 RegShow = (List<RegisterEntry>)xs.Deserialize(fs);
-                //ColorInValid();
                 fs.Close();
                 //FlattenList();
                 dataGridView1.DataSource = RegShow;
-
+                ColorInValid();
             }
         }
 
@@ -330,15 +326,7 @@ namespace MappingBreakDown
         {
             if (entry.GetRegType() == RegisterEntry.type_field.FIELD)
             {
-                int i = -1;
-                RegisterEntry entf = null;
-                foreach (RegisterEntry ent in RegList)
-                    if (ent.Address == entry.Address)
-                    {
-                        i = ent.Address;
-                        entf = ent;
-                        break;
-                    }
+                RegisterEntry entf = FindAtAddress(entry.GetAddress(), true);
                 entf.AddField(entry);
             }
             else
@@ -348,15 +336,9 @@ namespace MappingBreakDown
 
         private void AddManyRegisters(List<RegisterEntry> entries, List<string> groups)
         {
-            if (!OpenValidation(entries))
-            {
-                InitFields();
-                return;
-            }
+            OpenValidation(entries);
             foreach (RegisterEntry entry in entries)
-            {
                 AddEntryToTable(entry);
-            }
 
             foreach (string group in groups)
                 if (!RegGroupOpts.Items.Contains(group))
@@ -385,7 +367,7 @@ namespace MappingBreakDown
 
         private void RegGroupOpts_MouseDown(object sender, MouseEventArgs e)
         {
-            if (this.RegGroupOpts.Items.Count == 0)
+            if (RegGroupOpts.Items.Count == 0)
                 MessageBox.Show("You must first add a group name");
         }
 
@@ -442,9 +424,10 @@ namespace MappingBreakDown
             UpdateXML(false, false, false, true, false);
         }
 
+        bool handle;
         private void DataGridView1_SelectionChanged(object sender, EventArgs e)
         {
-            if (RegShow != null && RegShow.Count() != 0)
+            if (handle && RegShow != null && RegShow.Count() != 0)
             {
                 RegisterEntry re = null;
                 foreach (DataGridViewRow item in dataGridView1.SelectedRows)
@@ -664,8 +647,10 @@ namespace MappingBreakDown
 
         private void Clear_Click(object sender, EventArgs e)
         {
+            handle = false;
             dataGridView1.SelectAll();
             Delete_Click(sender, e);
+            handle = true;
             InitFields();
         }
 
@@ -697,6 +682,66 @@ namespace MappingBreakDown
         {
             if (e.KeyCode == Keys.Delete)
                 Delete_Click(sender, e);
+        }
+
+        private void MappingPackageAutomation_Load_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lable5_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label6_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void MSBOpts_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void MAISOpts_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label7_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void TypeOpts_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void FPGAOpts_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void panel3_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void LSBOpts_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
