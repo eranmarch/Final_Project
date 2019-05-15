@@ -35,10 +35,9 @@ namespace MappingBreakDown
         public List<RegisterEntry> Fields { get; set; }
         public bool IsValid { get; set; }
         public string Reason { get; set; }
-        //public bool Show { get; set; }
 
-        public static string pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124]+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w*)[ \t]*\)[ \t]*,[ \t]*(--[ \t]*([a-zA-Z]*)[ \t]*)*";
-        public static string final_pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124]+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w*)[ \t]*\)[ \t]*(--[ \t]*([a-zA-Z]*)[ \t]*)*";
+        public static string pattern = @"^[ \t]*\(([a-zA-Z]\w*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124])[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*,[ \t]*(--[ \t]*(.*)[ \t]*)*";
+        public static string final_pattern = @"^[ \t]*\(([a-zA-Z]\w*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124])[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*(--[ \t]*(.*)[ \t]*)*";
 
         /* Constructors */
         public RegisterEntry() : this("", -1, 0, 0, 31, type_field.RD, fpga_field.G, "", "", "") { }
@@ -59,7 +58,6 @@ namespace MappingBreakDown
             Fields = new List<RegisterEntry>();
             IsValid = true;
             Reason = "";
-            //Show = false;
         }
 
         public RegisterEntry(string Name, int Address, string MAIS, string LSB, string MSB,
