@@ -96,12 +96,20 @@ namespace MappingBreakDown
             int addr_new = new_entry.GetAddress();
             string name_new = new_entry.GetName();
             foreach (RegisterEntry item in RegList)
-                if (item.GetAddress() == addr_new || item.GetName().Equals(name_new))
+            {
+                if (item.GetName().Equals(name_new))
                 {
                     new_entry.SetReason("Address " + addr_new + " is already in the list");
                     new_entry.SetValid(false);
                     return false;
                 }
+                if (item.GetAddress() == addr_new)
+                {
+                    new_entry.SetReason("Address " + addr_new + " is already in the list");
+                    new_entry.SetValid(false);
+                    return false;
+                }
+            }
             return true;
         }
 
@@ -166,12 +174,7 @@ namespace MappingBreakDown
             }
             else
             {
-                /*RegisterEntry tmp = FindAtAddress(entry.GetAddress(), true);
-                if (index != -1)
-                {
-                    entry.SetReason("Register " + entry.GetName() + " (" + RegList[index].GetAddress() + ") is already in the list");
-                    return false;
-                }*/
+                CheckDup(entry);
             }
 
             if (!entry.IsValidLsbMsb())

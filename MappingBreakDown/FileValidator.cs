@@ -289,11 +289,11 @@ namespace MappingBreakDown
         private void ValidRegLogic()
         {
             int n = Registers.Count;
-            //String[] entries_names = new String[n];
+            String[] entries_names = new String[n];
             RegisterEntry entry;
             for (int j = 0; j < n; j++)
             {
-                //entries_names[j] = Registers[j].GetName();
+                entries_names[j] = Registers[j].GetName();
                 entry = Registers[j];
                 //Console.WriteLine(entry);
                 //Console.WriteLine("LSB: " + entry.LSB + ", MSB: " + entry.MSB);
@@ -302,7 +302,7 @@ namespace MappingBreakDown
                     ValidEntry(field);
                 Registers[j].FieldValidation();
             }
-            //NamesCrossValid(names.ToArray(), entries_names);
+            NamesCrossValid(names.ToArray(), entries_names);
             AddressDuplicate();
         }
     }
