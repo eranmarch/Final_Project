@@ -289,14 +289,12 @@ namespace MappingBreakDown
         private void ValidRegLogic()
         {
             int n = Registers.Count;
-            String[] entries_names = new String[n];
+            string[] entries_names = new string[n];
             RegisterEntry entry;
             for (int j = 0; j < n; j++)
             {
                 entries_names[j] = Registers[j].GetName();
                 entry = Registers[j];
-                //Console.WriteLine(entry);
-                //Console.WriteLine("LSB: " + entry.LSB + ", MSB: " + entry.MSB);
                 ValidEntry(entry);
                 foreach (RegisterEntry field in entry.GetFields())
                     ValidEntry(field);

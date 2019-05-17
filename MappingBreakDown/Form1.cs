@@ -521,27 +521,6 @@ namespace MappingBreakDown
             return double.TryParse(s, out num);
         }
 
-        private string GetString(string reg, string addr, string mais, string lsb, string msb, string type, string fpga, string init)
-        {
-            int spaces;
-            if (type.Equals("FIELD"))
-                spaces = 4;
-            else
-                spaces = 0;
-            string ___reg_name___ = getSpaces(16) + "(" + reg + getSpaces((56 - spaces - ((17 + reg.Length))));
-            string __address = getSpaces(8 - addr.Length) + addr;
-            string __mais = getSpaces(3 - mais.Length) + mais;
-            string __lsb__msb = getSpaces(3 - lsb.Length) + lsb + "," + getSpaces(3 - msb.Length) + msb;
-            string _type__ = " " + type + getSpaces(5 - type.Length);
-            string _fpga__ = " " + fpga + getSpaces(4 - fpga.Length);
-            string __init;
-            if (IsNum(init))
-                __init = getSpaces(5 - init.Length) + init;
-            else
-                __init = init;
-            return ___reg_name___ + "," + __address + "," + __mais + "," + __lsb__msb + "," + _type__ + "," + _fpga__ + "," + __init + ")";
-        }
-
         private void SaveButton_Click(object sender, EventArgs e)
         {
             if (PathToFile.Text.Equals(""))
@@ -590,14 +569,7 @@ namespace MappingBreakDown
                     {
                         if (l.GetGroup().Equals(group))
                         {
-                            reg = l.GetName();
-                            addr = l.GetAddress().ToString();
-                            mais = l.GetMAIS().ToString();
-                            lsb = l.GetLSB().ToString();
-                            msb = l.GetMSB().ToString();
-                            type = l.GetRegType().ToString();
-                            fpga = l.GetFPGA().ToString();
-                            init = l.GetInit();
+                            reg = l.ToString();
                             comment = l.GetComment();
                             if (l.GetRegType().Equals(RegisterEntry.type_field.FIELD))
                             {
@@ -606,10 +578,10 @@ namespace MappingBreakDown
                             }
                             names += "\t\t\t\t" + reg + ",\n";
                             if (index++ != RegList.Count - 1)
-                                prop += GetString(reg, addr, mais, lsb, msb, type, fpga, init) + ",\t" + "-- " + comment + "\n";
+                                prop += reg + ",\t" + "-- " + comment + "\n";
                             //prop += l.ToString();
                             else
-                                prop += GetString(reg, addr, mais, lsb, msb, type, fpga, init) + "\t" + "-- " + comment + "\n";
+                                prop += reg + "\t" + "-- " + comment + "\n";
                             doc += "<tr><td>" + reg + "</td><td>" + l.GetGroup() + "</td><td>" + addr + "</td><td>" + mais + "</td><td>" + lsb + "</td><td>" + msb + "</td><td>" + type + "</td>";
                             doc += "<td>" + fpga + "</td><td>" + init + "</td><td>" + comment + "</td></tr>";
                         }
