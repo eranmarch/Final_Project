@@ -34,10 +34,11 @@ namespace MappingBreakDown
         public string Group { get; set; }
         public List<RegisterEntry> Fields { get; set; }
         public bool IsValid { get; set; }
+        public bool IsComment { get; set; }
         public string Reason { get; set; }
 
-        public static string pattern = @"^[ \t]*\(([a-zA-Z]\w*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124])[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*,[ \t]*(--[ \t]*(.*)[ \t]*)*";
-        public static string final_pattern = @"^[ \t]*\(([a-zA-Z]\w*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124])[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*(--[ \t]*(.*)[ \t]*)*";
+        public static string pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_ ]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124])[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*,[ \t]*(--[ \t]*(.*)[ \t]*)*";
+        public static string final_pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_ ]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124])[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*(--[ \t]*(.*)[ \t]*)*";
 
         /* Constructors */
         public RegisterEntry() : this("", -1, 0, 0, 31, type_field.RD, fpga_field.G, "", "", "") { }
@@ -57,6 +58,7 @@ namespace MappingBreakDown
             this.Group = Group;
             Fields = new List<RegisterEntry>();
             IsValid = true;
+            IsComment = false;
             Reason = "";
         }
 
@@ -201,7 +203,7 @@ namespace MappingBreakDown
 
         public void SetReason(string reason)
         {
-            this.Reason = reason;
+            Reason = reason;
         }
 
         public bool GetValid()
@@ -212,6 +214,16 @@ namespace MappingBreakDown
         public void SetValid(bool valid)
         {
             IsValid = valid;
+        }
+
+        public bool GetIsComment()
+        {
+            return IsComment;
+        }
+
+        public void SetIsComment(bool IsComment)
+        {
+            this.IsComment = IsComment;
         }
 
         /* Validation Functions */
@@ -233,7 +245,7 @@ namespace MappingBreakDown
         // Check fields don't intersect
         public bool FieldValidation()
         {
-            if (Fields.Count > 0)
+            if (!IsComment && Fields.Count > 0)
             {
                 List<Interval> fieldsIntervals = new List<Interval>();
                 foreach (RegisterEntry item in Fields)

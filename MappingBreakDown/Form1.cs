@@ -14,6 +14,7 @@ namespace MappingBreakDown
         public XmlSerializer xs;
         List<RegisterEntry> RegList;
         List<RegisterEntry> RegShow;
+        bool saved = false;
 
         public MappingPackageAutomation()
         {
@@ -91,22 +92,37 @@ namespace MappingBreakDown
             NewGroupText.Text = "";
         }
 
-        private bool CheckDup(RegisterEntry new_entry)
+        private bool CheckDup(RegisterEntry new_entry, bool delete = false)
         {
             int addr_new = new_entry.GetAddress();
             string name_new = new_entry.GetName();
             foreach (RegisterEntry item in RegList)
             {
+                if (item.GetIsComment() || item == new_entry)
+                    continue;
+                string reason;
                 if (item.GetName().Equals(name_new))
                 {
-                    new_entry.SetReason("Address " + addr_new + " is already in the list");
-                    new_entry.SetValid(false);
+                    reason = "Name " + name_new + " is already in the list";
+                    if (delete)
+                    {
+                        new_entry.SetReason(reason);
+                        new_entry.SetValid(false);
+                    }
+                    else
+                        MessageBox.Show(reason);
                     return false;
                 }
                 if (item.GetAddress() == addr_new)
                 {
-                    new_entry.SetReason("Address " + addr_new + " is already in the list");
-                    new_entry.SetValid(false);
+                    reason = "Address " + addr_new + " is already in the list";
+                    if (delete)
+                    {
+                        new_entry.SetReason(reason);
+                        new_entry.SetValid(false);
+                    }
+                    else
+                        MessageBox.Show(reason);
                     return false;
                 }
             }
@@ -114,16 +130,34 @@ namespace MappingBreakDown
         }
 
         /* Validate Opened file */
-        private void OpenValidation(List<RegisterEntry> lst)
+        private void OpenValidation(List<RegisterEntry> lst = null, bool delete = true)
         {
+            if (delete)
+                lst = RegList;
             foreach (RegisterEntry new_entry in lst)
             {
-                CheckDup(new_entry);
+                if (CheckDup(new_entry, delete))
+                {
+                    //MessageBox.Show("No DUP problem " + delete + " " + lst);
+                    if (delete)
+                    {
+                        if (!InputValidation(new_entry, false, false))
+                        {
+                            new_entry.SetReason("The register " + new_entry.GetName() + "(" + new_entry.GetAddress() + ") has MSB < LSB");
+                            new_entry.SetValid(false);
+                        }
+                        else
+                        {
+                            new_entry.SetValid(true);
+                            new_entry.SetReason("");
+                        } 
+                    }
+                }
             }
         }
 
         /* Check the a register can be added to the chart */
-        private bool InputValidation(RegisterEntry entry, bool add)
+        private bool InputValidation(RegisterEntry entry, bool add, bool print = true)
         {
             if (add)
             {
@@ -172,14 +206,11 @@ namespace MappingBreakDown
                     entry.SetAddress(addr);
                 }
             }
-            else
-            {
-                CheckDup(entry);
-            }
 
             if (!entry.IsValidLsbMsb())
             {
-                MessageBox.Show("Can't insert register " + entry.GetName() + " with LSB greater than MSB");
+                if (print)
+                    MessageBox.Show("Can't insert register " + entry.GetName() + " with LSB greater than MSB");
                 return false;
             }
             return true;
@@ -245,8 +276,15 @@ namespace MappingBreakDown
                 InitFields();
                 return;
             }
+            if (RegList[i].GetIsComment())
+            {
+                MessageBox.Show("This register is a comment and can't be edited");
+                InitFields();
+                return;
+            }
             Enum.TryParse(type, out RegisterEntry.type_field t);
-            if ((RegList[i].GetRegType() == RegisterEntry.type_field.FIELD && t != RegisterEntry.type_field.FIELD) || t == RegisterEntry.type_field.FIELD)
+            if ((RegList[i].GetRegType() == RegisterEntry.type_field.FIELD && t != RegisterEntry.type_field.FIELD) ||
+                RegList[i].GetRegType() != RegisterEntry.type_field.FIELD && t == RegisterEntry.type_field.FIELD)
             {
                 MessageBox.Show("Can't edit a field or create one using Load");
                 InitFields();
@@ -258,8 +296,7 @@ namespace MappingBreakDown
             RegList[i].EditRegister(mais, lsb, msb, t, r, init, comment, group);
             i = FindIndex(name, false);
             RegShow[i].EditRegister(mais, lsb, msb, t, r, init, comment, group);
-            RegShow[i].SetValid(true);
-            RegShow[i].SetReason("");
+            OpenValidation();
             UpdateXML(false, true, false, false, false);
         }
 
@@ -283,7 +320,9 @@ namespace MappingBreakDown
         {
             for (int i = 0; i < RegShow.Count; i++)
                 for (int j = 0; j < dataGridView1.ColumnCount; j++)
-                    if (!RegShow[i].GetValid())
+                    if (RegShow[i].GetIsComment())
+                        dataGridView1.Rows[i].Cells[j].Style.BackColor = System.Drawing.Color.Gray;
+                    else if (!RegShow[i].GetValid())
                         dataGridView1.Rows[i].Cells[j].Style.BackColor = System.Drawing.Color.Red;
                     else
                         dataGridView1.Rows[i].Cells[j].Style.BackColor = System.Drawing.Color.White;
@@ -334,6 +373,9 @@ namespace MappingBreakDown
                     RegShow = RegList;
                     //FlattenList();
                     dataGridView1.DataSource = RegList;
+                    dataGridView1.Columns["IsValid"].Visible = false;
+                    dataGridView1.Columns["IsComment"].Visible = false;
+                    dataGridView1.Columns["Reason"].Visible = false;
                     ColorInValid();
                     UpdateShow();
                 }
@@ -347,6 +389,9 @@ namespace MappingBreakDown
                 ReadShow();
                 //FlattenList();
                 dataGridView1.DataSource = RegShow;
+                dataGridView1.Columns["IsValid"].Visible = false;
+                dataGridView1.Columns["IsComment"].Visible = false;
+                dataGridView1.Columns["Reason"].Visible = false;
                 ColorInValid();
             }
         }
@@ -365,7 +410,7 @@ namespace MappingBreakDown
 
         private void AddManyRegisters(List<RegisterEntry> entries, List<string> groups)
         {
-            OpenValidation(entries);
+            OpenValidation(entries, false);
             foreach (RegisterEntry entry in entries)
                 AddEntryToTable(entry);
 
@@ -437,6 +482,12 @@ namespace MappingBreakDown
                 RegList.RemoveAt(index);
 
             searchBox.Text = "";
+            /*foreach (RegisterEntry reg in RegList)
+                if (!InputValidation(reg, false)){
+                    reg.SetReason("The register " + reg.GetName() + "(" + reg.GetAddress() + ") has MSB < LSB");
+                    reg.SetValid(false);
+                }*/
+            OpenValidation();
             UpdateXML(false, false, true, false, false);
         }
 
@@ -558,8 +609,7 @@ namespace MappingBreakDown
                         break;
                     res += line + "\n";
                 }
-                String reg, addr, mais, lsb, msb, type, fpga, init, comment;
-                String prop = "", names = "";
+                String prop = "", names = "", comment, reg;
                 int index = 0;
                 foreach (string group in RegGroupOpts.Items)
                 {
@@ -576,14 +626,15 @@ namespace MappingBreakDown
                                 names += "\t";
                                 prop += "\t";
                             }
-                            names += "\t\t\t\t" + reg + ",\n";
+                            names += "\t\t\t\t" + l.GetName() + ",\n";
                             if (index++ != RegList.Count - 1)
                                 prop += reg + ",\t" + "-- " + comment + "\n";
                             //prop += l.ToString();
                             else
                                 prop += reg + "\t" + "-- " + comment + "\n";
-                            doc += "<tr><td>" + reg + "</td><td>" + l.GetGroup() + "</td><td>" + addr + "</td><td>" + mais + "</td><td>" + lsb + "</td><td>" + msb + "</td><td>" + type + "</td>";
-                            doc += "<td>" + fpga + "</td><td>" + init + "</td><td>" + comment + "</td></tr>";
+                            doc += "<tr><td>" + l.GetName() + "</td><td>" + l.GetGroup() + "</td><td>" + l.GetAddress().ToString() + "</td><td>" + l.GetMAIS().ToString() + "</td><td>" +
+                                l.GetLSB().ToString() + "</td><td>" + l.GetMSB().ToString() + "</td><td>" + l.GetRegType().ToString() + "</td>";
+                            doc += "<td>" + l.GetFPGA().ToString() + "</td><td>" + l.GetInit() + "</td><td>" + comment + "</td></tr>";
                         }
                     }
                 }
@@ -647,10 +698,9 @@ namespace MappingBreakDown
 
         private void Clear_Click(object sender, EventArgs e)
         {
-            dataGridView1.SelectAll();
-            Delete_Click(sender, e);
-            RegList.Clear();
-            //UpdateXML()
+            for (int i = RegList.Count - 1; i >= 0; i--)
+                RegList.RemoveAt(i);
+            UpdateXML(false, false, true, false, false);
             InitFields();
         }
 
@@ -742,6 +792,27 @@ namespace MappingBreakDown
         private void label3_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void CloseButton_Click(object sender, EventArgs e)
+        {
+            if (PathToFile.Text.Equals(""))
+                return;
+            if (saved)
+                PathToFile.Text = "";
+            else
+            {
+                DialogResult dialogResult = MessageBox.Show("Are you sure you want to close the file without saving?", "Warning", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.Yes)
+                {
+                    //SaveButton_Click(sender, e);
+                    PathToFile.Text = "";
+                }
+                else if (dialogResult == DialogResult.No)
+                {
+                    //do nothing
+                }
+            }
         }
     }
 }

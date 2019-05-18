@@ -130,16 +130,23 @@ namespace MappingBreakDown
                 if (run_state == (int)Cmp_mod.Reg_names || run_state == (int)Cmp_mod.Reg_entrys)
                 {
                     int k;
-                    string curr_group = "JACKSHIT";
+                    string curr_group = "JACKSHIT", prev_group;
                     for (k = i; k < lines.Length && !lines_correct[j - 1].Equals(lines[k]); k++)
                     {
                         // Save Groups
                         Match result = Regex.Match(lines[k], pattern);
                         if (result.Success)
                         {
+                            prev_group = curr_group;
                             curr_group = Regex.Split(lines[k], pattern)[1];
-                            //MessageBox.Show(curr_group);
-                            if (!Groups.Contains(curr_group))
+                            RegisterEntry entry = RegisterEntry.RegEntryParse(curr_group, prev_group, lines[k + 1].Equals(lines_correct[j - 1]));
+                            if (entry != null)
+                            {
+                                entry.SetIsComment(true);
+                                Registers.Add(entry);
+                                curr_group = prev_group;
+                            }
+                            else if (!Groups.Contains(curr_group))
                                 Groups.Add(curr_group);
                         }
                         // Save Names
@@ -206,8 +213,13 @@ namespace MappingBreakDown
         private void AddressDuplicate()
         {
             for (int i = 1; i < Registers.Count; i++)
+            {
+                if (Registers[i].GetIsComment())
+                    continue;
                 for (int j = 0; j < i; j++)
                 {
+                    if (Registers[j].GetIsComment() || j == i)
+                        continue;
                     if (Registers[i].GetAddress() == Registers[j].GetAddress())
                     {
                         Registers[i].SetReason("Register " + Registers[i].GetName() + " has the same address as register " + Registers[j].GetName());
@@ -219,6 +231,7 @@ namespace MappingBreakDown
                         Registers[i].SetValid(false);
                     }
                 }
+            }
         }
 
         private String NamesCrossValid(String[] reg_names, String[] reg_entries_names)
@@ -259,6 +272,8 @@ namespace MappingBreakDown
 
         private void ValidEntry(RegisterEntry entry)
         {
+            if (entry.GetIsComment())
+                return;
             if (!entry.IsValidAddress())
             {
                 entry.SetReason("The register " + entry.GetName() + " has invalid address: " + entry.GetAddress());
@@ -273,6 +288,7 @@ namespace MappingBreakDown
             {
                 entry.SetReason("The register " + entry.GetName() + "(" + entry.GetAddress() + ") has LSB out of range [0, 32)");
                 entry.SetValid(false);
+                //Console.Write("sadsadsa");
             }
             if (!entry.IsValidLSB())
             {
@@ -289,18 +305,18 @@ namespace MappingBreakDown
         private void ValidRegLogic()
         {
             int n = Registers.Count;
-            string[] entries_names = new string[n];
+            //string[] entries_names = new string[n];
             RegisterEntry entry;
             for (int j = 0; j < n; j++)
             {
-                entries_names[j] = Registers[j].GetName();
+                // entries_names[j] = Registers[j].GetName();
                 entry = Registers[j];
                 ValidEntry(entry);
                 foreach (RegisterEntry field in entry.GetFields())
                     ValidEntry(field);
                 Registers[j].FieldValidation();
             }
-            NamesCrossValid(names.ToArray(), entries_names);
+            //NamesCrossValid(names.ToArray(), entries_names);
             AddressDuplicate();
         }
     }
