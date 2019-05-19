@@ -20,8 +20,10 @@ namespace MappingBreakDown
         {
             InitializeComponent();
             InitFields();
+            ErrorMessage.Text = "> ";
             xs = new XmlSerializer(typeof(List<RegisterEntry>));
             UpdateXML(false, false, false, false, true);
+            //UpdateXML(false, false, true, false, false);
         }
 
         /* Default values for each register */
@@ -333,7 +335,10 @@ namespace MappingBreakDown
                     if (RegShow[i].GetIsComment())
                         dataGridView1.Rows[i].Cells[j].Style.BackColor = System.Drawing.Color.Gray;
                     else if (!RegShow[i].GetValid())
+                    {
                         dataGridView1.Rows[i].Cells[j].Style.BackColor = System.Drawing.Color.Red;
+                        //Console.WriteLine(RegShow[i]);
+                    }
                     else
                         dataGridView1.Rows[i].Cells[j].Style.BackColor = System.Drawing.Color.White;
         }
@@ -461,7 +466,7 @@ namespace MappingBreakDown
             if (!real)
                 search = RegShow;
             for (int i = 0; i < search.Count; i++)
-                if ((byObj && search[i] == entry) || !byObj && search[i].GetName().Equals(name))
+                if ((byObj && search[i].CompareTo(entry) == 0) || !byObj && search[i].GetName().Equals(name))
                     return i;
             return -1;
         }
@@ -491,13 +496,10 @@ namespace MappingBreakDown
         private void TextBox2_TextChanged(object sender, EventArgs e)
         {
             String searchRes = searchBox.Text;
-            //RegShow.Clear();
             RegShow = new List<RegisterEntry>();
             foreach (RegisterEntry entry in RegList)
-            {
                 if (entry.GetName().Contains(searchRes))
                     RegShow.Add(entry);
-            }
             UpdateXML(false, false, false, true, false);
         }
 
@@ -543,7 +545,9 @@ namespace MappingBreakDown
                     RegGroupOpts.SelectedIndex = RegGroupOpts.FindStringExact(re.GetGroup());
 
                     if (!re.GetValid())
-                        MessageBox.Show(re.GetReason());
+                        ErrorMessage.Text = "[@] " + re.GetReason();
+                    else
+                        ErrorMessage.Text = "> ";
                 }
             }
         }
@@ -670,6 +674,8 @@ namespace MappingBreakDown
                     System.IO.File.WriteAllText(PathToFile.Text, res);
                     //MessageBox.Show(Path.GetDirectoryName(PathToFile.Text) + "\\" + title + "_doc.txt");
                     System.IO.File.WriteAllText(Path.GetDirectoryName(PathToFile.Text) + "\\" + title + "_doc.html", doc);
+                    saved = true;
+                    ErrorMessage.Text = "[#] File Saved!";
 
                 }
                 catch

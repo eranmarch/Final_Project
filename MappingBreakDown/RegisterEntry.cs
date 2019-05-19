@@ -9,7 +9,7 @@ using System.IO;
 
 namespace MappingBreakDown
 {
-    public class RegisterEntry
+    public class RegisterEntry : IComparable<RegisterEntry>
     {
         /* Globals */
         public enum type_field { RD, WR, RD_WR, FIELD };
@@ -335,12 +335,6 @@ namespace MappingBreakDown
             Group = group;
         }
 
-        public string[] TranslateToTable()
-        {
-            return new string[] {Name, Address.ToString(), MAIS.ToString(), LSB.ToString(), MSB.ToString(), valid_type[(int)Type],
-            valid_fpga[(int)FPGA], Init, Comment, Group, IsValid.ToString(), Reason};
-        }
-
         override
         public string ToString()
         {
@@ -370,12 +364,54 @@ namespace MappingBreakDown
             return ___reg_name___ + "," + __address + "," + __mais + "," + __lsb__msb + "," + _type__ + "," + _fpga__ + "," + __init + ")";
         }
 
-        /*public int CompareTo(RegisterEntry other)
+        public int CompareTo(RegisterEntry other)
         {
-            bool nameComp = Name.Equals(other.GetName());
-            bool addrComp = Address == other.GetAddress();
-            bool maisComp = MAIS == other.GetMAIS();
-            if (!)
-        }*/
+            int comp = Name.CompareTo(other.GetName());
+            if (comp < 0)
+                return -1;
+            else if (comp > 0)
+                return 1;
+            comp = Address.CompareTo(other.GetAddress());
+            if (comp < 0)
+                return -1;
+            else if (comp > 0)
+                return 1;
+            comp = MAIS.CompareTo(other.GetMAIS());
+            if (comp < 0)
+                return -1;
+            else if (comp > 0)
+                return 1;
+            comp = LSB.CompareTo(other.GetLSB());
+            if (comp < 0)
+                return -1;
+            else if (comp > 0)
+                return 1;
+            comp = MSB.CompareTo(other.GetMSB());
+            if (comp < 0)
+                return -1;
+            else if (comp > 0)
+                return 1;
+            comp = Type.CompareTo(other.GetRegType());
+            if (comp < 0)
+                return -1;
+            else if (comp > 0)
+                return 1;
+            comp = FPGA.CompareTo(other.GetFPGA());
+            if (comp < 0)
+                return -1;
+            else if (comp > 0)
+                return 1;
+            comp = Init.CompareTo(other.GetInit());
+            if (comp < 0)
+                return -1;
+            else if (comp > 0)
+                return 1;
+            comp = Group.CompareTo(other.GetGroup());
+            if (comp < 0)
+                return -1;
+            else if (comp > 0)
+                return 1;
+            return 0;
+        }
     }
 }

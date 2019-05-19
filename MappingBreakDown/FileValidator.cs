@@ -23,7 +23,7 @@ namespace MappingBreakDown
         private String[] valid_type = { "rd", "wr", "rd_wr", "field" };
         private String[] valid_fpga = { "g", "d", "a", "b", "c", "abc", "abcg" };
         private String path_to_correct = "mycorrect.txt";
-        string pattern = @"^[ \t]*--[ \t]*([a-zA-Z0-9]*)[ \t]*";
+        string pattern = @"^[ \t]*--[ \t]*(.*)[ \t]*";
 
         enum Cmp_mod { Start, Reg_names, Middle, Reg_entrys, End };
 
@@ -131,15 +131,18 @@ namespace MappingBreakDown
                 {
                     int k;
                     string curr_group = "JACKSHIT", prev_group;
-                    for (k = i; k < lines.Length && !lines_correct[j - 1].Equals(lines[k]); k++)
+                    for (k = i + 1; k < lines.Length && !lines_correct[j - 1].Equals(lines[k]); k++)
                     {
                         // Save Groups
                         Match result = Regex.Match(lines[k], pattern);
                         if (result.Success)
                         {
+                            //if (lines[k].Equals(lines_correct[j - 2]))
+                            //    continue;
                             prev_group = curr_group;
                             curr_group = Regex.Split(lines[k], pattern)[1];
                             RegisterEntry entry = RegisterEntry.RegEntryParse(curr_group, prev_group, lines[k + 1].Equals(lines_correct[j - 1]));
+                            //Console.WriteLine(curr_group);
                             if (entry != null)
                             {
                                 entry.SetIsComment(true);
@@ -206,6 +209,8 @@ namespace MappingBreakDown
                     j++;
                 }
             }
+            if (!NamesCrossValid())
+                return false;
             ValidRegLogic(); // Sematic Analysis, add everything from here
             return true;
         }
@@ -234,7 +239,55 @@ namespace MappingBreakDown
             }
         }
 
-        private String NamesCrossValid(String[] reg_names, String[] reg_entries_names)
+        private bool NamesCrossValid()
+        {
+            foreach (RegisterEntry entry in Registers)
+            {
+                if (!names.Contains(entry.GetName()))
+                {
+                    MessageBox.Show("Register " + entry.GetName() + " doesn't appear in the first list");
+                    return false;
+                }
+                List<RegisterEntry> fields = entry.GetFields();
+                foreach (RegisterEntry field in fields)
+                {
+                    if (!names.Contains(field.GetName()))
+                    {
+                        MessageBox.Show("Field " + field.GetName() + " of register " + entry.GetName() + " doesn't appear in the first list");
+                        return false;
+                    }
+                }
+            }
+            foreach (string name in names)
+            {
+                bool test = false;
+                foreach (RegisterEntry entry in Registers)
+                {
+                    if (entry.GetName().Equals(name))
+                    {
+                        test = true;
+                        break;
+                    }
+                    List<RegisterEntry> fields = entry.GetFields();
+                    foreach (RegisterEntry field in fields)
+                    {
+                        if (field.GetName().Equals(name))
+                        {
+                            test = true;
+                            break;
+                        }
+                    }
+                    if (!test)
+                    {
+                        MessageBox.Show("Register " + entry.GetName() + " doesn't appear in the second list");
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+       /* private String NamesCrossValid(String[] reg_names, String[] reg_entries_names)
         {
             for (int i = 0; i < reg_names.Length; i++)
             {
@@ -268,7 +321,7 @@ namespace MappingBreakDown
                 }
             }
             return null;
-        }
+        }*/
 
         private void ValidEntry(RegisterEntry entry)
         {
@@ -288,7 +341,6 @@ namespace MappingBreakDown
             {
                 entry.SetReason("The register " + entry.GetName() + "(" + entry.GetAddress() + ") has LSB out of range [0, 32)");
                 entry.SetValid(false);
-                //Console.Write("sadsadsa");
             }
             if (!entry.IsValidLSB())
             {
@@ -305,18 +357,16 @@ namespace MappingBreakDown
         private void ValidRegLogic()
         {
             int n = Registers.Count;
-            //string[] entries_names = new string[n];
             RegisterEntry entry;
             for (int j = 0; j < n; j++)
             {
-                // entries_names[j] = Registers[j].GetName();
                 entry = Registers[j];
                 ValidEntry(entry);
                 foreach (RegisterEntry field in entry.GetFields())
                     ValidEntry(field);
                 Registers[j].FieldValidation();
             }
-            //NamesCrossValid(names.ToArray(), entries_names);
+            
             AddressDuplicate();
         }
     }

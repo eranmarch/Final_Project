@@ -61,16 +61,19 @@
             this.MSBOpts = new System.Windows.Forms.ComboBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.CloseButton = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
             this.ClearButton = new System.Windows.Forms.Button();
             this.label10 = new System.Windows.Forms.Label();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.CloseButton = new System.Windows.Forms.Button();
+            this.panel4 = new System.Windows.Forms.Panel();
+            this.ErrorMessage = new System.Windows.Forms.RichTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
+            this.panel4.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -483,6 +486,16 @@
             this.panel1.Size = new System.Drawing.Size(835, 47);
             this.panel1.TabIndex = 37;
             // 
+            // CloseButton
+            // 
+            this.CloseButton.Location = new System.Drawing.Point(730, 12);
+            this.CloseButton.Name = "CloseButton";
+            this.CloseButton.Size = new System.Drawing.Size(75, 23);
+            this.CloseButton.TabIndex = 6;
+            this.CloseButton.Text = "Close";
+            this.CloseButton.UseVisualStyleBackColor = true;
+            this.CloseButton.Click += new System.EventHandler(this.CloseButton_Click);
+            // 
             // panel2
             // 
             this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -528,28 +541,37 @@
             this.panel3.Controls.Add(this.label7);
             this.panel3.Controls.Add(this.TypeOpts);
             this.panel3.Location = new System.Drawing.Point(757, 95);
-            this.panel3.Margin = new System.Windows.Forms.Padding(1, 1, 1, 1);
+            this.panel3.Margin = new System.Windows.Forms.Padding(1);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(143, 162);
             this.panel3.TabIndex = 40;
             this.panel3.Paint += new System.Windows.Forms.PaintEventHandler(this.panel3_Paint);
             // 
-            // CloseButton
+            // panel4
             // 
-            this.CloseButton.Location = new System.Drawing.Point(730, 12);
-            this.CloseButton.Name = "CloseButton";
-            this.CloseButton.Size = new System.Drawing.Size(75, 23);
-            this.CloseButton.TabIndex = 6;
-            this.CloseButton.Text = "Close";
-            this.CloseButton.UseVisualStyleBackColor = true;
-            this.CloseButton.Click += new System.EventHandler(this.CloseButton_Click);
+            this.panel4.Controls.Add(this.ErrorMessage);
+            this.panel4.Location = new System.Drawing.Point(925, 95);
+            this.panel4.Name = "panel4";
+            this.panel4.Size = new System.Drawing.Size(206, 161);
+            this.panel4.TabIndex = 41;
+            // 
+            // ErrorMessage
+            // 
+            this.ErrorMessage.Enabled = false;
+            this.ErrorMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+            this.ErrorMessage.Location = new System.Drawing.Point(13, 14);
+            this.ErrorMessage.Name = "ErrorMessage";
+            this.ErrorMessage.Size = new System.Drawing.Size(178, 134);
+            this.ErrorMessage.TabIndex = 0;
+            this.ErrorMessage.Text = "";
             // 
             // MappingPackageAutomation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1081, 578);
+            this.ClientSize = new System.Drawing.Size(1155, 618);
+            this.Controls.Add(this.panel4);
             this.Controls.Add(this.panel3);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.panel2);
@@ -576,6 +598,7 @@
             this.panel2.ResumeLayout(false);
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
+            this.panel4.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -621,6 +644,8 @@
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.Button CloseButton;
+        private System.Windows.Forms.Panel panel4;
+        private System.Windows.Forms.RichTextBox ErrorMessage;
         //private System.Windows.Forms.OpenFileDialog openFileDialog1;
     }
 }
