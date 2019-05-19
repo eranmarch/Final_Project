@@ -138,7 +138,6 @@ namespace MappingBreakDown
             {
                 if (CheckDup(new_entry, delete))
                 {
-                    //MessageBox.Show("No DUP problem " + delete + " " + lst);
                     if (delete)
                     {
                         if (!InputValidation(new_entry, false, false))
@@ -150,7 +149,7 @@ namespace MappingBreakDown
                         {
                             new_entry.SetValid(true);
                             new_entry.SetReason("");
-                        } 
+                        }
                     }
                 }
             }
@@ -250,13 +249,23 @@ namespace MappingBreakDown
         /* Edit a register */
         private void Load_Click(object sender, EventArgs e)
         {
-            if (RegNameText.Text.Equals(""))
+            /*if (RegNameText.Text.Equals(""))
             {
                 MessageBox.Show("Invalid register name");
                 InitFields();
                 return;
+            }*/
+            RegisterEntry re = null;
+            foreach (DataGridViewRow item in dataGridView1.SelectedRows)
+            {
+                re = RegShow[item.Index];
+                break;
             }
-
+            if (re == null)
+            {
+                MessageBox.Show("Please select a register in order to edit");
+                return;
+            }
             string name = RegNameText.Text;
             string mais = MAISOpts.Text;
             string lsb = LSBOpts.Text;
@@ -269,7 +278,8 @@ namespace MappingBreakDown
             int addr = -1;
 
             RegisterEntry entry = new RegisterEntry(name, addr, mais, lsb, msb, type, fpga, init, comment, group);
-            int i = FindIndex(name, true);
+
+            int i = FindIndex(name, true, re, true);
             if (i == -1)
             {
                 MessageBox.Show("No such register " + name);
@@ -294,7 +304,7 @@ namespace MappingBreakDown
                 return;
             Enum.TryParse(fpga, out RegisterEntry.fpga_field r);
             RegList[i].EditRegister(mais, lsb, msb, t, r, init, comment, group);
-            i = FindIndex(name, false);
+            i = FindIndex(name, false, re, true);
             RegShow[i].EditRegister(mais, lsb, msb, t, r, init, comment, group);
             OpenValidation();
             UpdateXML(false, true, false, false, false);
@@ -445,48 +455,35 @@ namespace MappingBreakDown
                 MessageBox.Show("You must first add a group name");
         }
 
-        private int FindIndex(string name, bool real)
+        private int FindIndex(string name, bool real, RegisterEntry entry = null, bool byObj = false)
         {
             List<RegisterEntry> search = RegList;
             if (!real)
                 search = RegShow;
             for (int i = 0; i < search.Count; i++)
-            {
-                if (search[i].GetName().Equals(name))
+                if ((byObj && search[i] == entry) || !byObj && search[i].GetName().Equals(name))
                     return i;
-            }
             return -1;
         }
 
         private void Delete_Click(object sender, EventArgs e)
         {
             List<int> indices = new List<int>();
-            int i, addr;
             foreach (DataGridViewRow item in dataGridView1.SelectedRows)
             {
-                i = FindIndex(((RegisterEntry)item.DataBoundItem).GetName(), true);
-                if (RegList[i].GetRegType() != RegisterEntry.type_field.FIELD)
-                {
-                    addr = ((RegisterEntry)item.DataBoundItem).GetAddress();
-                    for (int j = 0; j < RegList.Count; j++)
-                    {
-                        if (RegList[j].GetAddress() == addr && j != i &&
-                            RegList[j].GetRegType() == RegisterEntry.type_field.FIELD && !indices.Contains(j))
-                            indices.Add(j);
-                    }
-                }
+                int i = FindIndex("", true, (RegisterEntry)item.DataBoundItem, true);
+                // Insert here field deletion
                 if (!indices.Contains(i))
                     indices.Add(i);
             }
+            /*string print = "";
+            foreach (int index in indices)
+                print += index;
+            MessageBox.Show(print);*/
             foreach (int index in indices.OrderByDescending(v => v))
                 RegList.RemoveAt(index);
 
             searchBox.Text = "";
-            /*foreach (RegisterEntry reg in RegList)
-                if (!InputValidation(reg, false)){
-                    reg.SetReason("The register " + reg.GetName() + "(" + reg.GetAddress() + ") has MSB < LSB");
-                    reg.SetValid(false);
-                }*/
             OpenValidation();
             UpdateXML(false, false, true, false, false);
         }

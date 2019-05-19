@@ -369,5 +369,13 @@ namespace MappingBreakDown
                 __init = Init;
             return ___reg_name___ + "," + __address + "," + __mais + "," + __lsb__msb + "," + _type__ + "," + _fpga__ + "," + __init + ")";
         }
+
+        /*public int CompareTo(RegisterEntry other)
+        {
+            bool nameComp = Name.Equals(other.GetName());
+            bool addrComp = Address == other.GetAddress();
+            bool maisComp = MAIS == other.GetMAIS();
+            if (!)
+        }*/
     }
 }
