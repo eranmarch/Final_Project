@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28010.2050
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MappingBreakDown", "MappingBreakDown\MappingBreakDown.csproj", "{85299E5D-C955-464C-8B0B-E344C951C11A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpandableGridView", "..\..\..\Desktop\שיט של אחרים\ערן ועידן\ערן לימודים\גיבוי פרויקט גמר\TreeGridview\TreeGridView\ExpandableGridView.csproj", "{2EFE526F-79B3-49BC-9575-A7B258C59BB5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{85299E5D-C955-464C-8B0B-E344C951C11A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{85299E5D-C955-464C-8B0B-E344C951C11A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{85299E5D-C955-464C-8B0B-E344C951C11A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EFE526F-79B3-49BC-9575-A7B258C59BB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EFE526F-79B3-49BC-9575-A7B258C59BB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EFE526F-79B3-49BC-9575-A7B258C59BB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EFE526F-79B3-49BC-9575-A7B258C59BB5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -84,6 +84,7 @@ namespace MappingBreakDown
             if (result.Success)
             {
                 string[] substrings = Regex.Split(reg_name, pattern);
+                //MessageBox.Show(substrings[1] + " " + substrings[1].Length.ToString());
                 names.Add(substrings[1]);
                 return true;
             }
@@ -92,7 +93,7 @@ namespace MappingBreakDown
 
         private RegisterEntry FindAtAdress(int i)
         {
-            foreach (RegisterEntry entry in Registers)
+            foreach (RegisterEntry entry in Enumerable.Reverse(Registers))
                 if (entry.GetAddress() == i)
                     return entry;
             return null;
@@ -101,8 +102,8 @@ namespace MappingBreakDown
         public bool IsFileValid()
         {
             // Prepare texts for comparison: remove comments and convert to lower case
-            String[] lines_correct = File.ReadAllLines(path_to_correct);
-            String[] lines = File.ReadAllLines(path_to_file);
+            string[] lines_correct = File.ReadAllLines(path_to_correct);
+            string[] lines = File.ReadAllLines(path_to_file);
             for (int i = 0; i < lines_correct.Length; i++)
                 lines_correct[i] = TrimAndLower(lines_correct[i]);
             for (int i = 0; i < lines.Length; i++)
@@ -137,12 +138,9 @@ namespace MappingBreakDown
                         Match result = Regex.Match(lines[k], pattern);
                         if (result.Success)
                         {
-                            //if (lines[k].Equals(lines_correct[j - 2]))
-                            //    continue;
                             prev_group = curr_group;
                             curr_group = Regex.Split(lines[k], pattern)[1];
                             RegisterEntry entry = RegisterEntry.RegEntryParse(curr_group, prev_group, lines[k + 1].Equals(lines_correct[j - 1]));
-                            //Console.WriteLine(curr_group);
                             if (entry != null)
                             {
                                 entry.SetIsComment(true);
@@ -163,13 +161,10 @@ namespace MappingBreakDown
                         }
                         else if (run_state == (int)Cmp_mod.Reg_entrys)
                         {
-                            RegisterEntry entry;
-                            if (lines[k + 1].Equals(lines_correct[j - 1]))
-                                entry = RegisterEntry.RegEntryParse(lines[k], curr_group, true);
-                            else
-                                entry = RegisterEntry.RegEntryParse(lines[k], curr_group, false);
+                            RegisterEntry entry = RegisterEntry.RegEntryParse(lines[k], curr_group, lines[k + 1].Equals(lines_correct[j - 1]));
                             if (entry != null)
                             {
+                                //MessageBox.Show(entry.GetName() + " " + entry.GetName().Length.ToString());
                                 string type = entry.GetRegType().ToString();
                                 if (type.Equals("FIELD") || type.Equals("field"))
                                 {
@@ -209,8 +204,8 @@ namespace MappingBreakDown
                     j++;
                 }
             }
-            if (!NamesCrossValid())
-                return false;
+           // if (!NamesCrossValid())
+            //   return false;
             ValidRegLogic(); // Sematic Analysis, add everything from here
             return true;
         }
@@ -241,19 +236,24 @@ namespace MappingBreakDown
 
         private bool NamesCrossValid()
         {
+            string nameReg, nameField;
             foreach (RegisterEntry entry in Registers)
             {
-                if (!names.Contains(entry.GetName()))
+                if (entry.GetIsComment())
+                    continue;
+                nameReg = entry.GetName().Trim();
+                if (!names.Contains(nameReg))
                 {
-                    MessageBox.Show("Register " + entry.GetName() + " doesn't appear in the first list");
+                    MessageBox.Show("Register " + nameReg + " doesn't appear in the first list");
                     return false;
                 }
                 List<RegisterEntry> fields = entry.GetFields();
                 foreach (RegisterEntry field in fields)
                 {
-                    if (!names.Contains(field.GetName()))
+                    nameField = field.GetName().Trim();
+                    if (!names.Contains(nameField))
                     {
-                        MessageBox.Show("Field " + field.GetName() + " of register " + entry.GetName() + " doesn't appear in the first list");
+                        MessageBox.Show("Field " + nameField + " of register " + nameReg + " doesn't appear in the first list");
                         return false;
                     }
                 }
@@ -263,7 +263,8 @@ namespace MappingBreakDown
                 bool test = false;
                 foreach (RegisterEntry entry in Registers)
                 {
-                    if (entry.GetName().Equals(name))
+                    nameReg = entry.GetName().Trim();
+                    if (nameReg.Equals(name.Trim()))
                     {
                         test = true;
                         break;
@@ -271,7 +272,8 @@ namespace MappingBreakDown
                     List<RegisterEntry> fields = entry.GetFields();
                     foreach (RegisterEntry field in fields)
                     {
-                        if (field.GetName().Equals(name))
+                        nameField = field.GetName().Trim();
+                        if (nameField.Equals(name.Trim()))
                         {
                             test = true;
                             break;
@@ -279,49 +281,13 @@ namespace MappingBreakDown
                     }
                     if (!test)
                     {
-                        MessageBox.Show("Register " + entry.GetName() + " doesn't appear in the second list");
+                        MessageBox.Show("Register " + nameReg + " doesn't appear in the second list");
                         return false;
                     }
                 }
             }
             return true;
         }
-
-       /* private String NamesCrossValid(String[] reg_names, String[] reg_entries_names)
-        {
-            for (int i = 0; i < reg_names.Length; i++)
-            {
-                int j;
-                for (j = 0; j < reg_entries_names.Length; j++)
-                {
-                    if (reg_names[i].Equals(reg_entries_names[j]))
-                        break;
-                }
-                if (j == reg_entries_names.Length)
-                {
-                    MessageBox.Show("The register " + reg_names[i] + " is refrenced in only one list");
-                    Registers[i].SetValid(false);
-                    //return reg_names[i];
-                }
-            }
-
-            for (int i = 0; i < reg_entries_names.Length; i++)
-            {
-                int j;
-                for (j = 0; j < reg_names.Length; j++)
-                {
-                    if (reg_entries_names[i].Equals(reg_names[j]))
-                        break;
-                }
-                if (j == reg_names.Length)
-                {
-                    MessageBox.Show("The register " + reg_entries_names[i] + " is refrenced in only one list");
-                    Registers[i].SetValid(false);
-                    //return reg_entries_names[i];
-                }
-            }
-            return null;
-        }*/
 
         private void ValidEntry(RegisterEntry entry)
         {
@@ -364,9 +330,8 @@ namespace MappingBreakDown
                 ValidEntry(entry);
                 foreach (RegisterEntry field in entry.GetFields())
                     ValidEntry(field);
-                Registers[j].FieldValidation();
+                entry.FieldValidation();
             }
-            
             AddressDuplicate();
         }
     }

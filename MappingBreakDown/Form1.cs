@@ -11,6 +11,7 @@ namespace MappingBreakDown
 {
     public partial class MappingPackageAutomation : Form
     {
+        
         public XmlSerializer xs;
         List<RegisterEntry> RegList;
         List<RegisterEntry> RegShow;
@@ -23,7 +24,6 @@ namespace MappingBreakDown
             ErrorMessage.Text = "> ";
             xs = new XmlSerializer(typeof(List<RegisterEntry>));
             UpdateXML(false, false, false, false, true);
-            //UpdateXML(false, false, true, false, false);
         }
 
         /* Default values for each register */
@@ -136,7 +136,7 @@ namespace MappingBreakDown
         {
             if (delete)
                 lst = RegList;
-            foreach (RegisterEntry new_entry in lst)
+            foreach (RegisterEntry new_entry in RegList)
             {
                 if (CheckDup(new_entry, delete))
                 {
@@ -162,18 +162,33 @@ namespace MappingBreakDown
         {
             if (add)
             {
+                string reason;
                 if (entry.GetRegType() != RegisterEntry.type_field.FIELD)
                 {
                     int index = FindIndex(entry.GetName(), true);
                     if (index != -1)
                     {
-                        MessageBox.Show("Register " + entry.GetName() + " (" + RegList[index].GetAddress() + ") is already in the list");
+                        reason = "Register " + entry.GetName() + " (" + RegList[index].GetAddress() + ") is already in the list";
+                        if (print)
+                            MessageBox.Show(reason);
+                        else
+                        {
+                            entry.SetReason(reason);
+                            entry.SetValid(false);
+                        }
                         return false;
                     }
                     int addr = FindAddress();
                     if (addr == -1)
                     {
-                        MessageBox.Show("Unable to add register " + entry.GetName() + ", no free slot in memory");
+                        reason = "Unable to add register " + entry.GetName() + ", no free slot in memory";
+                        if (print)
+                            MessageBox.Show(reason);
+                        else
+                        {
+                            entry.SetReason(reason);
+                            entry.SetValid(false);
+                        }
                         return false;
                     }
                     entry.SetAddress(addr);
@@ -182,7 +197,14 @@ namespace MappingBreakDown
                 {
                     if (RegList.Count == 0)
                     {
-                        MessageBox.Show("There are no registers in the list");
+                        reason = "There are no registers in the list";
+                        if (print)
+                            MessageBox.Show(reason);
+                        else
+                        {
+                            entry.SetReason(reason);
+                            entry.SetValid(false);
+                        }
                         return false;
                     }
                     int addr = -1;
@@ -201,7 +223,14 @@ namespace MappingBreakDown
                     foreach (RegisterEntry field in fields)
                         if (field.GetName().Equals(entry.GetName()))
                         {
-                            MessageBox.Show("Field " + entry.GetName() + " (" + item.GetAddress() + ") is already in the list of " + item.GetName());
+                            reason = "Field " + entry.GetName() + " (" + item.GetAddress() + ") is already in the list of " + item.GetName();
+                            if (print)
+                                MessageBox.Show(reason);
+                            else
+                            {
+                                entry.SetReason(reason);
+                                entry.SetValid(false);
+                            }
                             return false;
                         }
                     entry.SetAddress(addr);
@@ -269,6 +298,11 @@ namespace MappingBreakDown
                 return;
             }
             string name = RegNameText.Text;
+            if (!re.GetName().Equals(name))
+            {
+                MessageBox.Show("You can't edit a register's name");
+                return;
+            }
             string mais = MAISOpts.Text;
             string lsb = LSBOpts.Text;
             string msb = MSBOpts.Text;
@@ -425,10 +459,10 @@ namespace MappingBreakDown
 
         private void AddManyRegisters(List<RegisterEntry> entries, List<string> groups)
         {
-            OpenValidation(entries, false);
             foreach (RegisterEntry entry in entries)
                 AddEntryToTable(entry);
-
+            OpenValidation(entries);
+            //UpdateXML(true, false, false, false, false);
             foreach (string group in groups)
                 if (!RegGroupOpts.Items.Contains(group))
                     RegGroupOpts.Items.Add(group);
@@ -495,7 +529,7 @@ namespace MappingBreakDown
 
         private void TextBox2_TextChanged(object sender, EventArgs e)
         {
-            String searchRes = searchBox.Text;
+            string searchRes = searchBox.Text;
             RegShow = new List<RegisterEntry>();
             foreach (RegisterEntry entry in RegList)
                 if (entry.GetName().Contains(searchRes))
@@ -544,6 +578,8 @@ namespace MappingBreakDown
                     FPGAOpts.SelectedIndex = index;
                     RegGroupOpts.SelectedIndex = RegGroupOpts.FindStringExact(re.GetGroup());
 
+                    if (re.GetIsComment())
+                        ErrorMessage.Text = "> ";
                     if (!re.GetValid())
                         ErrorMessage.Text = "[@] " + re.GetReason();
                     else

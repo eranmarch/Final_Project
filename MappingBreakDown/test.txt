@@ -35,6 +35,8 @@ constant 	fpga_date_reg     : integer := conv_integer(FPGA_DAY & FPGA_MONTH & FP
 type        avalon_map_defenition  is  (
 		 -- 
 				reg1,
+				reg2,
+				another3,
                 last_deff) ;    -- last_deff must be the last in the list.
 
 
@@ -68,7 +70,7 @@ type        fields_table_type   is array(1 to number_of_fields) of field_type ;
 constant    avalon_fields_table     : fields_table_type :=  (
 --               field name or port name                ,ADDRESS,MAIS,LSB,MSB, TYPE , FPGA,INIT
 		 -- erter reterter
-         --       (reg1                                   ,       1,  4,  0, 31, RD   , G   , algo),	-- dsfsf
+                (reg1                                   ,       1,  4,  0, 31, RD   , G   , algo),	-- dsfsf
 		--			(reg1_F								,		1,	2,	4,	23,	FIELD,	A, init),	-- field_111
 				(reg2									,		2,	0,	45,	456,	WR,	ABC,	init),	-- field_wrong
 				--(reg3									,		3,	4,	23,	27,	WR,	G,	sfsdfdsf), -- asdjnasjdnj
