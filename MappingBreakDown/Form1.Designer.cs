@@ -70,6 +70,15 @@
             this.panel4 = new System.Windows.Forms.Panel();
             this.ErrorMessage = new System.Windows.Forms.RichTextBox();
             this.treeGridView1 = new AdvancedDataGridView.TreeGridView();
+            this.Registers = new AdvancedDataGridView.TreeGridColumn();
+            this.AddressColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.MAISColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.LSBColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.MSBColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TypeColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.FPGAColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.InitColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.CommentColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -608,12 +617,95 @@
             // 
             this.treeGridView1.AllowUserToAddRows = false;
             this.treeGridView1.AllowUserToDeleteRows = false;
+            this.treeGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Registers,
+            this.AddressColumn,
+            this.MAISColumn,
+            this.LSBColumn,
+            this.MSBColumn,
+            this.TypeColumn,
+            this.FPGAColumn,
+            this.InitColumn,
+            this.CommentColumn});
             this.treeGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.treeGridView1.ImageList = null;
             this.treeGridView1.Location = new System.Drawing.Point(194, 744);
             this.treeGridView1.Name = "treeGridView1";
             this.treeGridView1.Size = new System.Drawing.Size(1553, 565);
             this.treeGridView1.TabIndex = 42;
+            // 
+            // Registers
+            // 
+            this.Registers.DataPropertyName = "Registers";
+            this.Registers.DefaultNodeImage = null;
+            this.Registers.HeaderText = "Registers";
+            this.Registers.Name = "Registers";
+            this.Registers.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.Registers.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // AddressColumn
+            // 
+            this.AddressColumn.HeaderText = "Address";
+            this.AddressColumn.Name = "AddressColumn";
+            this.AddressColumn.ReadOnly = true;
+            this.AddressColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.AddressColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // MAISColumn
+            // 
+            this.MAISColumn.HeaderText = "MAIS";
+            this.MAISColumn.Name = "MAISColumn";
+            this.MAISColumn.ReadOnly = true;
+            this.MAISColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.MAISColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // LSBColumn
+            // 
+            this.LSBColumn.HeaderText = "LSB";
+            this.LSBColumn.Name = "LSBColumn";
+            this.LSBColumn.ReadOnly = true;
+            this.LSBColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.LSBColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // MSBColumn
+            // 
+            this.MSBColumn.HeaderText = "MSB";
+            this.MSBColumn.Name = "MSBColumn";
+            this.MSBColumn.ReadOnly = true;
+            this.MSBColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.MSBColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // TypeColumn
+            // 
+            this.TypeColumn.HeaderText = "Type";
+            this.TypeColumn.Name = "TypeColumn";
+            this.TypeColumn.ReadOnly = true;
+            this.TypeColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.TypeColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // FPGAColumn
+            // 
+            this.FPGAColumn.HeaderText = "FPGA";
+            this.FPGAColumn.Name = "FPGAColumn";
+            this.FPGAColumn.ReadOnly = true;
+            this.FPGAColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.FPGAColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // InitColumn
+            // 
+            this.InitColumn.HeaderText = "Init";
+            this.InitColumn.Name = "InitColumn";
+            this.InitColumn.ReadOnly = true;
+            this.InitColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.InitColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // CommentColumn
+            // 
+            this.CommentColumn.HeaderText = "Comment";
+            this.CommentColumn.Name = "CommentColumn";
+            this.CommentColumn.ReadOnly = true;
+            this.CommentColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.CommentColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // MappingPackageAutomation
             // 
@@ -700,6 +792,15 @@
         private System.Windows.Forms.Panel panel4;
         private System.Windows.Forms.RichTextBox ErrorMessage;
         private AdvancedDataGridView.TreeGridView treeGridView1;
+        private AdvancedDataGridView.TreeGridColumn Registers;
+        private System.Windows.Forms.DataGridViewTextBoxColumn AddressColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn MAISColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn LSBColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn MSBColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn TypeColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn FPGAColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn InitColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn CommentColumn;
         //private System.Windows.Forms.OpenFileDialog openFileDialog1;
     }
 }

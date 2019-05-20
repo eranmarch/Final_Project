@@ -6,6 +6,7 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using AdvancedDataGridView;
 
 namespace MappingBreakDown
 {
@@ -24,6 +25,8 @@ namespace MappingBreakDown
             ErrorMessage.Text = "> ";
             xs = new XmlSerializer(typeof(List<RegisterEntry>));
             UpdateXML(false, false, false, false, true);
+            treeGridView1.Nodes.Add("");
+            //updateTable();
         }
 
         /* Default values for each register */
@@ -91,7 +94,9 @@ namespace MappingBreakDown
                 }
             }
             RegGroupOpts.Items.Add(NewGroupText.Text);
+            treeGridView1.Nodes.Add(NewGroupText.Text);
             NewGroupText.Text = "";
+            
         }
 
         private bool CheckDup(RegisterEntry new_entry, bool delete = false)
@@ -344,6 +349,8 @@ namespace MappingBreakDown
             RegShow[i].EditRegister(mais, lsb, msb, t, r, init, comment, group);
             OpenValidation();
             UpdateXML(false, true, false, false, false);
+            //updateTable();
+
         }
 
         /* PROBLEM HERE */
@@ -426,6 +433,7 @@ namespace MappingBreakDown
                     dataGridView1.Columns["IsComment"].Visible = false;
                     dataGridView1.Columns["Reason"].Visible = false;
                     ColorInValid();
+                    //treeGridView1.DataSource = RegList;
                     UpdateShow();
                 }
             }
@@ -441,20 +449,44 @@ namespace MappingBreakDown
                 dataGridView1.Columns["IsValid"].Visible = false;
                 dataGridView1.Columns["IsComment"].Visible = false;
                 dataGridView1.Columns["Reason"].Visible = false;
+                //treeGridView1.DataSource = RegShow;
                 ColorInValid();
             }
         }
 
+        private void updateTable(RegisterEntry entry)
+        {
+            TreeGridNode node;
+            string group = entry.GetGroup();
+            
+            foreach (TreeGridNode group_node in treeGridView1.Nodes)
+            {
+                if (group_node.Cells["Registers"].Value.ToString().Equals(group))
+                {
+                    node = group_node.Nodes.Add(entry.GetName(), entry.GetAddress(), entry.GetMAIS(), entry.GetLSB(),
+                        entry.GetMSB(), entry.GetRegType().ToString(), entry.GetFPGA().ToString(), entry.GetInit(), entry.GetComment());
+                    List<RegisterEntry> fields = entry.GetFields();
+                    TreeGridNode child;
+                    foreach (RegisterEntry field in fields)
+                        child = node.Nodes.Add(field.GetName(), field.GetAddress(), field.GetMAIS(), field.GetLSB(),
+                        field.GetMSB(), field.GetRegType().ToString(), field.GetFPGA().ToString(), field.GetInit(), field.GetComment());
+                }
+            }
+        }
         private void AddEntryToTable(RegisterEntry entry)
         {
             if (entry.GetRegType() == RegisterEntry.type_field.FIELD)
             {
+                
                 RegisterEntry entf = FindAtAddress(entry.GetAddress(), true);
+                entry.SetGroup(entf.GetGroup());
                 entf.AddField(entry);
             }
             else
                 RegList.Add(entry);
             UpdateXML(true, false, false, false, false);
+            updateTable(entry);
+
         }
 
         private void AddManyRegisters(List<RegisterEntry> entries, List<string> groups)
@@ -525,6 +557,8 @@ namespace MappingBreakDown
             searchBox.Text = "";
             OpenValidation();
             UpdateXML(false, false, true, false, false);
+            //updateTable();
+
         }
 
         private void TextBox2_TextChanged(object sender, EventArgs e)
@@ -535,6 +569,8 @@ namespace MappingBreakDown
                 if (entry.GetName().Contains(searchRes))
                     RegShow.Add(entry);
             UpdateXML(false, false, false, true, false);
+            //updateTable();
+
         }
 
         private void DataGridView1_SelectionChanged(object sender, EventArgs e)
@@ -740,6 +776,8 @@ namespace MappingBreakDown
             for (int i = RegList.Count - 1; i >= 0; i--)
                 RegList.RemoveAt(i);
             UpdateXML(false, false, true, false, false);
+            //updateTable();
+
             InitFields();
         }
 
