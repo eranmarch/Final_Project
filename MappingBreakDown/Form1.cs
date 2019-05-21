@@ -12,7 +12,7 @@ namespace MappingBreakDown
 {
     public partial class MappingPackageAutomation : Form
     {
-        
+
         public XmlSerializer xs;
         List<RegisterEntry> RegList;
         List<RegisterEntry> RegShow;
@@ -96,7 +96,7 @@ namespace MappingBreakDown
             RegGroupOpts.Items.Add(NewGroupText.Text);
             treeGridView1.Nodes.Add(NewGroupText.Text);
             NewGroupText.Text = "";
-            
+
         }
 
         private bool CheckDup(RegisterEntry new_entry, bool delete = false)
@@ -454,30 +454,39 @@ namespace MappingBreakDown
             }
         }
 
-        private void updateTable(RegisterEntry entry)
+        private void updateTable(RegisterEntry entry = null, bool isField = false)
         {
             TreeGridNode node;
             string group = entry.GetGroup();
-            
+
             foreach (TreeGridNode group_node in treeGridView1.Nodes)
             {
                 if (group_node.Cells["Registers"].Value.ToString().Equals(group))
-                {
-                    node = group_node.Nodes.Add(entry.GetName(), entry.GetAddress(), entry.GetMAIS(), entry.GetLSB(),
-                        entry.GetMSB(), entry.GetRegType().ToString(), entry.GetFPGA().ToString(), entry.GetInit(), entry.GetComment());
-                    List<RegisterEntry> fields = entry.GetFields();
-                    TreeGridNode child;
-                    foreach (RegisterEntry field in fields)
-                        child = node.Nodes.Add(field.GetName(), field.GetAddress(), field.GetMAIS(), field.GetLSB(),
-                        field.GetMSB(), field.GetRegType().ToString(), field.GetFPGA().ToString(), field.GetInit(), field.GetComment());
-                }
+                    if (!isField)
+                        node = group_node.Nodes.Add(entry.GetName(), entry.GetAddress(), entry.GetMAIS(), entry.GetLSB(),
+                            entry.GetMSB(), entry.GetRegType().ToString(), entry.GetFPGA().ToString(), entry.GetInit(), entry.GetComment());
+                    else
+                    {
+                        TreeGridNode tmp = null;
+                        foreach (TreeGridNode reg in group_node.Nodes)
+                        {
+                            if ((int)reg.Cells["AddressColumn"].Value == entry.GetAddress())
+                            {
+                                tmp = reg;
+                                break;
+                            }
+                        }
+                        if (tmp != null)
+                            node = tmp.Nodes.Add(entry.GetName(), entry.GetAddress(), entry.GetMAIS(), entry.GetLSB(),
+                                entry.GetMSB(), entry.GetRegType().ToString(), entry.GetFPGA().ToString(), entry.GetInit(), entry.GetComment());
+                    }
             }
         }
         private void AddEntryToTable(RegisterEntry entry)
         {
             if (entry.GetRegType() == RegisterEntry.type_field.FIELD)
             {
-                
+
                 RegisterEntry entf = FindAtAddress(entry.GetAddress(), true);
                 entry.SetGroup(entf.GetGroup());
                 entf.AddField(entry);
@@ -485,8 +494,7 @@ namespace MappingBreakDown
             else
                 RegList.Add(entry);
             UpdateXML(true, false, false, false, false);
-            updateTable(entry);
-
+            updateTable(entry, entry.GetRegType() == RegisterEntry.type_field.FIELD);
         }
 
         private void AddManyRegisters(List<RegisterEntry> entries, List<string> groups)

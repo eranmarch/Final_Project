@@ -363,11 +363,12 @@
             // 
             // dataGridView1
             // 
+            this.dataGridView1.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(2134, 680);
+            this.dataGridView1.Location = new System.Drawing.Point(2715, 35);
             this.dataGridView1.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(882, 542);
+            this.dataGridView1.Size = new System.Drawing.Size(186, 136);
             this.dataGridView1.TabIndex = 28;
             this.dataGridView1.SelectionChanged += new System.EventHandler(this.DataGridView1_SelectionChanged);
             this.dataGridView1.KeyUp += new System.Windows.Forms.KeyEventHandler(this.DataGridView1_KeyUp);
@@ -617,6 +618,8 @@
             // 
             this.treeGridView1.AllowUserToAddRows = false;
             this.treeGridView1.AllowUserToDeleteRows = false;
+            this.treeGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.treeGridView1.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.treeGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Registers,
             this.AddressColumn,
@@ -629,9 +632,9 @@
             this.CommentColumn});
             this.treeGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.treeGridView1.ImageList = null;
-            this.treeGridView1.Location = new System.Drawing.Point(194, 744);
+            this.treeGridView1.Location = new System.Drawing.Point(35, 744);
             this.treeGridView1.Name = "treeGridView1";
-            this.treeGridView1.Size = new System.Drawing.Size(1553, 565);
+            this.treeGridView1.Size = new System.Drawing.Size(3000, 691);
             this.treeGridView1.TabIndex = 42;
             // 
             // Registers
