@@ -36,6 +36,7 @@ namespace MappingBreakDown
         public bool IsValid { get; set; }
         public bool IsComment { get; set; }
         public string Reason { get; set; }
+        public int Index { get; set; }
 
         public static string pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_ ]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124])[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*,[ \t]*(--[ \t]*(.*)[ \t]*)*";
         public static string final_pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_ ]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124])[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*(--[ \t]*(.*)[ \t]*)*";
@@ -60,6 +61,7 @@ namespace MappingBreakDown
             IsValid = true;
             IsComment = false;
             Reason = "";
+            Index = -1;
         }
 
         public RegisterEntry(string Name, int Address, string MAIS, string LSB, string MSB,
@@ -224,6 +226,16 @@ namespace MappingBreakDown
         public void SetIsComment(bool IsComment)
         {
             this.IsComment = IsComment;
+        }
+
+        public int GetIndex()
+        {
+            return Index;
+        }
+
+        public void SetIndex(int Index)
+        {
+            this.Index = Index;
         }
 
         /* Validation Functions */

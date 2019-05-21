@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MappingBreakDown", "Mapping
 		{2EFE526F-79B3-49BC-9575-A7B258C59BB5} = {2EFE526F-79B3-49BC-9575-A7B258C59BB5}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpandableGridView", "E:\Eran\אוניברסיטה\פרויקט גמר\TreeGridview\TreeGridView\ExpandableGridView.csproj", "{2EFE526F-79B3-49BC-9575-A7B258C59BB5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpandableGridView", "..\..\..\Desktop\שיט של אחרים\ערן ועידן\ערן לימודים\גיבוי פרויקט גמר\TreeGridview\TreeGridView\ExpandableGridView.csproj", "{2EFE526F-79B3-49BC-9575-A7B258C59BB5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -464,7 +464,7 @@ namespace MappingBreakDown
                 if (group_node.Cells["Registers"].Value.ToString().Equals(group))
                     if (!isField)
                         node = group_node.Nodes.Add(entry.GetName(), entry.GetAddress(), entry.GetMAIS(), entry.GetLSB(),
-                            entry.GetMSB(), entry.GetRegType().ToString(), entry.GetFPGA().ToString(), entry.GetInit(), entry.GetComment());
+                            entry.GetMSB(), entry.GetRegType().ToString(), entry.GetFPGA().ToString(), entry.GetInit(), entry.GetComment(), entry.GetIndex());
                     else
                     {
                         TreeGridNode tmp = null;
@@ -478,7 +478,7 @@ namespace MappingBreakDown
                         }
                         if (tmp != null)
                             node = tmp.Nodes.Add(entry.GetName(), entry.GetAddress(), entry.GetMAIS(), entry.GetLSB(),
-                                entry.GetMSB(), entry.GetRegType().ToString(), entry.GetFPGA().ToString(), entry.GetInit(), entry.GetComment());
+                                entry.GetMSB(), entry.GetRegType().ToString(), entry.GetFPGA().ToString(), entry.GetInit(), entry.GetComment(), entry.GetIndex());
                     }
             }
         }
@@ -489,10 +489,15 @@ namespace MappingBreakDown
 
                 RegisterEntry entf = FindAtAddress(entry.GetAddress(), true);
                 entry.SetGroup(entf.GetGroup());
+                entry.SetIndex(entf.GetFields().Count); // inner index
                 entf.AddField(entry);
             }
             else
+            {
+                entry.SetIndex(RegList.Count);
                 RegList.Add(entry);
+            }
+            
             UpdateXML(true, false, false, false, false);
             updateTable(entry, entry.GetRegType() == RegisterEntry.type_field.FIELD);
         }
@@ -600,8 +605,9 @@ namespace MappingBreakDown
                 RegisterEntry re = null;
                 foreach (DataGridViewRow item in dataGridView1.SelectedRows)
                 {
-                    MessageBox.Show(item.Index.ToString());
+                    
                     re = RegShow[item.Index];
+                    MessageBox.Show(re.Index.ToString());
                     break;
                 }
                 if (re != null)
