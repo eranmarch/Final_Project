@@ -212,13 +212,14 @@ namespace MappingBreakDown
                         }
                         return false;
                     }
-                    int addr = -1;
+                    int addr = -1, index = -1;
                     RegisterEntry item;
                     using (ChooseAddressPrompt prompt = new ChooseAddressPrompt(RegList.ToArray()))
                     {
                         if (prompt.ShowDialog() == DialogResult.OK)
                         {
                             addr = prompt.Chosen_address;
+                            index = prompt.Index;
                             item = RegList[prompt.Index];
                         }
                         else
@@ -239,6 +240,7 @@ namespace MappingBreakDown
                             return false;
                         }
                     entry.SetAddress(addr);
+                    entry.SetIndex(index);
                 }
             }
 
@@ -458,13 +460,13 @@ namespace MappingBreakDown
         {
             TreeGridNode node;
             string group = entry.GetGroup();
-
+            //MessageBox.Show(entry.GetAddress().ToString());
+            object[] ent = entry.GetTableEntry();
             foreach (TreeGridNode group_node in treeGridView1.Nodes)
             {
                 if (group_node.Cells["Registers"].Value.ToString().Equals(group))
                     if (!isField)
-                        node = group_node.Nodes.Add(entry.GetName(), entry.GetAddress(), entry.GetMAIS(), entry.GetLSB(),
-                            entry.GetMSB(), entry.GetRegType().ToString(), entry.GetFPGA().ToString(), entry.GetInit(), entry.GetComment(), entry.GetIndex());
+                        node = group_node.Nodes.Add(ent);
                     else
                     {
                         TreeGridNode tmp = null;
@@ -477,29 +479,33 @@ namespace MappingBreakDown
                             }
                         }
                         if (tmp != null)
-                            node = tmp.Nodes.Add(entry.GetName(), entry.GetAddress(), entry.GetMAIS(), entry.GetLSB(),
-                                entry.GetMSB(), entry.GetRegType().ToString(), entry.GetFPGA().ToString(), entry.GetInit(), entry.GetComment(), entry.GetIndex());
+                            node = tmp.Nodes.Add(ent);
                     }
             }
         }
         private void AddEntryToTable(RegisterEntry entry)
         {
-            if (entry.GetRegType() == RegisterEntry.type_field.FIELD)
+            bool isField = entry.GetRegType() == RegisterEntry.type_field.FIELD;
+            MessageBox.Show(isField.ToString());
+            if (isField)
             {
 
-                RegisterEntry entf = FindAtAddress(entry.GetAddress(), true);
+                //RegisterEntry entf = FindAtAddress(entry.GetAddress(), true);
+                RegisterEntry entf = RegList[entry.GetIndex()];
                 entry.SetGroup(entf.GetGroup());
-                entry.SetIndex(entf.GetFields().Count); // inner index
+                entry.SetSecondaryIndex(entf.GetFields().Count); // inner index
+                //entry.SetIndex(entf.GetIndex()); // outer index
+                MessageBox.Show(entry.GetIndex().ToString() + ", " + entry.GetSecondaryIndex().ToString());
                 entf.AddField(entry);
             }
             else
             {
-                entry.SetIndex(RegList.Count);
+                entry.SetIndex(RegList.Count); // only outer index
                 RegList.Add(entry);
             }
-            
+
             UpdateXML(true, false, false, false, false);
-            updateTable(entry, entry.GetRegType() == RegisterEntry.type_field.FIELD);
+            updateTable(entry, isField);
         }
 
         private void AddManyRegisters(List<RegisterEntry> entries, List<string> groups)
@@ -577,25 +583,13 @@ namespace MappingBreakDown
         private void TextBox2_TextChanged(object sender, EventArgs e)
         {
             string searchRes = searchBox.Text;
-            //dataGridView1.DataSource = RegList.Where(v => v.GetName().Contains(searchRes)).ToList();
-
             foreach (TreeGridNode group_node in treeGridView1.Nodes)
-            {
                 foreach (TreeGridNode reg in group_node.Nodes)
                 {
                     foreach (TreeGridNode field in reg.Nodes)
                         field.Visible = field.Cells["Registers"].Value.ToString().Contains(searchRes);
                     reg.Visible = reg.Cells["Registers"].Value.ToString().Contains(searchRes);
                 }
-            }
-
-            /*RegShow = new List<RegisterEntry>();
-            foreach (RegisterEntry entry in RegList)
-                if (entry.GetName().Contains(searchRes))
-                    RegShow.Add(entry);
-            UpdateXML(false, false, false, true, false);*/
-            //updateTable();
-
         }
 
         private void DataGridView1_SelectionChanged(object sender, EventArgs e)
@@ -605,7 +599,7 @@ namespace MappingBreakDown
                 RegisterEntry re = null;
                 foreach (DataGridViewRow item in dataGridView1.SelectedRows)
                 {
-                    
+
                     re = RegShow[item.Index];
                     MessageBox.Show(re.Index.ToString());
                     break;
@@ -915,6 +909,30 @@ namespace MappingBreakDown
                 else if (dialogResult == DialogResult.No)
                 {
                     //do nothing
+                }
+            }
+        }
+
+        private void TreeGridView1_SelectionChanged(object sender, EventArgs e)
+        {
+            RegisterEntry re = null;
+            foreach (TreeGridNode item in treeGridView1.SelectedRows)
+            {
+                try
+                {
+                    MessageBox.Show(item.Cells["IndexColumn"].Value.ToString());
+
+                    re = RegList[(int)item.Cells["IndexColumn"].Value];
+                    MessageBox.Show(re.Index.ToString());
+                    int index = re.GetSecondaryIndex();
+                    if (index != -1)
+                        re = re.GetFields()[index];
+                    break;
+                }
+                catch (NullReferenceException)
+                {
+                    //nothing
+                    return;
                 }
             }
         }

@@ -80,6 +80,7 @@
             this.InitColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CommentColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.IndexColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.SecondaryIndexColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -631,7 +632,8 @@
             this.FPGAColumn,
             this.InitColumn,
             this.CommentColumn,
-            this.IndexColumn});
+            this.IndexColumn,
+            this.SecondaryIndexColumn});
             this.treeGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.treeGridView1.ImageList = null;
             this.treeGridView1.Location = new System.Drawing.Point(35, 744);
@@ -639,6 +641,7 @@
             this.treeGridView1.Name = "treeGridView1";
             this.treeGridView1.Size = new System.Drawing.Size(3000, 692);
             this.treeGridView1.TabIndex = 42;
+            this.treeGridView1.SelectionChanged += new System.EventHandler(this.TreeGridView1_SelectionChanged);
             // 
             // Registers
             // 
@@ -720,6 +723,14 @@
             this.IndexColumn.ReadOnly = true;
             this.IndexColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.IndexColumn.Visible = false;
+            // 
+            // SecondaryIndexColumn
+            // 
+            this.SecondaryIndexColumn.HeaderText = "SecondaryIndex";
+            this.SecondaryIndexColumn.Name = "SecondaryIndexColumn";
+            this.SecondaryIndexColumn.ReadOnly = true;
+            this.SecondaryIndexColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.SecondaryIndexColumn.Visible = false;
             // 
             // MappingPackageAutomation
             // 
@@ -816,6 +827,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn InitColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn CommentColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn IndexColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn SecondaryIndexColumn;
         //private System.Windows.Forms.OpenFileDialog openFileDialog1;
     }
 }

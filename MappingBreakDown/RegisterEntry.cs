@@ -37,6 +37,7 @@ namespace MappingBreakDown
         public bool IsComment { get; set; }
         public string Reason { get; set; }
         public int Index { get; set; }
+        public int SecondaryIndex { get; set; }
 
         public static string pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_ ]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124])[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*,[ \t]*(--[ \t]*(.*)[ \t]*)*";
         public static string final_pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_ ]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124])[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*(--[ \t]*(.*)[ \t]*)*";
@@ -62,6 +63,7 @@ namespace MappingBreakDown
             IsComment = false;
             Reason = "";
             Index = -1;
+            SecondaryIndex = -1;
         }
 
         public RegisterEntry(string Name, int Address, string MAIS, string LSB, string MSB,
@@ -238,6 +240,16 @@ namespace MappingBreakDown
             this.Index = Index;
         }
 
+        public int GetSecondaryIndex()
+        {
+            return SecondaryIndex;
+        }
+
+        public void SetSecondaryIndex(int index)
+        {
+            SecondaryIndex = index;
+        }
+
         /* Validation Functions */
         public bool IsValidLsbMsb()
         {
@@ -374,6 +386,11 @@ namespace MappingBreakDown
             else
                 __init = Init;
             return ___reg_name___ + "," + __address + "," + __mais + "," + __lsb__msb + "," + _type__ + "," + _fpga__ + "," + __init + ")";
+        }
+
+        public object[] GetTableEntry()
+        {
+            return new object[] { Name, Address, MAIS, LSB, MSB, Type, FPGA, Init, Comment, Index, SecondaryIndex };
         }
 
         public int CompareTo(RegisterEntry other)

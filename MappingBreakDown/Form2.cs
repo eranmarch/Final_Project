@@ -42,8 +42,10 @@ namespace MappingBreakDown
             //MessageBox.Show(registers[i].Address.ToString());
             try
             {
-                Chosen_address = registers[i].GetAddress();
-                Index = i;
+                //Chosen_address = registers[i].GetAddress();
+                //Index = i;
+                Index = AddressOpts.SelectedIndex;
+                Chosen_address = registers[Index].GetAddress();
                 DialogResult = DialogResult.OK;
             }
             catch (System.IndexOutOfRangeException)
