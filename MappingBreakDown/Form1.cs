@@ -572,11 +572,23 @@ namespace MappingBreakDown
         private void TextBox2_TextChanged(object sender, EventArgs e)
         {
             string searchRes = searchBox.Text;
-            RegShow = new List<RegisterEntry>();
+            //dataGridView1.DataSource = RegList.Where(v => v.GetName().Contains(searchRes)).ToList();
+
+            foreach (TreeGridNode group_node in treeGridView1.Nodes)
+            {
+                foreach (TreeGridNode reg in group_node.Nodes)
+                {
+                    foreach (TreeGridNode field in reg.Nodes)
+                        field.Visible = field.Cells["Registers"].Value.ToString().Contains(searchRes);
+                    reg.Visible = reg.Cells["Registers"].Value.ToString().Contains(searchRes);
+                }
+            }
+
+            /*RegShow = new List<RegisterEntry>();
             foreach (RegisterEntry entry in RegList)
                 if (entry.GetName().Contains(searchRes))
                     RegShow.Add(entry);
-            UpdateXML(false, false, false, true, false);
+            UpdateXML(false, false, false, true, false);*/
             //updateTable();
 
         }
@@ -588,6 +600,7 @@ namespace MappingBreakDown
                 RegisterEntry re = null;
                 foreach (DataGridViewRow item in dataGridView1.SelectedRows)
                 {
+                    MessageBox.Show(item.Index.ToString());
                     re = RegShow[item.Index];
                     break;
                 }

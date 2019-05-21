@@ -1,11 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.28010.2050
+VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MappingBreakDown", "MappingBreakDown\MappingBreakDown.csproj", "{85299E5D-C955-464C-8B0B-E344C951C11A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2EFE526F-79B3-49BC-9575-A7B258C59BB5} = {2EFE526F-79B3-49BC-9575-A7B258C59BB5}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpandableGridView", "..\..\..\Desktop\שיט של אחרים\ערן ועידן\ערן לימודים\גיבוי פרויקט גמר\TreeGridview\TreeGridView\ExpandableGridView.csproj", "{2EFE526F-79B3-49BC-9575-A7B258C59BB5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpandableGridView", "E:\Eran\אוניברסיטה\פרויקט גמר\TreeGridview\TreeGridView\ExpandableGridView.csproj", "{2EFE526F-79B3-49BC-9575-A7B258C59BB5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

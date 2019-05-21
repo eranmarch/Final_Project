@@ -105,8 +105,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Desktop\שיט של אחרים\ערן ועידן\ערן לימודים\גיבוי פרויקט גמר\TreeGridview\TreeGridView\ExpandableGridView.csproj">
-      <Project>{2EFE526F-79B3-49BC-9575-A7B258C59BB5}</Project>
+    <ProjectReference Include="E:\Eran\אוניברסיטה\פרויקט גמר\TreeGridview\TreeGridView\ExpandableGridView.csproj">
+      <Project>{2efe526f-79b3-49bc-9575-a7b258c59bb5}</Project>
       <Name>ExpandableGridView</Name>
     </ProjectReference>
   </ItemGroup>
