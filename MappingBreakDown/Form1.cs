@@ -281,6 +281,7 @@ namespace MappingBreakDown
         private void Load_Click(object sender, EventArgs e)
         {
             RegisterEntry re = null;
+            TreeGridNode node = null;
             foreach (TreeGridNode item in treeGridView1.SelectedRows)
             {
                 try
@@ -289,6 +290,7 @@ namespace MappingBreakDown
                     int index = (int)item.Cells["SecondaryIndexColumn"].Value;
                     if (index != -1)
                         re = re.GetFields()[index];
+                    node = item;
                     break;
                 }
                 catch (NullReferenceException)
@@ -352,7 +354,7 @@ namespace MappingBreakDown
             entry.EditRegister(mais, lsb, msb, t, r, init, comment, group);
             OpenValidation();
             UpdateDataBase();
-            UpdateTable(entry, true, false);
+            EditCell(node, entry.GetTableEntry());
         }
 
         private void ColorNode(TreeGridNode node)
@@ -398,7 +400,7 @@ namespace MappingBreakDown
                 cell.Cells[i].Value = ent[i];
         }
 
-        private void UpdateTable(RegisterEntry entry, bool load, bool delete)
+        private void UpdateTable(RegisterEntry entry, bool delete)
         {
             TreeGridNode node;
             string group = entry.GetGroup();
@@ -407,7 +409,7 @@ namespace MappingBreakDown
             foreach (TreeGridNode group_node in treeGridView1.Nodes)
             {
                 if (group_node.Cells["Registers"].Value.ToString().Equals(group))
-                    if (!isField && !load && !delete)
+                    if (!isField && !delete)
                     {
                         node = group_node.Nodes.Add(ent);
                         group_node.Expand();
@@ -430,16 +432,14 @@ namespace MappingBreakDown
                         }
                         if (tmp != null)
                         {
-                            if (!load && !delete)
+                            if (!delete)
                             {
                                 node = tmp.Nodes.Add(ent);
                                 group_node.Expand();
                                 tmp.Expand();
                             }
                             else if (!isField)
-                                if (load)
-                                    EditCell(tmp, ent);
-                                else if (delete)
+                                if (delete)
                                 {
                                     group_node.Nodes.Remove(tmp);
                                     //remove fields
@@ -450,9 +450,7 @@ namespace MappingBreakDown
                                     {
                                         if ((int)f.Cells["SecondaryIndexColumn"].Value == entry.GetSecondaryIndex())
                                         {
-                                            if (load)
-                                                EditCell(f, ent);
-                                            else if (delete)
+                                            if (delete)
                                                 tmp.Nodes.Remove(f);
                                             break;
                                         }
@@ -462,7 +460,7 @@ namespace MappingBreakDown
                         break;
                     }
             }
-            if (load || delete)
+            if (delete)
                 ColorInValid();
         }
 
@@ -484,7 +482,7 @@ namespace MappingBreakDown
             }
 
             UpdateDataBase();
-            UpdateTable(entry, false, false);
+            UpdateTable(entry, false);
         }
 
         private void AddManyRegisters(List<RegisterEntry> entries, List<string> groups)
@@ -523,31 +521,24 @@ namespace MappingBreakDown
             List<int> indices = new List<int>();
             List<Tuple<int, int>> s = new List<Tuple<int, int>>();
             List<RegisterEntry> fields;
-            RegisterEntry re, reg;
             foreach (TreeGridNode item in treeGridView1.SelectedRows)
             {
                 int i = (int)item.Cells["IndexColumn"].Value, j = (int)item.Cells["SecondaryIndexColumn"].Value;
-                re = RegList[i];
                 if (j != -1)
-                {
-                    re = re.GetFields()[j];
                     s.Add(new Tuple<int, int>(i, j));
-                    UpdateTable(re, false, true);
-                }
                 else
                 {
                     indices.Add(i);
-                    fields = re.GetFields();
-                    foreach (RegisterEntry f in fields)
-                        UpdateTable(f, false, true);
-                } 
+                    foreach (TreeGridNode f in item.Nodes)
+                        item.Nodes.Remove(f);
+                }
+                treeGridView1.Rows.Remove(item);
             }
-            
+            s = s.OrderByDescending(v => v.Item2).ToList();
             foreach (Tuple<int, int> index in s)
             {
-                reg = RegList[index.Item1];
                 int j = index.Item2;
-                fields = reg.GetFields();
+                fields = RegList[index.Item1].GetFields();
                 for (int k = j + 1; j < fields.Count; k++)
                     fields[k].SecondaryIndex--;
                 fields.RemoveAt(j);
@@ -716,7 +707,7 @@ namespace MappingBreakDown
             {
                 entry = RegList[i];
                 RegList.Remove(entry);
-                UpdateTable(entry, false, true);
+                UpdateTable(entry, true);
                 //RegList.RemoveAt(i);
             }
             UpdateDataBase();
