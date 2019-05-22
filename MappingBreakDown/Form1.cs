@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using AdvancedDataGridView;
+using System.Runtime;
 
 namespace MappingBreakDown
 {
@@ -15,7 +16,6 @@ namespace MappingBreakDown
 
         public XmlSerializer xs;
         List<RegisterEntry> RegList;
-        List<RegisterEntry> RegShow;
         bool saved = false;
 
         public MappingPackageAutomation()
@@ -24,9 +24,11 @@ namespace MappingBreakDown
             InitFields();
             ErrorMessage.Text = "> ";
             xs = new XmlSerializer(typeof(List<RegisterEntry>));
-            UpdateXML(false, false, false, false, true);
+            //ReadDataBase();
+            RegList = new List<RegisterEntry>();
             treeGridView1.Nodes.Add("");
-            //updateTable();
+            //foreach (RegisterEntry entry in RegList)
+            //    UpdateTable(entry, false, false);
         }
 
         /* Default values for each register */
@@ -65,18 +67,6 @@ namespace MappingBreakDown
                     return i;
             }
             return -1;
-        }
-
-        /* Find Register entry at a given address */
-        private RegisterEntry FindAtAddress(int address, bool real)
-        {
-            List<RegisterEntry> search = RegList;
-            if (!real)
-                search = RegShow;
-            foreach (RegisterEntry entry in search)
-                if (entry.GetAddress() == address)
-                    return entry;
-            return null;
         }
 
         /* Add a new group */
@@ -170,7 +160,10 @@ namespace MappingBreakDown
                 string reason;
                 if (entry.GetRegType() != RegisterEntry.type_field.FIELD)
                 {
-                    int index = FindIndex(entry.GetName(), true);
+                    int index = -1;
+                    for (int i = 0; i < RegList.Count; i++)
+                        if (RegList[i].GetName().Equals(entry.GetName()))
+                            index = i;
                     if (index != -1)
                     {
                         reason = "Register " + entry.GetName() + " (" + RegList[index].GetAddress() + ") is already in the list";
@@ -287,17 +280,22 @@ namespace MappingBreakDown
         /* Edit a register */
         private void Load_Click(object sender, EventArgs e)
         {
-            /*if (RegNameText.Text.Equals(""))
-            {
-                MessageBox.Show("Invalid register name");
-                InitFields();
-                return;
-            }*/
             RegisterEntry re = null;
-            foreach (DataGridViewRow item in dataGridView1.SelectedRows)
+            foreach (TreeGridNode item in treeGridView1.SelectedRows)
             {
-                re = RegShow[item.Index];
-                break;
+                try
+                {
+                    re = RegList[(int)item.Cells["IndexColumn"].Value];
+                    int index = (int)item.Cells["SecondaryIndexColumn"].Value;
+                    if (index != -1)
+                        re = re.GetFields()[index];
+                    break;
+                }
+                catch (NullReferenceException)
+                {
+                    //do nothing for groups
+                    return;
+                }
             }
             if (re == null)
             {
@@ -308,6 +306,7 @@ namespace MappingBreakDown
             if (!re.GetName().Equals(name))
             {
                 MessageBox.Show("You can't edit a register's name");
+                RegNameText.Text = re.GetName();
                 return;
             }
             string mais = MAISOpts.Text;
@@ -318,72 +317,65 @@ namespace MappingBreakDown
             string init = InitText.Text;
             string comment = CommentText.Text;
             string group = RegGroupOpts.Text;
-            int addr = -1;
-
-            RegisterEntry entry = new RegisterEntry(name, addr, mais, lsb, msb, type, fpga, init, comment, group);
-
-            int i = FindIndex(name, true, re, true);
+            RegisterEntry entry;
+            int i = re.GetIndex(), j = re.GetSecondaryIndex();
             if (i == -1)
             {
                 MessageBox.Show("No such register " + name);
                 InitFields();
                 return;
             }
-            if (RegList[i].GetIsComment())
+            entry = RegList[i];
+            if (j != -1)
+                entry = entry.GetFields()[j];
+            if (entry.GetIsComment())
             {
                 MessageBox.Show("This register is a comment and can't be edited");
                 InitFields();
                 return;
             }
             Enum.TryParse(type, out RegisterEntry.type_field t);
-            if ((RegList[i].GetRegType() == RegisterEntry.type_field.FIELD && t != RegisterEntry.type_field.FIELD) ||
-                RegList[i].GetRegType() != RegisterEntry.type_field.FIELD && t == RegisterEntry.type_field.FIELD)
+            if ((entry.GetRegType() == RegisterEntry.type_field.FIELD && t != RegisterEntry.type_field.FIELD) ||
+                entry.GetRegType() != RegisterEntry.type_field.FIELD && t == RegisterEntry.type_field.FIELD)
             {
                 MessageBox.Show("Can't edit a field or create one using Load");
                 InitFields();
                 return;
             }
-            if (!InputValidation(entry, false))
-                return;
-            Enum.TryParse(fpga, out RegisterEntry.fpga_field r);
-            RegList[i].EditRegister(mais, lsb, msb, t, r, init, comment, group);
-            i = FindIndex(name, false, re, true);
-            RegShow[i].EditRegister(mais, lsb, msb, t, r, init, comment, group);
-            OpenValidation();
-            UpdateXML(false, true, false, false, false);
-            //updateTable();
-
-        }
-
-        /* PROBLEM HERE */
-        public void FlattenList()
-        {
-            //IEnumerable<RegisterEntry> jack = RegShow.SelectMany(val => val.GetFields());
-            //List<RegisterEntry> onlyFIELDS = jack.ToList();
-            List<RegisterEntry> res = new List<RegisterEntry>();
-            var xml = XElement.Parse(@"show.txt");
-
-            foreach (RegisterEntry reg in RegList)
+            if (!RegisterEntry.IsValidLsbMsb(msb, lsb))
             {
-                res.Add(reg);
-                res.Concat(reg.GetFields());
+                MessageBox.Show("Can't edit an entry to have LSB > MSB");
+                InitFields();
+                return;
             }
+            Enum.TryParse(fpga, out RegisterEntry.fpga_field r);
+            entry.EditRegister(mais, lsb, msb, t, r, init, comment, group);
+            OpenValidation();
+            UpdateDataBase();
+            UpdateTable(entry, true, false);
         }
-        /* PROBLEM HERE */
+
+        private void ColorNode(TreeGridNode node)
+        {
+            RegisterEntry entry = RegList[(int)node.Cells["IndexColumn"].Value];
+            for (int i = 0; i < treeGridView1.ColumnCount; i++)
+                if (entry.GetIsComment())
+                    node.Cells[i].Style.BackColor = System.Drawing.Color.Gray;
+                else if (!entry.GetValid())
+                    node.Cells[i].Style.BackColor = System.Drawing.Color.Red;
+                else
+                    node.Cells[i].Style.BackColor = System.Drawing.Color.White;
+        }
 
         private void ColorInValid()
         {
-            for (int i = 0; i < RegShow.Count; i++)
-                for (int j = 0; j < dataGridView1.ColumnCount; j++)
-                    if (RegShow[i].GetIsComment())
-                        dataGridView1.Rows[i].Cells[j].Style.BackColor = System.Drawing.Color.Gray;
-                    else if (!RegShow[i].GetValid())
-                    {
-                        dataGridView1.Rows[i].Cells[j].Style.BackColor = System.Drawing.Color.Red;
-                        //Console.WriteLine(RegShow[i]);
-                    }
-                    else
-                        dataGridView1.Rows[i].Cells[j].Style.BackColor = System.Drawing.Color.White;
+            foreach (TreeGridNode group_node in treeGridView1.Nodes)
+                foreach (TreeGridNode register in group_node.Nodes)
+                {
+                    ColorNode(register);
+                    foreach (TreeGridNode field in register.Nodes)
+                        ColorNode(field);
+                }
         }
 
         private void UpdateDataBase()
@@ -400,89 +392,80 @@ namespace MappingBreakDown
             fs.Close();
         }
 
-        private void UpdateShow()
+        private void EditCell(TreeGridNode cell, object[] ent)
         {
-            FileStream fs = new FileStream(@"show.txt", FileMode.Create, FileAccess.Write);
-            xs.Serialize(fs, RegShow);
-            fs.Close();
+            for (int i = 0; i < ent.Length; i++)
+                cell.Cells[i].Value = ent[i];
         }
 
-        private void ReadShow()
-        {
-            FileStream fs = new FileStream(@"show.txt", FileMode.Open, FileAccess.Read);
-            RegShow = (List<RegisterEntry>)xs.Deserialize(fs);
-            fs.Close();
-        }
-
-        /* Update inner files */
-        private void UpdateXML(bool insert, bool load, bool delete, bool search, bool restore)
-        {
-            //RegList = RegList.OrderBy(y => y.GetGroup()).ThenBy(y => y.GetAddress()).ThenBy(y => y.GetRegType()).ThenBy(y => y.GetLSB()).ToList();
-            //RegShow = RegShow.OrderBy(y => y.GetGroup()).ThenBy(y => y.GetAddress()).ThenBy(y => y.GetRegType()).ThenBy(y => y.GetLSB()).ToList();
-            if (insert || load || delete)
-            {
-                UpdateDataBase();
-            }
-            if (insert || delete || restore)
-            {
-                ReadDataBase();
-                if (insert || delete)
-                {
-                    RegShow = RegList;
-                    //FlattenList();
-                    dataGridView1.DataSource = RegList;
-                    dataGridView1.Columns["IsValid"].Visible = false;
-                    dataGridView1.Columns["IsComment"].Visible = false;
-                    dataGridView1.Columns["Reason"].Visible = false;
-                    ColorInValid();
-                    //treeGridView1.DataSource = RegList;
-                    UpdateShow();
-                }
-            }
-            if (load || search)
-            {
-                UpdateShow();
-            }
-            if (load || search || restore)
-            {
-                ReadShow();
-                //FlattenList();
-                dataGridView1.DataSource = RegShow;
-                dataGridView1.Columns["IsValid"].Visible = false;
-                dataGridView1.Columns["IsComment"].Visible = false;
-                dataGridView1.Columns["Reason"].Visible = false;
-                //treeGridView1.DataSource = RegShow;
-                ColorInValid();
-            }
-        }
-
-        private void updateTable(RegisterEntry entry = null, bool isField = false)
+        private void UpdateTable(RegisterEntry entry, bool load, bool delete)
         {
             TreeGridNode node;
             string group = entry.GetGroup();
             object[] ent = entry.GetTableEntry();
+            bool b, isField = entry.GetRegType() == RegisterEntry.type_field.FIELD;
             foreach (TreeGridNode group_node in treeGridView1.Nodes)
             {
                 if (group_node.Cells["Registers"].Value.ToString().Equals(group))
-                    if (!isField)
+                    if (!isField && !load && !delete)
+                    {
                         node = group_node.Nodes.Add(ent);
+                        group_node.Expand();
+                    }
                     else
                     {
                         TreeGridNode tmp = null;
+                        group_node.Expand();
                         foreach (TreeGridNode reg in group_node.Nodes)
                         {
+                            b = reg.GetIsExpanded();
+                            reg.Expand();
                             if ((int)reg.Cells["IndexColumn"].Value == entry.GetIndex())
                             {
                                 tmp = reg;
                                 break;
                             }
+                            else if (!b)
+                                reg.Collapse();
                         }
                         if (tmp != null)
-                            node = tmp.Nodes.Add(ent);
+                        {
+                            if (!load && !delete)
+                            {
+                                node = tmp.Nodes.Add(ent);
+                                group_node.Expand();
+                                tmp.Expand();
+                            }
+                            else if (!isField)
+                                if (load)
+                                    EditCell(tmp, ent);
+                                else if (delete)
+                                {
+                                    group_node.Nodes.Remove(tmp);
+                                    //remove fields
+                                }
+                                else
+                                {
+                                    foreach (TreeGridNode f in tmp.Nodes)
+                                    {
+                                        if ((int)f.Cells["SecondaryIndexColumn"].Value == entry.GetSecondaryIndex())
+                                        {
+                                            if (load)
+                                                EditCell(f, ent);
+                                            else if (delete)
+                                                tmp.Nodes.Remove(f);
+                                            break;
+                                        }
+                                    }
+                                }
+                        }
                         break;
                     }
             }
+            if (load || delete)
+                ColorInValid();
         }
+
         private void AddEntryToTable(RegisterEntry entry)
         {
             bool isField = entry.GetRegType() == RegisterEntry.type_field.FIELD;
@@ -500,8 +483,8 @@ namespace MappingBreakDown
                 RegList.Add(entry);
             }
 
-            UpdateXML(true, false, false, false, false);
-            updateTable(entry, isField);
+            UpdateDataBase();
+            UpdateTable(entry, false, false);
         }
 
         private void AddManyRegisters(List<RegisterEntry> entries, List<string> groups)
@@ -509,7 +492,6 @@ namespace MappingBreakDown
             foreach (RegisterEntry entry in entries)
                 AddEntryToTable(entry);
             OpenValidation(entries);
-            //UpdateXML(true, false, false, false, false);
             foreach (string group in groups)
                 if (!RegGroupOpts.Items.Contains(group))
                     RegGroupOpts.Items.Add(group);
@@ -530,125 +512,74 @@ namespace MappingBreakDown
             }
         }
 
-        private void RegGroupOpts_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void RegGroupOpts_MouseDown(object sender, MouseEventArgs e)
         {
             if (RegGroupOpts.Items.Count == 0)
                 MessageBox.Show("You must first add a group name");
         }
 
-        private int FindIndex(string name, bool real, RegisterEntry entry = null, bool byObj = false)
-        {
-            List<RegisterEntry> search = RegList;
-            if (!real)
-                search = RegShow;
-            for (int i = 0; i < search.Count; i++)
-                if ((byObj && search[i].CompareTo(entry) == 0) || !byObj && search[i].GetName().Equals(name))
-                    return i;
-            return -1;
-        }
-
         private void Delete_Click(object sender, EventArgs e)
         {
             List<int> indices = new List<int>();
-            foreach (DataGridViewRow item in dataGridView1.SelectedRows)
+            List<Tuple<int, int>> s = new List<Tuple<int, int>>();
+            List<RegisterEntry> fields;
+            RegisterEntry re, reg;
+            foreach (TreeGridNode item in treeGridView1.SelectedRows)
             {
-                int i = FindIndex("", true, (RegisterEntry)item.DataBoundItem, true);
-                // Insert here field deletion
-                if (!indices.Contains(i))
+                int i = (int)item.Cells["IndexColumn"].Value, j = (int)item.Cells["SecondaryIndexColumn"].Value;
+                re = RegList[i];
+                if (j != -1)
+                {
+                    re = re.GetFields()[j];
+                    s.Add(new Tuple<int, int>(i, j));
+                    UpdateTable(re, false, true);
+                }
+                else
+                {
                     indices.Add(i);
+                    fields = re.GetFields();
+                    foreach (RegisterEntry f in fields)
+                        UpdateTable(f, false, true);
+                } 
             }
-            /*string print = "";
-            foreach (int index in indices)
-                print += index;
-            MessageBox.Show(print);*/
+            
+            foreach (Tuple<int, int> index in s)
+            {
+                reg = RegList[index.Item1];
+                int j = index.Item2;
+                fields = reg.GetFields();
+                for (int k = j + 1; j < fields.Count; k++)
+                    fields[k].SecondaryIndex--;
+                fields.RemoveAt(j);
+            }
             foreach (int index in indices.OrderByDescending(v => v))
+            {
+                for (int i = index + 1; i < RegList.Count; i++)
+                    RegList[i].Index--;
                 RegList.RemoveAt(index);
+            }
 
             searchBox.Text = "";
             OpenValidation();
-            UpdateXML(false, false, true, false, false);
-            //updateTable();
-
+            UpdateDataBase();
         }
 
         private void TextBox2_TextChanged(object sender, EventArgs e)
         {
             string searchRes = searchBox.Text;
             foreach (TreeGridNode group_node in treeGridView1.Nodes)
+            {
+                group_node.Expand();
                 foreach (TreeGridNode reg in group_node.Nodes)
                 {
+                    reg.Expand();
                     foreach (TreeGridNode field in reg.Nodes)
+                    {
                         field.Visible = field.Cells["Registers"].Value.ToString().Contains(searchRes);
+                    }
                     reg.Visible = reg.Cells["Registers"].Value.ToString().Contains(searchRes);
                 }
-        }
-
-        private void DataGridView1_SelectionChanged(object sender, EventArgs e)
-        {
-            if (RegShow != null && RegShow.Count() != 0)
-            {
-                RegisterEntry re = null;
-                foreach (DataGridViewRow item in dataGridView1.SelectedRows)
-                {
-
-                    re = RegShow[item.Index];
-                    MessageBox.Show(re.Index.ToString());
-                    break;
-                }
-                if (re != null)
-                {
-                    RegNameText.Text = re.GetName();
-                    CommentText.Text = re.GetComment();
-                    InitText.Text = re.GetInit();
-                    int index = LSBOpts.FindStringExact(re.GetLSB().ToString());
-                    if (index == -1)
-                        index = 0;
-                    LSBOpts.SelectedIndex = index;
-                    index = LSBOpts.FindStringExact(re.GetLSB().ToString());
-                    if (index == -1)
-                        index = 0;
-                    LSBOpts.SelectedIndex = index;
-                    index = MSBOpts.FindStringExact(re.GetMSB().ToString());
-                    if (index == -1)
-                        index = 31;
-                    MSBOpts.SelectedIndex = index;
-                    index = MAISOpts.FindStringExact(re.GetMAIS().ToString());
-                    if (index == -1)
-                        index = 0;
-                    MAISOpts.SelectedIndex = index;
-                    index = TypeOpts.FindStringExact(re.GetRegType().ToString());
-                    if (index == -1)
-                        index = 0;
-                    TypeOpts.SelectedIndex = index;
-                    index = FPGAOpts.FindStringExact(re.GetFPGA().ToString());
-                    if (index == -1)
-                        index = 0;
-                    FPGAOpts.SelectedIndex = index;
-                    RegGroupOpts.SelectedIndex = RegGroupOpts.FindStringExact(re.GetGroup());
-
-                    if (re.GetIsComment())
-                        ErrorMessage.Text = "> ";
-                    if (!re.GetValid())
-                        ErrorMessage.Text = "[@] " + re.GetReason();
-                    else
-                        ErrorMessage.Text = "> ";
-                }
             }
-        }
-
-        private void RegNameText_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void Button2_Click(object sender, EventArgs e)
-        {
-
         }
 
         private String getSpaces(int x)
@@ -778,23 +709,17 @@ namespace MappingBreakDown
             }
         }
 
-        private void RegGroupOpts_SelectedIndexChanged_1(object sender, EventArgs e)
-        {
-
-        }
-
-        private void MappingPackageAutomation_Load(object sender, EventArgs e)
-        {
-
-        }
-
         private void Clear_Click(object sender, EventArgs e)
         {
+            RegisterEntry entry;
             for (int i = RegList.Count - 1; i >= 0; i--)
-                RegList.RemoveAt(i);
-            UpdateXML(false, false, true, false, false);
-            //updateTable();
-
+            {
+                entry = RegList[i];
+                RegList.Remove(entry);
+                UpdateTable(entry, false, true);
+                //RegList.RemoveAt(i);
+            }
+            UpdateDataBase();
             InitFields();
         }
 
@@ -820,72 +745,6 @@ namespace MappingBreakDown
         {
             if (e.KeyCode == Keys.Enter)
                 InsertButton_Click(sender, e);
-        }
-
-        private void DataGridView1_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Delete)
-                Delete_Click(sender, e);
-        }
-
-        private void MappingPackageAutomation_Load_1(object sender, EventArgs e)
-        {
-
-        }
-
-        private void lable5_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label6_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void MSBOpts_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void MAISOpts_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label4_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label7_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void TypeOpts_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void FPGAOpts_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void panel3_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void LSBOpts_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label3_Click(object sender, EventArgs e)
-        {
-
         }
 
         private void CloseButton_Click(object sender, EventArgs e)
@@ -966,6 +825,12 @@ namespace MappingBreakDown
                 else
                     ErrorMessage.Text = "> ";
             }
+        }
+
+        private void TreeGridView1_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+                Delete_Click(sender, e);
         }
     }
 }

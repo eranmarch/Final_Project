@@ -9,7 +9,7 @@ using System.IO;
 
 namespace MappingBreakDown
 {
-    public class RegisterEntry : IComparable<RegisterEntry>
+    public class RegisterEntry //: IComparable<RegisterEntry>
     {
         /* Globals */
         public enum type_field { RD, WR, RD_WR, FIELD };
@@ -256,6 +256,13 @@ namespace MappingBreakDown
             return MSB >= LSB;
         }
 
+        public static bool IsValidLsbMsb(string msb, string lsb)
+        {
+            int lsbInt = Int32.Parse(lsb);
+            int msbInt = Int32.Parse(msb);
+            return msbInt >= lsbInt;
+        }
+
         public bool IsValidMAIS()
         {
             return MAIS == 0 || MAIS == 1 || MAIS == 2 || MAIS == 4;
@@ -393,7 +400,7 @@ namespace MappingBreakDown
             return new object[] { Name, Address, MAIS, LSB, MSB, Type, FPGA, Init, Comment, Index, SecondaryIndex };
         }
 
-        public int CompareTo(RegisterEntry other)
+        /*public int CompareTo(RegisterEntry other)
         {
             int comp = Name.CompareTo(other.GetName());
             if (comp < 0)
@@ -441,6 +448,6 @@ namespace MappingBreakDown
             else if (comp > 0)
                 return 1;
             return 0;
-        }
+        }*/
     }
 }
