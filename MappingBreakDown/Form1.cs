@@ -460,7 +460,6 @@ namespace MappingBreakDown
         {
             TreeGridNode node;
             string group = entry.GetGroup();
-            //MessageBox.Show(entry.GetAddress().ToString());
             object[] ent = entry.GetTableEntry();
             foreach (TreeGridNode group_node in treeGridView1.Nodes)
             {
@@ -472,7 +471,7 @@ namespace MappingBreakDown
                         TreeGridNode tmp = null;
                         foreach (TreeGridNode reg in group_node.Nodes)
                         {
-                            if ((int)reg.Cells["AddressColumn"].Value == entry.GetAddress())
+                            if ((int)reg.Cells["IndexColumn"].Value == entry.GetIndex())
                             {
                                 tmp = reg;
                                 break;
@@ -480,22 +479,19 @@ namespace MappingBreakDown
                         }
                         if (tmp != null)
                             node = tmp.Nodes.Add(ent);
+                        break;
                     }
             }
         }
         private void AddEntryToTable(RegisterEntry entry)
         {
             bool isField = entry.GetRegType() == RegisterEntry.type_field.FIELD;
-            MessageBox.Show(isField.ToString());
             if (isField)
             {
-
-                //RegisterEntry entf = FindAtAddress(entry.GetAddress(), true);
                 RegisterEntry entf = RegList[entry.GetIndex()];
                 entry.SetGroup(entf.GetGroup());
                 entry.SetSecondaryIndex(entf.GetFields().Count); // inner index
-                //entry.SetIndex(entf.GetIndex()); // outer index
-                MessageBox.Show(entry.GetIndex().ToString() + ", " + entry.GetSecondaryIndex().ToString());
+                //MessageBox.Show(entry.GetIndex().ToString() + ", " + entry.GetSecondaryIndex().ToString());
                 entf.AddField(entry);
             }
             else
@@ -920,20 +916,55 @@ namespace MappingBreakDown
             {
                 try
                 {
-                    MessageBox.Show(item.Cells["IndexColumn"].Value.ToString());
-
                     re = RegList[(int)item.Cells["IndexColumn"].Value];
-                    MessageBox.Show(re.Index.ToString());
-                    int index = re.GetSecondaryIndex();
+                    int index = (int)item.Cells["SecondaryIndexColumn"].Value;
                     if (index != -1)
                         re = re.GetFields()[index];
                     break;
                 }
                 catch (NullReferenceException)
                 {
-                    //nothing
+                    //do nothing for groups
                     return;
                 }
+            }
+            if (re != null)
+            {
+                RegNameText.Text = re.GetName();
+                CommentText.Text = re.GetComment();
+                InitText.Text = re.GetInit();
+                int index = LSBOpts.FindStringExact(re.GetLSB().ToString());
+                if (index == -1)
+                    index = 0;
+                LSBOpts.SelectedIndex = index;
+                index = LSBOpts.FindStringExact(re.GetLSB().ToString());
+                if (index == -1)
+                    index = 0;
+                LSBOpts.SelectedIndex = index;
+                index = MSBOpts.FindStringExact(re.GetMSB().ToString());
+                if (index == -1)
+                    index = 31;
+                MSBOpts.SelectedIndex = index;
+                index = MAISOpts.FindStringExact(re.GetMAIS().ToString());
+                if (index == -1)
+                    index = 0;
+                MAISOpts.SelectedIndex = index;
+                index = TypeOpts.FindStringExact(re.GetRegType().ToString());
+                if (index == -1)
+                    index = 0;
+                TypeOpts.SelectedIndex = index;
+                index = FPGAOpts.FindStringExact(re.GetFPGA().ToString());
+                if (index == -1)
+                    index = 0;
+                FPGAOpts.SelectedIndex = index;
+                RegGroupOpts.SelectedIndex = RegGroupOpts.FindStringExact(re.GetGroup());
+
+                if (re.GetIsComment())
+                    ErrorMessage.Text = "> ";
+                if (!re.GetValid())
+                    ErrorMessage.Text = "[@] " + re.GetReason();
+                else
+                    ErrorMessage.Text = "> ";
             }
         }
     }
