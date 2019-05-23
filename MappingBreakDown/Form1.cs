@@ -522,7 +522,6 @@ namespace MappingBreakDown
             List<Tuple<int, int>> s = new List<Tuple<int, int>>();
             List<RegisterEntry> fields;
             TreeGridNodeCollection siblings;
-            //List<TreeGridNode> siblings;
             foreach (TreeGridNode item in treeGridView1.SelectedRows)
             {
                 int i = (int)item.Cells["IndexColumn"].Value, j = (int)item.Cells["SecondaryIndexColumn"].Value;
@@ -530,41 +529,40 @@ namespace MappingBreakDown
                 if (j != -1)
                 {
                     s.Add(new Tuple<int, int>(i, j));
-                    //siblings = siblings.OrderByDescending(v => v.Cells["SecondaryIndexColumn"].Value);
+                   // MessageBox.Show(i.ToString() + ", " + j.ToString());
                 }
                 else
                 {
                     indices.Add(i);
-                    //siblings = siblings.OrderByDescending(v => v.Cells["IndexColumn"].Value);
-                    // foreach (TreeGridNode f in item.Nodes)
-                    //    item.Nodes.Remove(f);
+                    //MessageBox.Show(i.ToString());
                 }
                 foreach (TreeGridNode sibling in siblings)
                 {
                     if (j == -1)
                     {
+                        //MessageBox.Show(sibling.Cells["IndexColumn"].Value.ToString());
                         if ((int)sibling.Cells["IndexColumn"].Value > i)
                             sibling.Cells["IndexColumn"].Value = (int)sibling.Cells["IndexColumn"].Value - 1;
-                        //else
-                        //    break;
                     }
                     else
                     {
+                        //MessageBox.Show(sibling.Cells["SecondaryIndexColumn"].Value.ToString());
                         if ((int)sibling.Cells["SecondaryIndexColumn"].Value > i)
                             sibling.Cells["SecondaryIndexColumn"].Value = (int)sibling.Cells["SecondaryIndexColumn"].Value - 1;
-                        //else
-                        //    break;
                     }
                 }
-                treeGridView1.Rows.Remove(item);
+                item.Parent.Nodes.Remove(item);
             }
-            /*s = s.OrderByDescending(v => v.Item2).ToList();
+            s = s.OrderByDescending(v => v.Item2).ToList();
             foreach (Tuple<int, int> index in s)
             {
                 int j = index.Item2;
                 fields = RegList[index.Item1].GetFields();
-                for (int k = j + 1; j < fields.Count; k++)
-                    fields[k].SecondaryIndex--;
+                for (int i = j + 1; i < fields.Count; i++)
+                {
+                    //MessageBox.Show(i.ToString() + " < " + fields.Count.ToString());
+                    fields[i].SecondaryIndex--;
+                }
                 fields.RemoveAt(j);
             }
             foreach (int index in indices.OrderByDescending(v => v))
@@ -576,7 +574,7 @@ namespace MappingBreakDown
 
             searchBox.Text = "";
             OpenValidation();
-            UpdateDataBase();*/
+            UpdateDataBase();
         }
 
         private void TextBox2_TextChanged(object sender, EventArgs e)
@@ -597,15 +595,14 @@ namespace MappingBreakDown
             }
         }
 
-        private String getSpaces(int x)
+        private String GetSpaces(int x)
         {
             return String.Concat(Enumerable.Repeat(" ", x));
         }
 
         private bool IsNum(String s)
         {
-            double num;
-            return double.TryParse(s, out num);
+            return double.TryParse(s, out double num);
         }
 
         private void SaveButton_Click(object sender, EventArgs e)
@@ -618,7 +615,7 @@ namespace MappingBreakDown
             StreamReader file;
             try
             {
-                file = new System.IO.StreamReader("mycorrect.txt");
+                file = new StreamReader("mycorrect.txt");
                 string line;
                 String res = "";
                 string title = Path.GetFileNameWithoutExtension(PathToFile.Text);
@@ -795,7 +792,14 @@ namespace MappingBreakDown
                     re = RegList[(int)item.Cells["IndexColumn"].Value];
                     int index = (int)item.Cells["SecondaryIndexColumn"].Value;
                     if (index != -1)
+                    {
                         re = re.GetFields()[index];
+                        MessageBox.Show(re.GetIndex().ToString() + ", " + index);
+                    }
+                    else
+                    {
+                        MessageBox.Show(re.GetIndex().ToString());
+                    }
                     break;
                 }
                 catch (NullReferenceException)
