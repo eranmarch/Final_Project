@@ -521,20 +521,44 @@ namespace MappingBreakDown
             List<int> indices = new List<int>();
             List<Tuple<int, int>> s = new List<Tuple<int, int>>();
             List<RegisterEntry> fields;
+            TreeGridNodeCollection siblings;
+            //List<TreeGridNode> siblings;
             foreach (TreeGridNode item in treeGridView1.SelectedRows)
             {
                 int i = (int)item.Cells["IndexColumn"].Value, j = (int)item.Cells["SecondaryIndexColumn"].Value;
+                siblings = item.Parent.Nodes;
                 if (j != -1)
+                {
                     s.Add(new Tuple<int, int>(i, j));
+                    //siblings = siblings.OrderByDescending(v => v.Cells["SecondaryIndexColumn"].Value);
+                }
                 else
                 {
                     indices.Add(i);
-                    foreach (TreeGridNode f in item.Nodes)
-                        item.Nodes.Remove(f);
+                    //siblings = siblings.OrderByDescending(v => v.Cells["IndexColumn"].Value);
+                    // foreach (TreeGridNode f in item.Nodes)
+                    //    item.Nodes.Remove(f);
+                }
+                foreach (TreeGridNode sibling in siblings)
+                {
+                    if (j == -1)
+                    {
+                        if ((int)sibling.Cells["IndexColumn"].Value > i)
+                            sibling.Cells["IndexColumn"].Value = (int)sibling.Cells["IndexColumn"].Value - 1;
+                        //else
+                        //    break;
+                    }
+                    else
+                    {
+                        if ((int)sibling.Cells["SecondaryIndexColumn"].Value > i)
+                            sibling.Cells["SecondaryIndexColumn"].Value = (int)sibling.Cells["SecondaryIndexColumn"].Value - 1;
+                        //else
+                        //    break;
+                    }
                 }
                 treeGridView1.Rows.Remove(item);
             }
-            s = s.OrderByDescending(v => v.Item2).ToList();
+            /*s = s.OrderByDescending(v => v.Item2).ToList();
             foreach (Tuple<int, int> index in s)
             {
                 int j = index.Item2;
@@ -552,7 +576,7 @@ namespace MappingBreakDown
 
             searchBox.Text = "";
             OpenValidation();
-            UpdateDataBase();
+            UpdateDataBase();*/
         }
 
         private void TextBox2_TextChanged(object sender, EventArgs e)
@@ -766,6 +790,8 @@ namespace MappingBreakDown
             {
                 try
                 {
+                    //MessageBox.Show(item.Parent.Nodes[0].Cells["Registers"].ToString());
+                    //item.Parent.Nodes.Remove(item.Parent.Nodes[0]);
                     re = RegList[(int)item.Cells["IndexColumn"].Value];
                     int index = (int)item.Cells["SecondaryIndexColumn"].Value;
                     if (index != -1)
