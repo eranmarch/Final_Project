@@ -333,7 +333,7 @@ namespace MappingBreakDown
             if (entry.GetIsComment())
             {
                 MessageBox.Show("This register is a comment and can't be edited");
-                InitFields();
+                //InitFields();
                 return;
             }
             Enum.TryParse(type, out RegisterEntry.type_field t);
@@ -341,13 +341,13 @@ namespace MappingBreakDown
                 entry.GetRegType() != RegisterEntry.type_field.FIELD && t == RegisterEntry.type_field.FIELD)
             {
                 MessageBox.Show("Can't edit a field or create one using Load");
-                InitFields();
+                //InitFields();
                 return;
             }
             if (!RegisterEntry.IsValidLsbMsb(msb, lsb))
             {
                 MessageBox.Show("Can't edit an entry to have LSB > MSB");
-                InitFields();
+                //InitFields();
                 return;
             }
             Enum.TryParse(fpga, out RegisterEntry.fpga_field r);
@@ -400,7 +400,7 @@ namespace MappingBreakDown
                 cell.Cells[i].Value = ent[i];
         }
 
-        private void UpdateTable(RegisterEntry entry, bool delete)
+        private void UpdateTable(RegisterEntry entry)
         {
             TreeGridNode node;
             string group = entry.GetGroup();
@@ -409,7 +409,7 @@ namespace MappingBreakDown
             foreach (TreeGridNode group_node in treeGridView1.Nodes)
             {
                 if (group_node.Cells["Registers"].Value.ToString().Equals(group))
-                    if (!isField && !delete)
+                    if (!isField)
                     {
                         node = group_node.Nodes.Add(ent);
                         group_node.Expand();
@@ -432,36 +432,13 @@ namespace MappingBreakDown
                         }
                         if (tmp != null)
                         {
-                            if (!delete)
-                            {
-                                node = tmp.Nodes.Add(ent);
-                                group_node.Expand();
-                                tmp.Expand();
-                            }
-                            else if (!isField)
-                                if (delete)
-                                {
-                                    group_node.Nodes.Remove(tmp);
-                                    //remove fields
-                                }
-                                else
-                                {
-                                    foreach (TreeGridNode f in tmp.Nodes)
-                                    {
-                                        if ((int)f.Cells["SecondaryIndexColumn"].Value == entry.GetSecondaryIndex())
-                                        {
-                                            if (delete)
-                                                tmp.Nodes.Remove(f);
-                                            break;
-                                        }
-                                    }
-                                }
+                            node = tmp.Nodes.Add(ent);
+                            //group_node.Expand();
+                            tmp.Expand();
                         }
                         break;
                     }
             }
-            if (delete)
-                ColorInValid();
         }
 
         private void AddEntryToTable(RegisterEntry entry)
@@ -482,7 +459,7 @@ namespace MappingBreakDown
             }
 
             UpdateDataBase();
-            UpdateTable(entry, false);
+            UpdateTable(entry);
         }
 
         private void AddManyRegisters(List<RegisterEntry> entries, List<string> groups)
@@ -529,7 +506,7 @@ namespace MappingBreakDown
                 if (j != -1)
                 {
                     s.Add(new Tuple<int, int>(i, j));
-                   // MessageBox.Show(i.ToString() + ", " + j.ToString());
+                    //MessageBox.Show(i.ToString() + ", " + j.ToString());
                 }
                 else
                 {
@@ -723,14 +700,11 @@ namespace MappingBreakDown
 
         private void Clear_Click(object sender, EventArgs e)
         {
-            RegisterEntry entry;
+            foreach (TreeGridNode node in treeGridView1.Nodes)
+                for (int i = node.Nodes.Count - 1; i >= 0; i--)
+                    node.Nodes.Remove(node.Nodes[i]);
             for (int i = RegList.Count - 1; i >= 0; i--)
-            {
-                entry = RegList[i];
-                RegList.Remove(entry);
-                UpdateTable(entry, true);
-                //RegList.RemoveAt(i);
-            }
+                RegList.RemoveAt(i);
             UpdateDataBase();
             InitFields();
         }
@@ -787,18 +761,16 @@ namespace MappingBreakDown
             {
                 try
                 {
-                    //MessageBox.Show(item.Parent.Nodes[0].Cells["Registers"].ToString());
-                    //item.Parent.Nodes.Remove(item.Parent.Nodes[0]);
                     re = RegList[(int)item.Cells["IndexColumn"].Value];
                     int index = (int)item.Cells["SecondaryIndexColumn"].Value;
                     if (index != -1)
                     {
                         re = re.GetFields()[index];
-                        MessageBox.Show(re.GetIndex().ToString() + ", " + index);
+                        //MessageBox.Show(re.GetIndex().ToString() + ", " + index);
                     }
                     else
                     {
-                        MessageBox.Show(re.GetIndex().ToString());
+                        //MessageBox.Show(re.GetIndex().ToString());
                     }
                     break;
                 }
