@@ -88,7 +88,7 @@ namespace MappingBreakDown
             NewGroupText.Text = "";
         }
 
-        private bool CheckDup(RegisterEntry new_entry, bool set = false)
+        private bool CheckDup(RegisterEntry new_entry)
         {
             int addr_new = new_entry.GetAddress();
             string name_new = new_entry.GetName();
@@ -96,29 +96,16 @@ namespace MappingBreakDown
             {
                 if (item.GetIsComment() || item == new_entry)
                     continue;
-                string reason;
                 if (item.GetName().Equals(name_new))
                 {
-                    reason = "Name " + name_new + " is already in the list at address " + item.GetAddress().ToString();
-                    if (set)
-                    {
-                        new_entry.SetReason(reason);
-                        new_entry.SetValid(false);
-                    }
-                    else
-                        MessageBox.Show(reason);
+                    new_entry.SetReason("Name " + name_new + " is already in the list at address " + item.GetAddress().ToString());
+                    new_entry.SetValid(false);
                     return false;
                 }
                 if (item.GetAddress() == addr_new)
                 {
-                    reason = "Address " + addr_new + " is already in the list at register " + item.GetName();
-                    if (set)
-                    {
-                        new_entry.SetReason(reason);
-                        new_entry.SetValid(false);
-                    }
-                    else
-                        MessageBox.Show(reason);
+                    new_entry.SetReason("Address " + addr_new + " is already in the list at register " + item.GetName());
+                    new_entry.SetValid(false);
                     return false;
                 }
             }
@@ -130,20 +117,13 @@ namespace MappingBreakDown
         {
             foreach (RegisterEntry new_entry in RegList)
             {
-                if (CheckDup(new_entry, set))
+                //MessageBox.Show(new_entry.GetName());
+                if (CheckDup(new_entry))
                 {
-                    if (set)
+                    if (FileValidator.ValidEntry(new_entry))
                     {
-                        if (!new_entry.IsValidLsbMsb())
-                        {
-                            new_entry.SetReason("The register " + new_entry.GetName() + "(" + new_entry.GetAddress() + ") has MSB < LSB");
-                            new_entry.SetValid(false);
-                        }
-                        else
-                        {
-                            new_entry.SetValid(true);
-                            new_entry.SetReason("");
-                        }
+                        new_entry.SetValid(true);
+                        new_entry.SetReason("");
                     }
                 }
             }
@@ -351,15 +331,19 @@ namespace MappingBreakDown
             }
             Enum.TryParse(fpga, out RegisterEntry.fpga_field r);
             entry.EditRegister(mais, lsb, msb, t, r, init, comment, group);
-            //OpenValidation();
-            CheckDup(entry, true);
+            OpenValidation();
+            //CheckDup(entry, true);
             UpdateDataBase();
             EditCell(node, entry.GetTableEntry());
         }
 
         private void ColorNode(TreeGridNode node)
         {
-            RegisterEntry entry = RegList[(int)node.Cells["IndexColumn"].Value];
+            int index = (int)node.Cells["IndexColumn"].Value, indexSec = (int)node.Cells["SecondaryIndexColumn"].Value;
+            RegisterEntry entry = RegList[index];
+            //MessageBox.Show(entry.GetName() + ": [" + index + ", " + indexSec + "]");
+            if (indexSec != -1)
+                entry = entry.GetFields()[indexSec];
             for (int i = 0; i < treeGridView1.ColumnCount; i++)
                 if (entry.GetIsComment())
                     node.Cells[i].Style.BackColor = System.Drawing.Color.Gray;
@@ -425,7 +409,7 @@ namespace MappingBreakDown
                         RegGroupOpts.Items.Add(group);
                         treeGridView1.Nodes.Add(group);
                     }
-                    
+
                     UpdateTable(entry);
                     List<RegisterEntry> fields = entry.GetFields();
                     foreach (RegisterEntry field in fields)
@@ -514,6 +498,7 @@ namespace MappingBreakDown
             foreach (RegisterEntry entry in entries)
             {
                 AddEntryToTable(entry, true);
+                //MessageBox.Show(entry.GetName() + ", " + entry.GetSecondaryIndex().ToString());
                 fields = entry.GetFields();
                 foreach (RegisterEntry field in fields)
                 {
@@ -523,7 +508,6 @@ namespace MappingBreakDown
                 }
             }
             OpenValidation();
-            //ColorInValid();
             UpdateDataBase();
         }
 
@@ -548,11 +532,11 @@ namespace MappingBreakDown
             List<int> indices = new List<int>();
             List<Tuple<int, int>> s = new List<Tuple<int, int>>();
             List<RegisterEntry> fields;
-            TreeGridNodeCollection siblings;
+            //TreeGridNodeCollection siblings;
             foreach (TreeGridNode item in treeGridView1.SelectedRows)
             {
                 int i = (int)item.Cells["IndexColumn"].Value, j = (int)item.Cells["SecondaryIndexColumn"].Value;
-                siblings = item.Parent.Nodes;
+                //siblings = item.Parent.Nodes;
                 if (j != -1)
                 {
                     s.Add(new Tuple<int, int>(i, j));
@@ -563,19 +547,26 @@ namespace MappingBreakDown
                     indices.Add(i);
                     //MessageBox.Show(i.ToString());
                 }
-                foreach (TreeGridNode sibling in siblings)
+                foreach (TreeGridNode group in treeGridView1.Nodes)
                 {
-                    if (j == -1)
+                    foreach (TreeGridNode sibling in group.Nodes)
                     {
-                        //MessageBox.Show(sibling.Cells["IndexColumn"].Value.ToString());
-                        if ((int)sibling.Cells["IndexColumn"].Value > i)
-                            sibling.Cells["IndexColumn"].Value = (int)sibling.Cells["IndexColumn"].Value - 1;
-                    }
-                    else
-                    {
-                        //MessageBox.Show(sibling.Cells["SecondaryIndexColumn"].Value.ToString());
-                        if ((int)sibling.Cells["SecondaryIndexColumn"].Value > i)
-                            sibling.Cells["SecondaryIndexColumn"].Value = (int)sibling.Cells["SecondaryIndexColumn"].Value - 1;
+                        if (j == -1)
+                        {
+                            //MessageBox.Show(sibling.Cells["IndexColumn"].Value.ToString());
+                            if ((int)sibling.Cells["IndexColumn"].Value > i)
+                            {
+                                sibling.Cells["IndexColumn"].Value = (int)sibling.Cells["IndexColumn"].Value - 1;
+                                foreach (TreeGridNode field in sibling.Nodes)
+                                    field.Cells["IndexColumn"].Value = (int)field.Cells["IndexColumn"].Value - 1;
+                            }
+                        }
+                        else
+                        {
+                            //MessageBox.Show(sibling.Cells["SecondaryIndexColumn"].Value.ToString());
+                            if ((int)sibling.Cells["SecondaryIndexColumn"].Value > i)
+                                sibling.Cells["SecondaryIndexColumn"].Value = (int)sibling.Cells["SecondaryIndexColumn"].Value - 1;
+                        }
                     }
                 }
                 item.Parent.Nodes.Remove(item);
@@ -594,8 +585,15 @@ namespace MappingBreakDown
             }
             foreach (int index in indices.OrderByDescending(v => v))
             {
+                RegisterEntry entry;
                 for (int i = index + 1; i < RegList.Count; i++)
-                    RegList[i].Index--;
+                {
+                    entry = RegList[i];
+                    entry.Index--;
+                    fields = entry.GetFields();
+                    foreach (RegisterEntry field in fields)
+                        field.Index--;
+                }
                 RegList.RemoveAt(index);
             }
 

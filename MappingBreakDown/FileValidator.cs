@@ -298,35 +298,42 @@ namespace MappingBreakDown
             return true;
         }
 
-        private void ValidEntry(RegisterEntry entry)
+        public static bool ValidEntry(RegisterEntry entry)
         {
             if (entry.GetIsComment())
-                return;
+                return true;
+            bool b = true;
             if (!entry.IsValidAddress())
             {
                 entry.SetReason("The register " + entry.GetName() + " has invalid address: " + entry.GetAddress());
                 entry.SetValid(false);
+                b = false;
             }
             if (!entry.IsValidMAIS())
             {
                 entry.SetReason("The register " + entry.GetName() + " has invalid MAIS field: " + entry.GetMAIS());
                 entry.SetValid(false);
+                b = false;
             }
             if (!entry.IsValidLSB())
             {
                 entry.SetReason("The register " + entry.GetName() + "(" + entry.GetAddress() + ") has LSB out of range [0, 32)");
                 entry.SetValid(false);
+                b = false;
             }
             if (!entry.IsValidLSB())
             {
                 entry.SetReason("The register " + entry.GetName() + "(" + entry.GetAddress() + ") has MSB out of range [0, 32)");
                 entry.SetValid(false);
+                b = false;
             }
             if (!entry.IsValidLsbMsb())
             {
                 entry.SetReason("The register " + entry.GetName() + "(" + entry.GetAddress() + ") has MSB < LSB");
                 entry.SetValid(false);
+                b = false;
             }
+            return b;
         }
 
         private void ValidRegLogic()
