@@ -138,7 +138,7 @@ namespace MappingBreakDown
                 {
                     if (set)
                     {
-                        if (!InputValidation(new_entry, false, false))
+                        if (!new_entry.IsValidLsbMsb())
                         {
                             new_entry.SetReason("The register " + new_entry.GetName() + "(" + new_entry.GetAddress() + ") has MSB < LSB");
                             new_entry.SetValid(false);
@@ -151,6 +151,7 @@ namespace MappingBreakDown
                     }
                 }
             }
+            ColorInValid();
         }
 
         /* Check the a register can be added to the chart */
@@ -354,7 +355,8 @@ namespace MappingBreakDown
             }
             Enum.TryParse(fpga, out RegisterEntry.fpga_field r);
             entry.EditRegister(mais, lsb, msb, t, r, init, comment, group);
-            OpenValidation();
+            //OpenValidation();
+            CheckDup(entry, true);
             UpdateDataBase();
             EditCell(node, entry.GetTableEntry());
         }
