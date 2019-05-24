@@ -359,7 +359,6 @@
             this.RegGroupOpts.Name = "RegGroupOpts";
             this.RegGroupOpts.Size = new System.Drawing.Size(166, 26);
             this.RegGroupOpts.TabIndex = 32;
-            this.RegGroupOpts.MouseDown += new System.Windows.Forms.MouseEventHandler(this.RegGroupOpts_MouseDown);
             // 
             // searchBox
             // 

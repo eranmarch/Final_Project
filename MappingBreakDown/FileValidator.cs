@@ -144,7 +144,16 @@ namespace MappingBreakDown
                             if (entry != null)
                             {
                                 entry.SetIsComment(true);
-                                Registers.Add(entry);
+                                if (entry.GetRegType() == RegisterEntry.type_field.FIELD)
+                                {
+                                    int address = entry.GetAddress();
+                                    RegisterEntry re = FindAtAdress(address);
+                                    if (re != null)
+                                        re.AddField(entry);
+                                    //MessageBox.Show("sdfsdfsdfsdf");
+                                }
+                                else
+                                    Registers.Add(entry);
                                 curr_group = prev_group;
                             }
                             else if (!Groups.Contains(curr_group))
@@ -171,7 +180,7 @@ namespace MappingBreakDown
                                     int address = entry.GetAddress();
                                     RegisterEntry re = FindAtAdress(address);
                                     if (re != null)
-                                        entry.AddField(entry);
+                                        re.AddField(entry);
                                     else
                                     {
                                         MessageBox.Show("COMPILATION 2: Address " + address + " doesn't exist (" + (k + 1) + ")");
@@ -204,7 +213,7 @@ namespace MappingBreakDown
                     j++;
                 }
             }
-           // if (!NamesCrossValid())
+            // if (!NamesCrossValid())
             //   return false;
             ValidRegLogic(); // Sematic Analysis, add everything from here
             return true;

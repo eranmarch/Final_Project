@@ -197,6 +197,8 @@ namespace MappingBreakDown
 
         public void AddField(RegisterEntry Field)
         {
+            Field.SetGroup(Group);
+            Field.SetSecondaryIndex(Fields.Count);
             Fields.Add(Field);
         }
 

@@ -24,11 +24,15 @@ namespace MappingBreakDown
             InitFields();
             ErrorMessage.Text = "> ";
             xs = new XmlSerializer(typeof(List<RegisterEntry>));
-            //ReadDataBase();
-            RegList = new List<RegisterEntry>();
+            ReadDataBase();
             treeGridView1.Nodes.Add("");
-            //foreach (RegisterEntry entry in RegList)
-            //    UpdateTable(entry, false, false);
+            foreach (RegisterEntry entry in RegList)
+            {
+                UpdateTable(entry);
+                List<RegisterEntry> fields = entry.GetFields();
+                foreach (RegisterEntry field in fields)
+                    UpdateTable(field);
+            }
         }
 
         /* Default values for each register */
@@ -51,7 +55,7 @@ namespace MappingBreakDown
         {
             int i = 1, x;
             bool found;
-            for (; i <= 1023; i++)
+            for (; i <= 1024; i++)
             {
                 found = true;
                 foreach (RegisterEntry l in RegList)
@@ -86,10 +90,9 @@ namespace MappingBreakDown
             RegGroupOpts.Items.Add(NewGroupText.Text);
             treeGridView1.Nodes.Add(NewGroupText.Text);
             NewGroupText.Text = "";
-
         }
 
-        private bool CheckDup(RegisterEntry new_entry, bool delete = false)
+        private bool CheckDup(RegisterEntry new_entry, bool set = false)
         {
             int addr_new = new_entry.GetAddress();
             string name_new = new_entry.GetName();
@@ -100,8 +103,8 @@ namespace MappingBreakDown
                 string reason;
                 if (item.GetName().Equals(name_new))
                 {
-                    reason = "Name " + name_new + " is already in the list";
-                    if (delete)
+                    reason = "Name " + name_new + " is already in the list at address " + item.GetAddress().ToString();
+                    if (set)
                     {
                         new_entry.SetReason(reason);
                         new_entry.SetValid(false);
@@ -112,8 +115,8 @@ namespace MappingBreakDown
                 }
                 if (item.GetAddress() == addr_new)
                 {
-                    reason = "Address " + addr_new + " is already in the list";
-                    if (delete)
+                    reason = "Address " + addr_new + " is already in the list at register " + item.GetName();
+                    if (set)
                     {
                         new_entry.SetReason(reason);
                         new_entry.SetValid(false);
@@ -127,15 +130,13 @@ namespace MappingBreakDown
         }
 
         /* Validate Opened file */
-        private void OpenValidation(List<RegisterEntry> lst = null, bool delete = true)
+        private void OpenValidation(bool set = true)
         {
-            if (delete)
-                lst = RegList;
             foreach (RegisterEntry new_entry in RegList)
             {
-                if (CheckDup(new_entry, delete))
+                if (CheckDup(new_entry, set))
                 {
-                    if (delete)
+                    if (set)
                     {
                         if (!InputValidation(new_entry, false, false))
                         {
@@ -337,11 +338,12 @@ namespace MappingBreakDown
                 return;
             }
             Enum.TryParse(type, out RegisterEntry.type_field t);
-            if ((entry.GetRegType() == RegisterEntry.type_field.FIELD && t != RegisterEntry.type_field.FIELD) ||
-                entry.GetRegType() != RegisterEntry.type_field.FIELD && t == RegisterEntry.type_field.FIELD)
+            RegisterEntry.type_field s = entry.GetRegType();
+            if ((s == RegisterEntry.type_field.FIELD && t != RegisterEntry.type_field.FIELD) ||
+                s != RegisterEntry.type_field.FIELD && t == RegisterEntry.type_field.FIELD)
             {
                 MessageBox.Show("Can't edit a field or create one using Load");
-                //InitFields();
+                TypeOpts.SelectedIndex = (int)s;
                 return;
             }
             if (!RegisterEntry.IsValidLsbMsb(msb, lsb))
@@ -389,9 +391,22 @@ namespace MappingBreakDown
 
         private void ReadDataBase()
         {
-            FileStream fs = new FileStream(@"jack.txt", FileMode.Open, FileAccess.Read);
-            RegList = (List<RegisterEntry>)xs.Deserialize(fs);
-            fs.Close();
+            if (!File.Exists(@"jack.txt"))
+            {
+                RegList = new List<RegisterEntry>();
+                return;
+            }
+            try
+            {
+                FileStream fs = new FileStream(@"jack.txt", FileMode.Open, FileAccess.Read);
+                RegList = (List<RegisterEntry>)xs.Deserialize(fs);
+                fs.Close();
+            }
+            catch (IOException)
+            {
+                RegList = new List<RegisterEntry>();
+            }
+
         }
 
         private void EditCell(TreeGridNode cell, object[] ent)
@@ -441,56 +456,62 @@ namespace MappingBreakDown
             }
         }
 
-        private void AddEntryToTable(RegisterEntry entry)
+        private void AddEntryToTable(RegisterEntry entry, bool open = false)
         {
             bool isField = entry.GetRegType() == RegisterEntry.type_field.FIELD;
             if (isField)
             {
-                RegisterEntry entf = RegList[entry.GetIndex()];
-                entry.SetGroup(entf.GetGroup());
-                entry.SetSecondaryIndex(entf.GetFields().Count); // inner index
-                //MessageBox.Show(entry.GetIndex().ToString() + ", " + entry.GetSecondaryIndex().ToString());
-                entf.AddField(entry);
+                RegList[entry.GetIndex()].AddField(entry);
             }
             else
             {
                 entry.SetIndex(RegList.Count); // only outer index
                 RegList.Add(entry);
             }
-
-            UpdateDataBase();
+            if (!open)
+                UpdateDataBase();
             UpdateTable(entry);
         }
 
         private void AddManyRegisters(List<RegisterEntry> entries, List<string> groups)
         {
-            foreach (RegisterEntry entry in entries)
-                AddEntryToTable(entry);
-            OpenValidation(entries);
             foreach (string group in groups)
                 if (!RegGroupOpts.Items.Contains(group))
+                {
                     RegGroupOpts.Items.Add(group);
+                    treeGridView1.Nodes.Add(group);
+                }
+            List<RegisterEntry> fields;
+            foreach (RegisterEntry entry in entries)
+            {
+                AddEntryToTable(entry, true);
+                fields = entry.GetFields();
+                foreach (RegisterEntry field in fields)
+                {
+                    //MessageBox.Show(field.GetName());
+                    field.SetIndex(entry.GetIndex());
+                    UpdateTable(field);
+                }
+            }
+            OpenValidation();
+            //ColorInValid();
+            UpdateDataBase();
         }
 
         private void SaveAsButton_Click(object sender, EventArgs e)
         {
-            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
-
-            saveFileDialog1.Filter = "txt files (*.txt)|*.txt";
-            saveFileDialog1.FilterIndex = 2;
-            saveFileDialog1.RestoreDirectory = true;
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog
+            {
+                Filter = "VHD files (*.vhd)|*.vhd",
+                FilterIndex = 2,
+                RestoreDirectory = true
+            };
 
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 PathToFile.Text = saveFileDialog1.FileName;
                 SaveButton_Click(sender, e);
             }
-        }
-
-        private void RegGroupOpts_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (RegGroupOpts.Items.Count == 0)
-                MessageBox.Show("You must first add a group name");
         }
 
         private void Delete_Click(object sender, EventArgs e)
@@ -766,11 +787,11 @@ namespace MappingBreakDown
                     if (index != -1)
                     {
                         re = re.GetFields()[index];
-                        //MessageBox.Show(re.GetIndex().ToString() + ", " + index);
+                        MessageBox.Show(re.GetIndex().ToString() + ", " + index);
                     }
                     else
                     {
-                        //MessageBox.Show(re.GetIndex().ToString());
+                        MessageBox.Show(re.GetIndex().ToString());
                     }
                     break;
                 }
