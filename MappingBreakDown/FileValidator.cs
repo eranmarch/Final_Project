@@ -102,6 +102,7 @@ namespace MappingBreakDown
         public bool IsFileValid()
         {
             // Prepare texts for comparison: remove comments and convert to lower case
+            Console.WriteLine("Preparing to compile");
             string[] lines_correct = File.ReadAllLines(path_to_correct);
             string[] lines = File.ReadAllLines(path_to_file);
             for (int i = 0; i < lines_correct.Length; i++)
@@ -116,6 +117,7 @@ namespace MappingBreakDown
             int j = 0;
 
             // Parsing Analysis: Compare
+            Console.WriteLine("Compile");
             for (int i = 0; i < lines.Length; i++)
             {
                 // Skip empty lines
@@ -207,15 +209,17 @@ namespace MappingBreakDown
                         i++;
                     if (!lines_correct[j].Equals(lines[i]))
                     {
-                        MessageBox.Show("COMPILATION: Invalid file\n" + lines[i] + "\n" + lines_correct[j]);
+                        MessageBox.Show("COMPILATION 4: Invalid file\n" + lines[i] + "\n" + lines_correct[j]);
                         return false;
                     }
                     j++;
                 }
             }
+            Console.WriteLine("Logic analysis");
             // if (!NamesCrossValid())
             //   return false;
             ValidRegLogic(); // Sematic Analysis, add everything from here
+            Console.WriteLine("Compilation is complete");
             return true;
         }
 

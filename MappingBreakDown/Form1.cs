@@ -212,6 +212,7 @@ namespace MappingBreakDown
                 if (fv.IsFileValid())
                 {
                     PathToFile.Text = openFileDialog1.FileName;
+                    Console.WriteLine("Adding to table");
                     AddManyRegisters(fv.GetRegList(), fv.GetGroups());
                 }
             }
@@ -449,13 +450,16 @@ namespace MappingBreakDown
 
         private void AddManyRegisters(List<RegisterEntry> entries, List<string> groups)
         {
+            Console.Write("Adding groups: ");
             foreach (string group in groups)
                 if (!RegGroupOpts.Items.Contains(group))
                 {
                     RegGroupOpts.Items.Add(group);
                     treeGridView1.Nodes.Add(group);
                 }
+            Console.Write("DONE\n");
             List<RegisterEntry> fields;
+            Console.Write("Adding registers: ");
             foreach (RegisterEntry entry in entries)
             {
                 AddEntryToTable(entry, true);
@@ -468,6 +472,7 @@ namespace MappingBreakDown
                     UpdateTable(field);
                 }
             }
+            Console.Write("DONE\nValidating logic with table");
             OpenValidation();
             UpdateDataBase();
         }
@@ -627,7 +632,7 @@ namespace MappingBreakDown
                     res += line + "\n";
                 }
                 String prop = "", names = "", comment, reg;
-                int index = 0;
+                //int index = 0;
                 foreach (string group in RegGroupOpts.Items)
                 {
                     names += "\t\t -- " + group + "\n";
@@ -640,27 +645,33 @@ namespace MappingBreakDown
                             comment = l.GetComment();
                             List<RegisterEntry> fields = l.GetFields();
                             names += "\t\t\t\t" + l.GetName() + ",\n";
-                            if (index++ != RegList.Count - 1)
+                            if (l.GetIsComment())
+                                prop += "-- ";
+                            prop += reg + ",\t" + "-- " + comment + "\n";
+                            /*if (index++ != RegList.Count - 1)
                                 prop += reg + ",\t" + "-- " + comment + "\n";
                             else if (fields.Count == 0)
-                                prop += reg + "\t" + "-- " + comment + "\n";
+                                prop += reg + "\t" + "-- " + comment + "\n";*/
                             doc += "<tr><td>" + l.GetName() + "</td><td>" + l.GetGroup() + "</td><td>" + l.GetAddress().ToString() + "</td><td>" + l.GetMAIS().ToString() + "</td><td>" +
                                 l.GetLSB().ToString() + "</td><td>" + l.GetMSB().ToString() + "</td><td>" + l.GetRegType().ToString() + "</td>";
                             doc += "<td>" + l.GetFPGA().ToString() + "</td><td>" + l.GetInit() + "</td><td>" + comment + "</td></tr>";
                             foreach (RegisterEntry field in fields)
                             {
-                                reg = l.ToString();
-                                comment = l.GetComment();
+                                reg = field.ToString();
+                                comment = field.GetComment();
                                 names += "\t";
                                 prop += "\t";
-                                names += "\t\t\t\t" + l.GetName() + ",\n";
-                                if (field.SecondaryIndex != fields.Count - 1)
+                                names += "\t\t\t\t" + field.GetName() + ",\n";
+                                if (field.GetIsComment())
+                                    prop += "-- ";
+                                prop += reg + ",\t" + "-- " + comment + "\n";
+                                /*if (field.SecondaryIndex != fields.Count - 1)
                                     prop += reg + ",\t" + "-- " + comment + "\n";
                                 else
-                                    prop += reg + "\t" + "-- " + comment + "\n";
-                                doc += "<tr><td>" + l.GetName() + "</td><td>" + l.GetGroup() + "</td><td>" + l.GetAddress().ToString() + "</td><td>" + l.GetMAIS().ToString() + "</td><td>" +
-                                    l.GetLSB().ToString() + "</td><td>" + l.GetMSB().ToString() + "</td><td>" + l.GetRegType().ToString() + "</td>";
-                                doc += "<td>" + l.GetFPGA().ToString() + "</td><td>" + l.GetInit() + "</td><td>" + comment + "</td></tr>";
+                                    prop += reg + "\t" + "-- " + comment + "\n";*/
+                                doc += "<tr><td>" + field.GetName() + "</td><td>" + field.GetGroup() + "</td><td>" + field.GetAddress().ToString() + "</td><td>" + field.GetMAIS().ToString() + "</td><td>" +
+                                    field.GetLSB().ToString() + "</td><td>" + field.GetMSB().ToString() + "</td><td>" + field.GetRegType().ToString() + "</td>";
+                                doc += "<td>" + field.GetFPGA().ToString() + "</td><td>" + field.GetInit() + "</td><td>" + comment + "</td></tr>";
                             }
 
                         }
@@ -698,9 +709,9 @@ namespace MappingBreakDown
                 file.Close();
                 try
                 {
-                    System.IO.File.WriteAllText(PathToFile.Text, res);
+                    File.WriteAllText(PathToFile.Text, res);
                     //MessageBox.Show(Path.GetDirectoryName(PathToFile.Text) + "\\" + title + "_doc.txt");
-                    System.IO.File.WriteAllText(Path.GetDirectoryName(PathToFile.Text) + "\\" + title + "_doc.html", doc);
+                    File.WriteAllText(Path.GetDirectoryName(PathToFile.Text) + "\\" + title + "_doc.html", doc);
                     saved = true;
                     ErrorMessage.Text = "[#] File Saved!";
 
