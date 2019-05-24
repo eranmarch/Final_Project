@@ -113,112 +113,74 @@ namespace MappingBreakDown
         }
 
         /* Validate Opened file */
-        private void OpenValidation(bool set = true)
+        private void OpenValidation()
         {
             foreach (RegisterEntry new_entry in RegList)
-            {
-                //MessageBox.Show(new_entry.GetName());
                 if (CheckDup(new_entry))
-                {
                     if (FileValidator.ValidEntry(new_entry))
                     {
                         new_entry.SetValid(true);
                         new_entry.SetReason("");
                     }
-                }
-            }
             ColorInValid();
         }
 
         /* Check the a register can be added to the chart */
-        private bool InputValidation(RegisterEntry entry, bool add, bool print = true)
+        private bool InputValidation(RegisterEntry entry)
         {
-            if (add)
+            if (entry.GetRegType() != RegisterEntry.type_field.FIELD)
             {
-                string reason;
-                if (entry.GetRegType() != RegisterEntry.type_field.FIELD)
+                int index = -1;
+                for (int i = 0; i < RegList.Count; i++)
+                    if (RegList[i].GetName().Equals(entry.GetName()))
+                        index = i;
+                if (index != -1)
                 {
-                    int index = -1;
-                    for (int i = 0; i < RegList.Count; i++)
-                        if (RegList[i].GetName().Equals(entry.GetName()))
-                            index = i;
-                    if (index != -1)
-                    {
-                        reason = "Register " + entry.GetName() + " (" + RegList[index].GetAddress() + ") is already in the list";
-                        if (print)
-                            MessageBox.Show(reason);
-                        else
-                        {
-                            entry.SetReason(reason);
-                            entry.SetValid(false);
-                        }
-                        return false;
-                    }
-                    int addr = FindAddress();
-                    if (addr == -1)
-                    {
-                        reason = "Unable to add register " + entry.GetName() + ", no free slot in memory";
-                        if (print)
-                            MessageBox.Show(reason);
-                        else
-                        {
-                            entry.SetReason(reason);
-                            entry.SetValid(false);
-                        }
-                        return false;
-                    }
-                    entry.SetAddress(addr);
+                    MessageBox.Show("Register " + entry.GetName() + " (" + RegList[index].GetAddress() + ") is already in the list");
+                    return false;
                 }
-                else
+                int addr = FindAddress();
+                if (addr == -1)
                 {
-                    if (RegList.Count == 0)
+                    MessageBox.Show("Unable to add register " + entry.GetName() + ", no free slot in memory");
+                    return false;
+                }
+                entry.SetAddress(addr);
+            }
+            else
+            {
+                if (RegList.Count == 0)
+                {
+                    MessageBox.Show("There are no registers in the list");
+                    return false;
+                }
+                int addr = -1, index = -1;
+                RegisterEntry item;
+                using (ChooseAddressPrompt prompt = new ChooseAddressPrompt(RegList.ToArray()))
+                {
+                    if (prompt.ShowDialog() == DialogResult.OK)
                     {
-                        reason = "There are no registers in the list";
-                        if (print)
-                            MessageBox.Show(reason);
-                        else
-                        {
-                            entry.SetReason(reason);
-                            entry.SetValid(false);
-                        }
+                        addr = prompt.Chosen_address;
+                        index = prompt.Index;
+                        item = RegList[prompt.Index];
+                    }
+                    else
+                        return false;
+                }
+                List<RegisterEntry> fields = item.GetFields();
+                foreach (RegisterEntry field in fields)
+                    if (field.GetName().Equals(entry.GetName()))
+                    {
+                        MessageBox.Show("Field " + entry.GetName() + " (" + item.GetAddress() + ") is already in the list of " + item.GetName());
                         return false;
                     }
-                    int addr = -1, index = -1;
-                    RegisterEntry item;
-                    using (ChooseAddressPrompt prompt = new ChooseAddressPrompt(RegList.ToArray()))
-                    {
-                        if (prompt.ShowDialog() == DialogResult.OK)
-                        {
-                            addr = prompt.Chosen_address;
-                            index = prompt.Index;
-                            item = RegList[prompt.Index];
-                        }
-                        else
-                            return false;
-                    }
-                    List<RegisterEntry> fields = item.GetFields();
-                    foreach (RegisterEntry field in fields)
-                        if (field.GetName().Equals(entry.GetName()))
-                        {
-                            reason = "Field " + entry.GetName() + " (" + item.GetAddress() + ") is already in the list of " + item.GetName();
-                            if (print)
-                                MessageBox.Show(reason);
-                            else
-                            {
-                                entry.SetReason(reason);
-                                entry.SetValid(false);
-                            }
-                            return false;
-                        }
-                    entry.SetAddress(addr);
-                    entry.SetIndex(index);
-                }
+                entry.SetAddress(addr);
+                entry.SetIndex(index);
             }
 
             if (!entry.IsValidLsbMsb())
             {
-                if (print)
-                    MessageBox.Show("Can't insert register " + entry.GetName() + " with LSB greater than MSB");
+                MessageBox.Show("Can't insert register " + entry.GetName() + " with LSB greater than MSB");
                 return false;
             }
             return true;
@@ -235,7 +197,7 @@ namespace MappingBreakDown
             }
 
             RegisterEntry entry = new RegisterEntry(RegNameText.Text, -1, MAISOpts.Text, LSBOpts.Text, MSBOpts.Text, TypeOpts.Text, FPGAOpts.Text, InitText.Text, CommentText.Text, RegGroupOpts.Text);
-            if (!InputValidation(entry, true))
+            if (!InputValidation(entry))
                 return;
             AddEntryToTable(entry);
             InitFields();
@@ -332,7 +294,6 @@ namespace MappingBreakDown
             Enum.TryParse(fpga, out RegisterEntry.fpga_field r);
             entry.EditRegister(mais, lsb, msb, t, r, init, comment, group);
             OpenValidation();
-            //CheckDup(entry, true);
             UpdateDataBase();
             EditCell(node, entry.GetTableEntry());
         }
@@ -532,11 +493,9 @@ namespace MappingBreakDown
             List<int> indices = new List<int>();
             List<Tuple<int, int>> s = new List<Tuple<int, int>>();
             List<RegisterEntry> fields;
-            //TreeGridNodeCollection siblings;
             foreach (TreeGridNode item in treeGridView1.SelectedRows)
             {
                 int i = (int)item.Cells["IndexColumn"].Value, j = (int)item.Cells["SecondaryIndexColumn"].Value;
-                //siblings = item.Parent.Nodes;
                 if (j != -1)
                 {
                     s.Add(new Tuple<int, int>(i, j));
@@ -679,20 +638,31 @@ namespace MappingBreakDown
                         {
                             reg = l.ToString();
                             comment = l.GetComment();
-                            if (l.GetRegType().Equals(RegisterEntry.type_field.FIELD))
-                            {
-                                names += "\t";
-                                prop += "\t";
-                            }
+                            List<RegisterEntry> fields = l.GetFields();
                             names += "\t\t\t\t" + l.GetName() + ",\n";
                             if (index++ != RegList.Count - 1)
                                 prop += reg + ",\t" + "-- " + comment + "\n";
-                            //prop += l.ToString();
-                            else
+                            else if (fields.Count == 0)
                                 prop += reg + "\t" + "-- " + comment + "\n";
                             doc += "<tr><td>" + l.GetName() + "</td><td>" + l.GetGroup() + "</td><td>" + l.GetAddress().ToString() + "</td><td>" + l.GetMAIS().ToString() + "</td><td>" +
                                 l.GetLSB().ToString() + "</td><td>" + l.GetMSB().ToString() + "</td><td>" + l.GetRegType().ToString() + "</td>";
                             doc += "<td>" + l.GetFPGA().ToString() + "</td><td>" + l.GetInit() + "</td><td>" + comment + "</td></tr>";
+                            foreach (RegisterEntry field in fields)
+                            {
+                                reg = l.ToString();
+                                comment = l.GetComment();
+                                names += "\t";
+                                prop += "\t";
+                                names += "\t\t\t\t" + l.GetName() + ",\n";
+                                if (field.SecondaryIndex != fields.Count - 1)
+                                    prop += reg + ",\t" + "-- " + comment + "\n";
+                                else
+                                    prop += reg + "\t" + "-- " + comment + "\n";
+                                doc += "<tr><td>" + l.GetName() + "</td><td>" + l.GetGroup() + "</td><td>" + l.GetAddress().ToString() + "</td><td>" + l.GetMAIS().ToString() + "</td><td>" +
+                                    l.GetLSB().ToString() + "</td><td>" + l.GetMSB().ToString() + "</td><td>" + l.GetRegType().ToString() + "</td>";
+                                doc += "<td>" + l.GetFPGA().ToString() + "</td><td>" + l.GetInit() + "</td><td>" + comment + "</td></tr>";
+                            }
+
                         }
                     }
                 }
@@ -814,11 +784,11 @@ namespace MappingBreakDown
                     if (index != -1)
                     {
                         re = re.GetFields()[index];
-                        MessageBox.Show(re.GetIndex().ToString() + ", " + index);
+                        //MessageBox.Show(re.GetIndex().ToString() + ", " + index);
                     }
                     else
                     {
-                        MessageBox.Show(re.GetIndex().ToString());
+                        //MessageBox.Show(re.GetIndex().ToString());
                     }
                     break;
                 }
@@ -861,7 +831,7 @@ namespace MappingBreakDown
 
                 if (re.GetIsComment())
                     ErrorMessage.Text = "> ";
-                if (!re.GetValid())
+                else if (!re.GetValid())
                     ErrorMessage.Text = "[@] " + re.GetReason();
                 else
                     ErrorMessage.Text = "> ";
