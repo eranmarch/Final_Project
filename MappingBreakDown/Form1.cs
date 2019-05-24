@@ -15,6 +15,7 @@ namespace MappingBreakDown
     {
 
         public XmlSerializer xs;
+        //public XmlSerializer ls;
         List<RegisterEntry> RegList;
         bool saved = false;
 
@@ -24,15 +25,10 @@ namespace MappingBreakDown
             InitFields();
             ErrorMessage.Text = "> ";
             xs = new XmlSerializer(typeof(List<RegisterEntry>));
-            ReadDataBase();
+            //ls = new XmlSerializer(typeof(List<string>));
             treeGridView1.Nodes.Add("");
-            foreach (RegisterEntry entry in RegList)
-            {
-                UpdateTable(entry);
-                List<RegisterEntry> fields = entry.GetFields();
-                foreach (RegisterEntry field in fields)
-                    UpdateTable(field);
-            }
+            ReadDataBase();
+            ColorInValid();
         }
 
         /* Default values for each register */
@@ -389,26 +385,57 @@ namespace MappingBreakDown
             FileStream fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
             xs.Serialize(fs, RegList);
             fs.Close();
+            /*fs = new FileStream(@"groups.txt", FileMode.Create, FileAccess.Write);
+            List<string> groups = new List<string>();
+            foreach (string group in RegGroupOpts.Items)
+                groups.Add(group);
+            ls.Serialize(fs, groups);
+            fs.Close();*/
         }
 
         private void ReadDataBase()
         {
-            if (!File.Exists(@"jack.txt"))
+            FileStream fs;
+            /*try
             {
-                RegList = new List<RegisterEntry>();
-                return;
-            }
-            try
-            {
-                FileStream fs = new FileStream(@"jack.txt", FileMode.Open, FileAccess.Read);
-                RegList = (List<RegisterEntry>)xs.Deserialize(fs);
+                fs = new FileStream(@"groups.txt", FileMode.Open, FileAccess.Read);
+                List<string> groups = (List<string>)ls.Deserialize(fs);
+                foreach (string group in groups)
+                {
+                    RegGroupOpts.Items.Add(group);
+                    treeGridView1.Nodes.Add(group);
+                }
                 fs.Close();
             }
-            catch (IOException)
+            catch (Exception)
+            {
+                treeGridView1.Nodes.Add("");
+            }*/
+            try
+            {
+                fs = new FileStream(@"jack.txt", FileMode.Open, FileAccess.Read);
+                RegList = (List<RegisterEntry>)xs.Deserialize(fs);
+                fs.Close();
+                string group;
+                foreach (RegisterEntry entry in RegList)
+                {
+                    group = entry.GetGroup();
+                    if (!RegGroupOpts.Items.Contains(group))
+                    {
+                        RegGroupOpts.Items.Add(group);
+                        treeGridView1.Nodes.Add(group);
+                    }
+                    
+                    UpdateTable(entry);
+                    List<RegisterEntry> fields = entry.GetFields();
+                    foreach (RegisterEntry field in fields)
+                        UpdateTable(field);
+                }
+            }
+            catch (Exception)
             {
                 RegList = new List<RegisterEntry>();
             }
-
         }
 
         private void EditCell(TreeGridNode cell, object[] ent)
