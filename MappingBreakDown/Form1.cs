@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.Xml.Serialization;
 using AdvancedDataGridView;
 using System.Runtime;
+using System.Drawing;
 
 namespace MappingBreakDown
 {
@@ -195,8 +196,17 @@ namespace MappingBreakDown
                 InitFields();
                 return;
             }
-
-            RegisterEntry entry = new RegisterEntry(RegNameText.Text, -1, MAISOpts.Text, LSBOpts.Text, MSBOpts.Text, TypeOpts.Text, FPGAOpts.Text, InitText.Text, CommentText.Text, RegGroupOpts.Text);
+            RegisterEntry entry;
+            if (InitText.Text.Equals(""))
+            {
+                ErrorMessage.Text = "[#] Init field is empty, resort to default (0)";
+                entry = new RegisterEntry(RegNameText.Text, -1, MAISOpts.Text, LSBOpts.Text, MSBOpts.Text, TypeOpts.Text, FPGAOpts.Text, "0", CommentText.Text, RegGroupOpts.Text);
+            }
+            else
+            {
+                ErrorMessage.Text = "[#] Register named " + RegNameText.Text + " was added";
+                entry = new RegisterEntry(RegNameText.Text, -1, MAISOpts.Text, LSBOpts.Text, MSBOpts.Text, TypeOpts.Text, FPGAOpts.Text, InitText.Text, CommentText.Text, RegGroupOpts.Text);
+            }
             if (!InputValidation(entry))
                 return;
             AddEntryToTable(entry);
@@ -631,52 +641,40 @@ namespace MappingBreakDown
                         break;
                     res += line + "\n";
                 }
-                String prop = "", names = "", comment, reg;
-                //int index = 0;
+                string prop = "", names = "";
+                int last_i_index = RegList.Count;
                 foreach (string group in RegGroupOpts.Items)
                 {
                     names += "\t\t -- " + group + "\n";
                     prop += "\t\t -- " + group + "\n";
+                    int i = 1;
                     foreach (RegisterEntry l in RegList)
                     {
                         if (l.GetGroup().Equals(group))
                         {
-                            reg = l.ToString();
-                            comment = l.GetComment();
                             List<RegisterEntry> fields = l.GetFields();
-                            names += "\t\t\t\t" + l.GetName() + ",\n";
-                            if (l.GetIsComment())
-                                prop += "-- ";
-                            prop += reg + ",\t" + "-- " + comment + "\n";
-                            /*if (index++ != RegList.Count - 1)
-                                prop += reg + ",\t" + "-- " + comment + "\n";
-                            else if (fields.Count == 0)
-                                prop += reg + "\t" + "-- " + comment + "\n";*/
-                            doc += "<tr><td>" + l.GetName() + "</td><td>" + l.GetGroup() + "</td><td>" + l.GetAddress().ToString() + "</td><td>" + l.GetMAIS().ToString() + "</td><td>" +
-                                l.GetLSB().ToString() + "</td><td>" + l.GetMSB().ToString() + "</td><td>" + l.GetRegType().ToString() + "</td>";
-                            doc += "<td>" + l.GetFPGA().ToString() + "</td><td>" + l.GetInit() + "</td><td>" + comment + "</td></tr>";
-                            foreach (RegisterEntry field in fields)
-                            {
-                                reg = field.ToString();
-                                comment = field.GetComment();
-                                names += "\t";
-                                prop += "\t";
-                                names += "\t\t\t\t" + field.GetName() + ",\n";
-                                if (field.GetIsComment())
-                                    prop += "-- ";
-                                prop += reg + ",\t" + "-- " + comment + "\n";
-                                /*if (field.SecondaryIndex != fields.Count - 1)
-                                    prop += reg + ",\t" + "-- " + comment + "\n";
-                                else
-                                    prop += reg + "\t" + "-- " + comment + "\n";*/
-                                doc += "<tr><td>" + field.GetName() + "</td><td>" + field.GetGroup() + "</td><td>" + field.GetAddress().ToString() + "</td><td>" + field.GetMAIS().ToString() + "</td><td>" +
-                                    field.GetLSB().ToString() + "</td><td>" + field.GetMSB().ToString() + "</td><td>" + field.GetRegType().ToString() + "</td>";
-                                doc += "<td>" + field.GetFPGA().ToString() + "</td><td>" + field.GetInit() + "</td><td>" + comment + "</td></tr>";
-                            }
 
+                            names += l.toName();
+
+                            prop += l.toEntry(i == last_i_index && fields.Count == 0);
+
+                            doc += l.toXMLstring();
+
+                            int j = 1, last_j_index = fields.Count;
+                            foreach (RegisterEntry f in fields)
+                            {
+                                names += f.toName();
+
+                                prop += f.toEntry(last_j_index == ++j);
+
+                                doc += f.toXMLstring();
+                            }
                         }
+                        i++;
                     }
+
                 }
+
                 doc += "</table></font></body></html>";
                 res += names;
                 while ((line = file.ReadLine()) != null)
@@ -854,5 +852,55 @@ namespace MappingBreakDown
             if (e.KeyCode == Keys.Delete)
                 Delete_Click(sender, e);
         }
+
+        private void frm_sizeChanged(object sender, EventArgs e)
+        {
+            treeGridView1.Size = new Size(this.Size.Width, this.Size.Height - this.panel4.Size.Height - 45);
+        }
+
+        //private void CommentButton_Click(object sender, EventArgs e)
+        //{
+        //    List<int> indices = new List<int>();
+        //    List<Tuple<int, int>> s = new List<Tuple<int, int>>();
+        //    List<RegisterEntry> fields;
+        //    foreach (TreeGridNode item in treeGridView1.SelectedRows)
+        //    {
+        //        int i = (int)item.Cells["IndexColumn"].Value, j = (int)item.Cells["SecondaryIndexColumn"].Value;
+
+        //        if (j != -1)
+        //            s.Add(new Tuple<int, int>(i, j));
+
+        //        else
+        //            indices.Add(i);
+                
+        //    }
+        //    s = s.OrderByDescending(v => v.Item2).ToList();
+        //    foreach (Tuple<int, int> index in s)
+        //    {
+        //        int j = index.Item2;
+        //        fields = RegList[index.Item1].GetFields();
+        //        foreach(RegisterEntry f in fields)
+
+        //            f.IsComment = true;
+
+        //    }
+        //    foreach (int index in indices.OrderByDescending(v => v))
+        //    {
+        //        RegisterEntry entry;
+        //        for (int i = index + 1; i < RegList.Count; i++)
+        //        {
+        //            entry = RegList[i];
+        //            entry.Index--;
+        //            fields = entry.GetFields();
+        //            foreach (RegisterEntry field in fields)
+        //                field.Index--;
+        //        }
+        //        RegList[index].IsComment = true;
+        //    }
+
+        //    searchBox.Text = "";
+        //    OpenValidation();
+        //    UpdateDataBase();
+        //}
     }
 }
