@@ -227,6 +227,7 @@ namespace MappingBreakDown
                 if (fv.IsFileValid())
                 {
                     PathToFile.Text = openFileDialog1.FileName;
+                    File.WriteAllText(@"path_file.txt", openFileDialog1.FileName);
                     Console.WriteLine("Adding entries to table...");
                     AddManyRegisters(fv.GetRegList(), fv.GetGroups());
                 }
@@ -352,6 +353,8 @@ namespace MappingBreakDown
                 groups.Add(group);
             ls.Serialize(fs, groups);
             fs.Close();*/
+            File.WriteAllText(@"file_path.txt", PathToFile.Text);
+
         }
 
         private void ReadDataBase()
@@ -393,12 +396,23 @@ namespace MappingBreakDown
                     foreach (RegisterEntry field in fields)
                         UpdateTable(field);
                 }
-                Console.WriteLine(" DONE");
+                Console.WriteLine(" SUCCESS");
             }
             catch (Exception e)
             {
-                Console.WriteLine("Invalid restore file: " + e.Message + "\nRestarting list...");
+                Console.WriteLine("FAILED\nException caught: " + e.Message + "\nReseting list...");
                 RegList = new List<RegisterEntry>();
+            }
+            try
+            {
+                Console.Write("Restoring opened file from 'file_path.txt': ");
+                PathToFile.Text = File.ReadAllText(@"file_path.txt");
+                Console.WriteLine("SUCCESS");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("FAILED\nException caught: " + e.Message + "\nReseting path...");
+                PathToFile.Text = "";
             }
         }
 
@@ -508,6 +522,7 @@ namespace MappingBreakDown
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 PathToFile.Text = saveFileDialog1.FileName;
+                File.WriteAllText(@"path_file.txt", saveFileDialog1.FileName);
                 SaveButton_Click(sender, e);
             }
         }

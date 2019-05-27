@@ -23,7 +23,7 @@ namespace MappingBreakDown
         private String[] valid_type = { "rd", "wr", "rd_wr", "field" };
         private String[] valid_fpga = { "g", "d", "a", "b", "c", "abc", "abcg" };
         private String path_to_correct = "mycorrect.txt";
-        string pattern = @"^[ \t]*--[ \t]*(.*)[ \t]*";
+        readonly string pattern = @"^[ \t]*--[ \t]*(.*)[ \t]*";
 
         enum Cmp_mod { Start, Reg_names, Middle, Reg_entrys, End };
 
@@ -215,8 +215,8 @@ namespace MappingBreakDown
                 }
             }
             Console.WriteLine("Logic analysis...");
-            // if (!NamesCrossValid())
-            //   return false;
+             if (!NamesCrossValid())
+               return false;
             ValidRegLogic(); // Sematic Analysis, add everything from here
             Console.WriteLine("Compilation is complete");
             return true;
@@ -290,12 +290,12 @@ namespace MappingBreakDown
                             test = true;
                             break;
                         }
-                    }
-                    if (!test)
-                    {
-                        MessageBox.Show("Register " + nameReg + " doesn't appear in the second list");
-                        return false;
-                    }
+                    }  
+                }
+                if (!test)
+                {
+                    MessageBox.Show("Register " + name + " doesn't appear in the second list");
+                    return false;
                 }
             }
             return true;

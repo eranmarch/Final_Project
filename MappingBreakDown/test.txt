@@ -40,6 +40,7 @@ type        avalon_map_defenition  is  (
 					reg1_f                             ,
 				reg2                                   ,
 				reg3                                   ,
+				--	reg3f								,
 				another3                               ,
                 last_deff) ;    -- last_deff must be the last in the list.
 

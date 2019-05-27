@@ -39,8 +39,8 @@ namespace MappingBreakDown
         public int Index { get; set; }
         public int SecondaryIndex { get; set; }
 
-        public static string pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_ ]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124])[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*,[ \t]*(--[ \t]*(.*)[ \t]*)*";
-        public static string final_pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_ ]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124])[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*(--[ \t]*(.*)[ \t]*)*";
+        public static string pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124])[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*,[ \t]*(--[ \t]*(.*)[ \t]*)*";
+        public static string final_pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124])[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*(--[ \t]*(.*)[ \t]*)*";
 
         /* Constructors */
         public RegisterEntry() : this("", -1, 0, 0, 31, type_field.RD, fpga_field.G, "", "", "") { }
