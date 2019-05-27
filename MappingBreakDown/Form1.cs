@@ -227,7 +227,7 @@ namespace MappingBreakDown
                 if (fv.IsFileValid())
                 {
                     PathToFile.Text = openFileDialog1.FileName;
-                    File.WriteAllText(@"path_file.txt", openFileDialog1.FileName);
+                    File.WriteAllText(@"file_path.txt", openFileDialog1.FileName);
                     Console.WriteLine("Adding entries to table...");
                     AddManyRegisters(fv.GetRegList(), fv.GetGroups());
                 }
@@ -522,7 +522,7 @@ namespace MappingBreakDown
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 PathToFile.Text = saveFileDialog1.FileName;
-                File.WriteAllText(@"path_file.txt", saveFileDialog1.FileName);
+                File.WriteAllText(@"file_path.txt", saveFileDialog1.FileName);
                 SaveButton_Click(sender, e);
             }
         }

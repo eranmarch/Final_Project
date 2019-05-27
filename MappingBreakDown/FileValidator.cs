@@ -262,6 +262,8 @@ namespace MappingBreakDown
                 List<RegisterEntry> fields = entry.GetFields();
                 foreach (RegisterEntry field in fields)
                 {
+                    if (field.GetIsComment())
+                        continue;
                     nameField = field.GetName().Trim();
                     if (!names.Contains(nameField))
                     {
