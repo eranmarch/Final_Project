@@ -510,40 +510,47 @@ namespace MappingBreakDown
             List<RegisterEntry> fields;
             foreach (TreeGridNode item in treeGridView1.SelectedRows)
             {
-                int i = (int)item.Cells["IndexColumn"].Value, j = (int)item.Cells["SecondaryIndexColumn"].Value;
-                if (j != -1)
+                try
                 {
-                    s.Add(new Tuple<int, int>(i, j));
-                    //MessageBox.Show(i.ToString() + ", " + j.ToString());
-                }
-                else
-                {
-                    indices.Add(i);
-                    //MessageBox.Show(i.ToString());
-                }
-                foreach (TreeGridNode group in treeGridView1.Nodes)
-                {
-                    foreach (TreeGridNode sibling in group.Nodes)
+                    int i = (int)item.Cells["IndexColumn"].Value, j = (int)item.Cells["SecondaryIndexColumn"].Value;
+                    if (j != -1)
                     {
-                        if (j == -1)
+                        s.Add(new Tuple<int, int>(i, j));
+                        //MessageBox.Show(i.ToString() + ", " + j.ToString());
+                    }
+                    else
+                    {
+                        indices.Add(i);
+                        //MessageBox.Show(i.ToString());
+                    }
+                    foreach (TreeGridNode group in treeGridView1.Nodes)
+                    {
+                        foreach (TreeGridNode sibling in group.Nodes)
                         {
-                            //MessageBox.Show(sibling.Cells["IndexColumn"].Value.ToString());
-                            if ((int)sibling.Cells["IndexColumn"].Value > i)
+                            if (j == -1)
                             {
-                                sibling.Cells["IndexColumn"].Value = (int)sibling.Cells["IndexColumn"].Value - 1;
-                                foreach (TreeGridNode field in sibling.Nodes)
-                                    field.Cells["IndexColumn"].Value = (int)field.Cells["IndexColumn"].Value - 1;
+                                //MessageBox.Show(sibling.Cells["IndexColumn"].Value.ToString());
+                                if ((int)sibling.Cells["IndexColumn"].Value > i)
+                                {
+                                    sibling.Cells["IndexColumn"].Value = (int)sibling.Cells["IndexColumn"].Value - 1;
+                                    foreach (TreeGridNode field in sibling.Nodes)
+                                        field.Cells["IndexColumn"].Value = (int)field.Cells["IndexColumn"].Value - 1;
+                                }
+                            }
+                            else
+                            {
+                                //MessageBox.Show(sibling.Cells["SecondaryIndexColumn"].Value.ToString());
+                                if ((int)sibling.Cells["SecondaryIndexColumn"].Value > i)
+                                    sibling.Cells["SecondaryIndexColumn"].Value = (int)sibling.Cells["SecondaryIndexColumn"].Value - 1;
                             }
                         }
-                        else
-                        {
-                            //MessageBox.Show(sibling.Cells["SecondaryIndexColumn"].Value.ToString());
-                            if ((int)sibling.Cells["SecondaryIndexColumn"].Value > i)
-                                sibling.Cells["SecondaryIndexColumn"].Value = (int)sibling.Cells["SecondaryIndexColumn"].Value - 1;
-                        }
                     }
+                    item.Parent.Nodes.Remove(item);
                 }
-                item.Parent.Nodes.Remove(item);
+                catch (Exception)
+                {
+                    //nothing
+                }
             }
             s = s.OrderByDescending(v => v.Item2).ToList();
             foreach (Tuple<int, int> index in s)
@@ -875,49 +882,59 @@ namespace MappingBreakDown
             treeGridView1.Size = new Size(this.Size.Width, this.Size.Height - this.panel4.Size.Height - 45);
         }
 
-        //private void CommentButton_Click(object sender, EventArgs e)
-        //{
-        //    List<int> indices = new List<int>();
-        //    List<Tuple<int, int>> s = new List<Tuple<int, int>>();
-        //    List<RegisterEntry> fields;
-        //    foreach (TreeGridNode item in treeGridView1.SelectedRows)
-        //    {
-        //        int i = (int)item.Cells["IndexColumn"].Value, j = (int)item.Cells["SecondaryIndexColumn"].Value;
+        private void CommentButton_Click(object sender, EventArgs e)
+        {
+            List<int> indices = new List<int>();
+            List<Tuple<int, int>> s = new List<Tuple<int, int>>();
+            //List<RegisterEntry> fields;
+            RegisterEntry entry;
+            foreach (TreeGridNode item in treeGridView1.SelectedRows)
+            {
+                try
+                {
+                    int i = (int)item.Cells["IndexColumn"].Value, j = (int)item.Cells["SecondaryIndexColumn"].Value;
+                    entry = RegList[i];
+                    if (j != -1)
+                        entry = entry.GetFields()[j];
+                    entry.SetIsComment(true);
+                }
+                catch (Exception)
+                {
+                    //nothing
+                }
 
-        //        if (j != -1)
-        //            s.Add(new Tuple<int, int>(i, j));
+            }
 
-        //        else
-        //            indices.Add(i);
+            searchBox.Text = "";
+            OpenValidation();
+            UpdateDataBase();
+        }
 
-        //    }
-        //    s = s.OrderByDescending(v => v.Item2).ToList();
-        //    foreach (Tuple<int, int> index in s)
-        //    {
-        //        int j = index.Item2;
-        //        fields = RegList[index.Item1].GetFields();
-        //        foreach(RegisterEntry f in fields)
+        private void UnCommentButton_Click(object sender, EventArgs e)
+        {
+            List<int> indices = new List<int>();
+            List<Tuple<int, int>> s = new List<Tuple<int, int>>();
+            //List<RegisterEntry> fields;
+            RegisterEntry entry;
+            foreach (TreeGridNode item in treeGridView1.SelectedRows)
+            {
+                try
+                {
+                    int i = (int)item.Cells["IndexColumn"].Value, j = (int)item.Cells["SecondaryIndexColumn"].Value;
+                    entry = RegList[i];
+                    if (j != -1)
+                        entry = entry.GetFields()[j];
+                    entry.SetIsComment(false);
+                }
+                catch (Exception)
+                {
+                    //nothing
+                }
 
-        //            f.IsComment = true;
-
-        //    }
-        //    foreach (int index in indices.OrderByDescending(v => v))
-        //    {
-        //        RegisterEntry entry;
-        //        for (int i = index + 1; i < RegList.Count; i++)
-        //        {
-        //            entry = RegList[i];
-        //            entry.Index--;
-        //            fields = entry.GetFields();
-        //            foreach (RegisterEntry field in fields)
-        //                field.Index--;
-        //        }
-        //        RegList[index].IsComment = true;
-        //    }
-
-        //    searchBox.Text = "";
-        //    OpenValidation();
-        //    UpdateDataBase();
-        //}
+            }
+            searchBox.Text = "";
+            OpenValidation();
+            UpdateDataBase();
+        }
     }
 }
