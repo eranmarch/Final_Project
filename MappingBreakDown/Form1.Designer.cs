@@ -64,9 +64,7 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.ClearButton = new System.Windows.Forms.Button();
             this.label10 = new System.Windows.Forms.Label();
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.panel4 = new System.Windows.Forms.Panel();
             this.ErrorMessage = new System.Windows.Forms.RichTextBox();
             this.treeGridView1 = new AdvancedDataGridView.TreeGridView();
             this.Registers = new AdvancedDataGridView.TreeGridColumn();
@@ -80,11 +78,14 @@
             this.CommentColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.IndexColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SecondaryIndexColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.panel4 = new System.Windows.Forms.Panel();
+            this.UnCommentButton = new System.Windows.Forms.Button();
+            this.CommentButton = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
-            this.panel4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.treeGridView1)).BeginInit();
+            this.panel4.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -101,7 +102,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(32, 97);
+            this.label2.Location = new System.Drawing.Point(50, 100);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(104, 18);
             this.label2.TabIndex = 1;
@@ -148,7 +149,7 @@
             // RegNameText
             // 
             this.RegNameText.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.1F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
-            this.RegNameText.Location = new System.Drawing.Point(138, 95);
+            this.RegNameText.Location = new System.Drawing.Point(156, 98);
             this.RegNameText.Name = "RegNameText";
             this.RegNameText.Size = new System.Drawing.Size(166, 24);
             this.RegNameText.TabIndex = 6;
@@ -202,7 +203,7 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(30, 132);
+            this.label5.Location = new System.Drawing.Point(48, 135);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(105, 18);
             this.label5.TabIndex = 15;
@@ -264,9 +265,9 @@
             // CommentText
             // 
             this.CommentText.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.1F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
-            this.CommentText.Location = new System.Drawing.Point(434, 97);
+            this.CommentText.Location = new System.Drawing.Point(416, 96);
             this.CommentText.Name = "CommentText";
-            this.CommentText.Size = new System.Drawing.Size(254, 24);
+            this.CommentText.Size = new System.Drawing.Size(205, 24);
             this.CommentText.TabIndex = 21;
             this.CommentText.KeyUp += new System.Windows.Forms.KeyEventHandler(this.CommentText_KeyUp);
             // 
@@ -274,7 +275,7 @@
             // 
             this.label8.AutoSize = true;
             this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label8.Location = new System.Drawing.Point(356, 100);
+            this.label8.Location = new System.Drawing.Point(338, 99);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(74, 18);
             this.label8.TabIndex = 22;
@@ -284,7 +285,7 @@
             // 
             this.label9.AutoSize = true;
             this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label9.Location = new System.Drawing.Point(393, 132);
+            this.label9.Location = new System.Drawing.Point(375, 131);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(26, 18);
             this.label9.TabIndex = 24;
@@ -293,15 +294,15 @@
             // InitText
             // 
             this.InitText.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.1F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
-            this.InitText.Location = new System.Drawing.Point(434, 132);
+            this.InitText.Location = new System.Drawing.Point(416, 131);
             this.InitText.Name = "InitText";
-            this.InitText.Size = new System.Drawing.Size(254, 24);
+            this.InitText.Size = new System.Drawing.Size(205, 24);
             this.InitText.TabIndex = 23;
             this.InitText.KeyUp += new System.Windows.Forms.KeyEventHandler(this.InitText_KeyUp);
             // 
             // InsertButton
             // 
-            this.InsertButton.Location = new System.Drawing.Point(307, 13);
+            this.InsertButton.Location = new System.Drawing.Point(101, 38);
             this.InsertButton.Name = "InsertButton";
             this.InsertButton.Size = new System.Drawing.Size(81, 22);
             this.InsertButton.TabIndex = 27;
@@ -311,7 +312,7 @@
             // 
             // Delete
             // 
-            this.Delete.Location = new System.Drawing.Point(105, 12);
+            this.Delete.Location = new System.Drawing.Point(101, 9);
             this.Delete.Name = "Delete";
             this.Delete.Size = new System.Drawing.Size(81, 23);
             this.Delete.TabIndex = 26;
@@ -321,7 +322,7 @@
             // 
             // Load
             // 
-            this.Load.Location = new System.Drawing.Point(10, 12);
+            this.Load.Location = new System.Drawing.Point(6, 9);
             this.Load.Name = "Load";
             this.Load.Size = new System.Drawing.Size(75, 23);
             this.Load.TabIndex = 25;
@@ -332,7 +333,7 @@
             // NewGroupText
             // 
             this.NewGroupText.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.1F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
-            this.NewGroupText.Location = new System.Drawing.Point(35, 185);
+            this.NewGroupText.Location = new System.Drawing.Point(55, 173);
             this.NewGroupText.Name = "NewGroupText";
             this.NewGroupText.Size = new System.Drawing.Size(176, 24);
             this.NewGroupText.TabIndex = 30;
@@ -340,7 +341,7 @@
             // 
             // AddGroupButton
             // 
-            this.AddGroupButton.Location = new System.Drawing.Point(227, 185);
+            this.AddGroupButton.Location = new System.Drawing.Point(247, 173);
             this.AddGroupButton.Name = "AddGroupButton";
             this.AddGroupButton.Size = new System.Drawing.Size(75, 23);
             this.AddGroupButton.TabIndex = 31;
@@ -355,7 +356,7 @@
             this.RegGroupOpts.FormattingEnabled = true;
             this.RegGroupOpts.Items.AddRange(new object[] {
             ""});
-            this.RegGroupOpts.Location = new System.Drawing.Point(138, 130);
+            this.RegGroupOpts.Location = new System.Drawing.Point(156, 133);
             this.RegGroupOpts.Name = "RegGroupOpts";
             this.RegGroupOpts.Size = new System.Drawing.Size(166, 26);
             this.RegGroupOpts.TabIndex = 32;
@@ -364,7 +365,7 @@
             // 
             this.searchBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.1F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
             this.searchBox.ForeColor = System.Drawing.SystemColors.MenuHighlight;
-            this.searchBox.Location = new System.Drawing.Point(92, 226);
+            this.searchBox.Location = new System.Drawing.Point(109, 236);
             this.searchBox.Name = "searchBox";
             this.searchBox.Size = new System.Drawing.Size(213, 24);
             this.searchBox.TabIndex = 33;
@@ -410,7 +411,7 @@
             "31"});
             this.LSBOpts.Location = new System.Drawing.Point(60, 10);
             this.LSBOpts.Name = "LSBOpts";
-            this.LSBOpts.Size = new System.Drawing.Size(75, 26);
+            this.LSBOpts.Size = new System.Drawing.Size(77, 26);
             this.LSBOpts.TabIndex = 35;
             // 
             // MSBOpts
@@ -453,7 +454,7 @@
             "31"});
             this.MSBOpts.Location = new System.Drawing.Point(60, 42);
             this.MSBOpts.Name = "MSBOpts";
-            this.MSBOpts.Size = new System.Drawing.Size(75, 26);
+            this.MSBOpts.Size = new System.Drawing.Size(77, 26);
             this.MSBOpts.TabIndex = 36;
             // 
             // openFileDialog1
@@ -469,7 +470,7 @@
             this.panel1.Controls.Add(this.OpenButton);
             this.panel1.Controls.Add(this.SaveAsButton);
             this.panel1.Controls.Add(this.SaveButton);
-            this.panel1.Location = new System.Drawing.Point(26, 26);
+            this.panel1.Location = new System.Drawing.Point(11, 13);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(835, 47);
             this.panel1.TabIndex = 37;
@@ -491,14 +492,14 @@
             this.panel2.Controls.Add(this.InsertButton);
             this.panel2.Controls.Add(this.Load);
             this.panel2.Controls.Add(this.Delete);
-            this.panel2.Location = new System.Drawing.Point(333, 198);
+            this.panel2.Location = new System.Drawing.Point(429, 198);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(400, 50);
+            this.panel2.Size = new System.Drawing.Size(192, 72);
             this.panel2.TabIndex = 38;
             // 
             // ClearButton
             // 
-            this.ClearButton.Location = new System.Drawing.Point(208, 12);
+            this.ClearButton.Location = new System.Drawing.Point(6, 37);
             this.ClearButton.Name = "ClearButton";
             this.ClearButton.Size = new System.Drawing.Size(75, 23);
             this.ClearButton.TabIndex = 28;
@@ -510,7 +511,7 @@
             // 
             this.label10.AutoSize = true;
             this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.Location = new System.Drawing.Point(32, 228);
+            this.label10.Location = new System.Drawing.Point(49, 238);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(55, 18);
             this.label10.TabIndex = 39;
@@ -528,27 +529,19 @@
             this.panel3.Controls.Add(this.FPGAOpts);
             this.panel3.Controls.Add(this.label7);
             this.panel3.Controls.Add(this.TypeOpts);
-            this.panel3.Location = new System.Drawing.Point(757, 95);
+            this.panel3.Location = new System.Drawing.Point(651, 96);
             this.panel3.Margin = new System.Windows.Forms.Padding(1);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(143, 162);
+            this.panel3.Size = new System.Drawing.Size(148, 174);
             this.panel3.TabIndex = 40;
-            // 
-            // panel4
-            // 
-            this.panel4.Controls.Add(this.ErrorMessage);
-            this.panel4.Location = new System.Drawing.Point(925, 95);
-            this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(206, 161);
-            this.panel4.TabIndex = 41;
             // 
             // ErrorMessage
             // 
             this.ErrorMessage.Enabled = false;
             this.ErrorMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
-            this.ErrorMessage.Location = new System.Drawing.Point(13, 14);
+            this.ErrorMessage.Location = new System.Drawing.Point(840, 96);
             this.ErrorMessage.Name = "ErrorMessage";
-            this.ErrorMessage.Size = new System.Drawing.Size(178, 134);
+            this.ErrorMessage.Size = new System.Drawing.Size(187, 174);
             this.ErrorMessage.TabIndex = 0;
             this.ErrorMessage.Text = "";
             // 
@@ -570,12 +563,13 @@
             this.CommentColumn,
             this.IndexColumn,
             this.SecondaryIndexColumn});
+            this.treeGridView1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.treeGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.treeGridView1.ImageList = null;
-            this.treeGridView1.Location = new System.Drawing.Point(13, 312);
+            this.treeGridView1.Location = new System.Drawing.Point(0, 300);
             this.treeGridView1.Margin = new System.Windows.Forms.Padding(1);
             this.treeGridView1.Name = "treeGridView1";
-            this.treeGridView1.Size = new System.Drawing.Size(1125, 290);
+            this.treeGridView1.Size = new System.Drawing.Size(1083, 289);
             this.treeGridView1.TabIndex = 42;
             this.treeGridView1.SelectionChanged += new System.EventHandler(this.TreeGridView1_SelectionChanged);
             this.treeGridView1.KeyUp += new System.Windows.Forms.KeyEventHandler(this.TreeGridView1_KeyUp);
@@ -669,30 +663,61 @@
             this.SecondaryIndexColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.SecondaryIndexColumn.Visible = false;
             // 
+            // panel4
+            // 
+            this.panel4.Controls.Add(this.UnCommentButton);
+            this.panel4.Controls.Add(this.CommentButton);
+            this.panel4.Controls.Add(this.panel1);
+            this.panel4.Controls.Add(this.ErrorMessage);
+            this.panel4.Controls.Add(this.RegNameText);
+            this.panel4.Controls.Add(this.label2);
+            this.panel4.Controls.Add(this.panel3);
+            this.panel4.Controls.Add(this.label5);
+            this.panel4.Controls.Add(this.panel2);
+            this.panel4.Controls.Add(this.label10);
+            this.panel4.Controls.Add(this.label9);
+            this.panel4.Controls.Add(this.NewGroupText);
+            this.panel4.Controls.Add(this.InitText);
+            this.panel4.Controls.Add(this.AddGroupButton);
+            this.panel4.Controls.Add(this.label8);
+            this.panel4.Controls.Add(this.searchBox);
+            this.panel4.Controls.Add(this.CommentText);
+            this.panel4.Controls.Add(this.RegGroupOpts);
+            this.panel4.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel4.Location = new System.Drawing.Point(0, 0);
+            this.panel4.Name = "panel4";
+            this.panel4.Size = new System.Drawing.Size(1083, 296);
+            this.panel4.TabIndex = 43;
+            this.panel4.Resize += new System.EventHandler(this.frm_sizeChanged);
+            // 
+            // UnCommentButton
+            // 
+            this.UnCommentButton.Image = ((System.Drawing.Image)(resources.GetObject("UnCommentButton.Image")));
+            this.UnCommentButton.Location = new System.Drawing.Point(365, 238);
+            this.UnCommentButton.Name = "UnCommentButton";
+            this.UnCommentButton.Size = new System.Drawing.Size(23, 22);
+            this.UnCommentButton.TabIndex = 42;
+            this.UnCommentButton.UseVisualStyleBackColor = true;
+            // 
+            // CommentButton
+            // 
+            this.CommentButton.Image = ((System.Drawing.Image)(resources.GetObject("CommentButton.Image")));
+            this.CommentButton.Location = new System.Drawing.Point(336, 238);
+            this.CommentButton.Name = "CommentButton";
+            this.CommentButton.Size = new System.Drawing.Size(23, 22);
+            this.CommentButton.TabIndex = 41;
+            this.CommentButton.UseVisualStyleBackColor = true;
+            //this.CommentButton.Click += new System.EventHandler(this.CommentButton_Click);
+            // 
             // MappingPackageAutomation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1153, 442);
-            this.Controls.Add(this.treeGridView1);
+            this.ClientSize = new System.Drawing.Size(1083, 589);
             this.Controls.Add(this.panel4);
-            this.Controls.Add(this.panel3);
-            this.Controls.Add(this.label10);
-            this.Controls.Add(this.panel2);
-            this.Controls.Add(this.panel1);
-            this.Controls.Add(this.searchBox);
-            this.Controls.Add(this.RegGroupOpts);
-            this.Controls.Add(this.AddGroupButton);
-            this.Controls.Add(this.NewGroupText);
-            this.Controls.Add(this.label9);
-            this.Controls.Add(this.InitText);
-            this.Controls.Add(this.label8);
-            this.Controls.Add(this.CommentText);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.RegNameText);
-            this.Controls.Add(this.label2);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Controls.Add(this.treeGridView1);
+            this.MinimumSize = new System.Drawing.Size(1099, 628);
             this.Name = "MappingPackageAutomation";
             this.ShowIcon = false;
             this.Text = "Mapping Package Automation";
@@ -701,10 +726,10 @@
             this.panel2.ResumeLayout(false);
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
-            this.panel4.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.treeGridView1)).EndInit();
+            this.panel4.ResumeLayout(false);
+            this.panel4.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -744,10 +769,8 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Button ClearButton;
-        private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.Button CloseButton;
-        private System.Windows.Forms.Panel panel4;
         private System.Windows.Forms.RichTextBox ErrorMessage;
         private AdvancedDataGridView.TreeGridView treeGridView1;
         private AdvancedDataGridView.TreeGridColumn Registers;
@@ -761,6 +784,9 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn CommentColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn IndexColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn SecondaryIndexColumn;
+        private System.Windows.Forms.Panel panel4;
+        private System.Windows.Forms.Button CommentButton;
+        private System.Windows.Forms.Button UnCommentButton;
         //private System.Windows.Forms.OpenFileDialog openFileDialog1;
     }
 }

@@ -368,33 +368,70 @@ namespace MappingBreakDown
             Group = group;
         }
 
-        override
-        public string ToString()
+        //override
+        public string toName()
         {
-            string addr = GetAddress().ToString();
-            string mais = MAIS.ToString();
+            string res = "";
+
+            if (IsComment)
+                res += "--";
+
+            if (Type != type_field.FIELD)
+                res += "\t\t\t\t" + Name + ",\n";
+            else
+                res += "\t\t\t\t\t" + Name + ",\n";
+            return res;
+        }
+
+        public string toXMLstring()
+        {
+            string res = "";
+            res += "<tr><td>" + Name;
+            res += "</td><td>" + Group;
+            res += "</td><td>" + Address.ToString();
+            res += "</td><td>" + MAIS.ToString();
+            res += "</td><td>" + LSB.ToString();
+            res += "</td><td>" + MSB.ToString();
+            res += "</td><td>" + valid_type[(int)Type];
+            res += "</td><td>" + valid_fpga[(int)FPGA];
+            res += "</td><td>" + Init;
+            res += "</td><td>" + Comment + "</td>";
+            return res; 
+        }
+
+        public string toEntry(bool last = false)
+        {
+            string res = "";
+            if (IsComment)
+                res += "--";
+            if (Type == type_field.FIELD)
+                res += "\t\t\t\t\t" + "(" + Name + getSpaces(35 - Name.Length) + ",";
+
+            else
+                res += "\t\t\t\t" + "(" + Name + getSpaces(39 - Name.Length) + ",";
+
+            string adrs = Address.ToString();
+            res += getSpaces(8 - adrs.Length) + adrs + ",";
+            res += "  " + MAIS.ToString() + ",";
             string lsb = LSB.ToString();
             string msb = MSB.ToString();
-            string type = valid_type[(int)Type];
-            string fpga = valid_fpga[(int)FPGA];
-            int spaces;
-            if (Type.Equals(type_field.FIELD))
-                spaces = 4;
-            else
-                spaces = 0;
-
-            string ___reg_name___ = getSpaces(16) + "(" + Name + getSpaces((56 - spaces - ((17 + Name.Length))));
-            string __address = getSpaces(8 - addr.Length) + addr;
-            string __mais = getSpaces(3 - mais.Length) + mais;
-            string __lsb__msb = getSpaces(3 - lsb.Length) + lsb + "," + getSpaces(3 - msb.Length) + msb;
-            string _type__ = " " + type + getSpaces(5 - type.Length);
-            string _fpga__ = " " + fpga + getSpaces(4 - fpga.Length);
-            string __init;
+            res += getSpaces(3 - lsb.Length) + lsb + "," + getSpaces(3 - msb.Length) + msb + ",";
+            res += " " + valid_type[(int)Type] + getSpaces(5 - valid_type[(int)Type].Length) + ",";
+            res += " " + valid_fpga[(int)FPGA] + getSpaces(4 - valid_fpga[(int)FPGA].Length) + ",";
+            
             if (int.TryParse(Init, out int x))
-                __init = getSpaces(5 - Init.Length) + Init;
+                res += getSpaces(Math.Max(4-Init.Length, 0)) + Init + ")";
+            
             else
-                __init = Init;
-            return ___reg_name___ + "," + __address + "," + __mais + "," + __lsb__msb + "," + _type__ + "," + _fpga__ + "," + __init + ")";
+                res += Init + ")";
+
+            if (!last)
+                res += ",";
+
+            if (Comment != "")
+                res += "\t-- " + Comment;
+            res += "\n";
+            return res;
         }
 
         public object[] GetTableEntry()
