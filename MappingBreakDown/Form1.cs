@@ -328,7 +328,7 @@ namespace MappingBreakDown
 
         private void UpdateDataBase()
         {
-            FileStream fs = new FileStream(@"jack.txt", FileMode.Create, FileAccess.Write);
+            FileStream fs = new FileStream(@"registers.txt", FileMode.Create, FileAccess.Write);
             xs.Serialize(fs, RegList);
             fs.Close();
             /*fs = new FileStream(@"groups.txt", FileMode.Create, FileAccess.Write);
@@ -359,7 +359,7 @@ namespace MappingBreakDown
             }*/
             try
             {
-                fs = new FileStream(@"jack.txt", FileMode.Open, FileAccess.Read);
+                fs = new FileStream(@"registers.txt", FileMode.Open, FileAccess.Read);
                 RegList = (List<RegisterEntry>)xs.Deserialize(fs);
                 fs.Close();
                 string group;

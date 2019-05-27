@@ -67,6 +67,11 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegisterEntry.cs" />
+    <Compile Include="TreeGridCell.cs" />
+    <Compile Include="TreeGridEvents.cs" />
+    <Compile Include="TreeGridNode.cs" />
+    <Compile Include="TreeGridNodeCollection.cs" />
+    <Compile Include="TreeGridView.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -103,12 +108,6 @@
     <Content Include="mycorrect.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="E:\Eran\אוניברסיטה\פרויקט גמר\TreeGridview\TreeGridView\ExpandableGridView.csproj">
-      <Project>{2efe526f-79b3-49bc-9575-a7b258c59bb5}</Project>
-      <Name>ExpandableGridView</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
