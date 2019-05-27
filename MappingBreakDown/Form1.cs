@@ -627,6 +627,27 @@ namespace MappingBreakDown
                 doc += "<h2>" + introDec + "</h2>";
                 doc += "<table style='width: 100 %'>";
                 doc += "<tr><th>Name</th><th>Group</th><th>Address</th><th>Mais</th><th>LSB</th><th>MSB</th><th>TYPE</th><th>FPGA</th><th>Init</th><th>Comment</th></tr>";
+                TreeGridNode last_node = null;
+                for (int i = treeGridView1.Nodes.Count - 1; i >= 0; i--)
+                {
+                    TreeGridNode last_group = treeGridView1.Nodes[i];
+                    if (last_group.HasChildren)
+                    {
+                        last_node = last_group.Nodes[last_group.Nodes.Count - 1];
+                        if (last_node.HasChildren)
+                        {
+                            last_node = last_node.Nodes[last_node.Nodes.Count - 1];
+                        }
+                        break;
+                    }
+                }
+                RegisterEntry last = RegList[(int)last_node.Cells["IndexColumn"].Value];
+                int k = (int)last_node.Cells["SecondaryIndexColumn"].Value;
+                if (k != -1)
+                {
+                    last = last.GetFields()[k];
+                    //MessageBox.Show()
+                }
                 while ((line = file.ReadLine()) != null)
                 {
                     if (line.Length == 0)
@@ -642,12 +663,10 @@ namespace MappingBreakDown
                     res += line + "\n";
                 }
                 string prop = "", names = "";
-                int last_i_index = RegList.Count;
                 foreach (string group in RegGroupOpts.Items)
                 {
                     names += "\t\t -- " + group + "\n";
                     prop += "\t\t -- " + group + "\n";
-                    int i = 1;
                     foreach (RegisterEntry l in RegList)
                     {
                         if (l.GetGroup().Equals(group))
@@ -656,21 +675,19 @@ namespace MappingBreakDown
 
                             names += l.toName();
 
-                            prop += l.toEntry(i == last_i_index && fields.Count == 0);
+                            prop += l.toEntry(l == last);
 
                             doc += l.toXMLstring();
 
-                            int j = 1, last_j_index = fields.Count;
                             foreach (RegisterEntry f in fields)
                             {
                                 names += f.toName();
 
-                                prop += f.toEntry(last_j_index == ++j);
+                                prop += f.toEntry(f == last);
 
                                 doc += f.toXMLstring();
                             }
                         }
-                        i++;
                     }
 
                 }
@@ -872,7 +889,7 @@ namespace MappingBreakDown
 
         //        else
         //            indices.Add(i);
-                
+
         //    }
         //    s = s.OrderByDescending(v => v.Item2).ToList();
         //    foreach (Tuple<int, int> index in s)
