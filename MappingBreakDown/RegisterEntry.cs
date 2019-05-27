@@ -383,10 +383,16 @@ namespace MappingBreakDown
             return res;
         }
 
-        public string toXMLstring()
+        public string ToXMLstring()
         {
             string res = "";
-            res += "<tr><td>" + Name;
+            if (IsComment)
+                res += "<tr bgcolor = 'green'>";
+            else if (!IsValid)
+                res += "<tr bgcolor = 'red'>";
+            else
+                res += "<tr>";
+            res += "<td>" + Name;
             res += "</td><td>" + Group;
             res += "</td><td>" + Address.ToString();
             res += "</td><td>" + MAIS.ToString();
@@ -395,11 +401,11 @@ namespace MappingBreakDown
             res += "</td><td>" + valid_type[(int)Type];
             res += "</td><td>" + valid_fpga[(int)FPGA];
             res += "</td><td>" + Init;
-            res += "</td><td>" + Comment + "</td>";
+            res += "</td><td>" + Comment + "</td></tr>";
             return res; 
         }
 
-        public string toEntry(bool last = false)
+        public string ToEntry(bool last = false)
         {
             string res = "";
             if (IsComment)

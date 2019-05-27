@@ -129,6 +129,11 @@ namespace MappingBreakDown
         /* Check the a register can be added to the chart */
         private bool InputValidation(RegisterEntry entry)
         {
+            if (entry.GetName()[0] >= '0' && entry.GetName()[0] <= '9')
+            {
+                MessageBox.Show("Register name can't begin with a digit");
+                return false;
+            }
             if (entry.GetRegType() != RegisterEntry.type_field.FIELD)
             {
                 int index = -1;
@@ -318,11 +323,11 @@ namespace MappingBreakDown
                 entry = entry.GetFields()[indexSec];
             for (int i = 0; i < treeGridView1.ColumnCount; i++)
                 if (entry.GetIsComment())
-                    node.Cells[i].Style.BackColor = System.Drawing.Color.Gray;
+                    node.Cells[i].Style.BackColor = Color.LimeGreen;
                 else if (!entry.GetValid())
-                    node.Cells[i].Style.BackColor = System.Drawing.Color.Red;
+                    node.Cells[i].Style.BackColor = Color.Red;
                 else
-                    node.Cells[i].Style.BackColor = System.Drawing.Color.White;
+                    node.Cells[i].Style.BackColor = Color.White;
         }
 
         private void ColorInValid()
@@ -482,9 +487,10 @@ namespace MappingBreakDown
                     UpdateTable(field);
                 }
             }
-            Console.Write("DONE\nValidating logic with table");
+            Console.Write("DONE\nValidating logic with table: ");
             OpenValidation();
             UpdateDataBase();
+            Console.WriteLine("DONE");
         }
 
         private void SaveAsButton_Click(object sender, EventArgs e)
@@ -623,15 +629,17 @@ namespace MappingBreakDown
             {
                 file = new StreamReader("mycorrect.txt");
                 string line;
-                String res = "";
+                string res = "";
                 string title = Path.GetFileNameWithoutExtension(PathToFile.Text);
-                String introDec = "Original path: " + PathToFile.Text + "</br>The following is a documentation for " + title + ". The table " +
+                string date = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
+                string introDec = "Original path: " + PathToFile.Text + "</br>The following is a documentation for " + title + ". The table " +
                     "contains the registers created using the GUI.";
                 //MessageBox.Show(Path.GetFileNameWithoutExtension(PathToFile.Text));
                 string doc = "<html><head><title>" + title + " Documentation" + "</title>";
                 doc += "<style>table, th, td { border: 1px solid black; } th, td {padding: 5px; text-align: center;}" + "</style></head><body>";
                 doc += "<h1><font face = 'arial'><u>Documentation For " + title + "</h1></u>";
-                doc += "<h2>" + introDec + "</h2>";
+                doc += date;
+                doc += "<h2>" + date + "<br/>" + introDec + "</h2>";
                 doc += "<table style='width: 100 %'>";
                 doc += "<tr><th>Name</th><th>Group</th><th>Address</th><th>Mais</th><th>LSB</th><th>MSB</th><th>TYPE</th><th>FPGA</th><th>Init</th><th>Comment</th></tr>";
                 TreeGridNode last_node = null;
@@ -682,17 +690,17 @@ namespace MappingBreakDown
 
                             names += l.toName();
 
-                            prop += l.toEntry(l == last);
+                            prop += l.ToEntry(l == last);
 
-                            doc += l.toXMLstring();
+                            doc += l.ToXMLstring();
 
                             foreach (RegisterEntry f in fields)
                             {
                                 names += f.toName();
 
-                                prop += f.toEntry(f == last);
+                                prop += f.ToEntry(f == last);
 
-                                doc += f.toXMLstring();
+                                doc += f.ToXMLstring();
                             }
                         }
                     }
