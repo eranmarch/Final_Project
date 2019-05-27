@@ -102,7 +102,7 @@ namespace MappingBreakDown
         public bool IsFileValid()
         {
             // Prepare texts for comparison: remove comments and convert to lower case
-            Console.WriteLine("Preparing to compile");
+            Console.WriteLine("Preparing to compile " + path_to_file);
             string[] lines_correct = File.ReadAllLines(path_to_correct);
             string[] lines = File.ReadAllLines(path_to_file);
             for (int i = 0; i < lines_correct.Length; i++)
@@ -117,7 +117,7 @@ namespace MappingBreakDown
             int j = 0;
 
             // Parsing Analysis: Compare
-            Console.WriteLine("Compile");
+            Console.WriteLine("Compiling...");
             for (int i = 0; i < lines.Length; i++)
             {
                 // Skip empty lines
@@ -152,7 +152,6 @@ namespace MappingBreakDown
                                     RegisterEntry re = FindAtAdress(address);
                                     if (re != null)
                                         re.AddField(entry);
-                                    //MessageBox.Show("sdfsdfsdfsdf");
                                 }
                                 else
                                     Registers.Add(entry);
@@ -215,7 +214,7 @@ namespace MappingBreakDown
                     j++;
                 }
             }
-            Console.WriteLine("Logic analysis");
+            Console.WriteLine("Logic analysis...");
             // if (!NamesCrossValid())
             //   return false;
             ValidRegLogic(); // Sematic Analysis, add everything from here

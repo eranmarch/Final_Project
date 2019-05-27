@@ -227,7 +227,7 @@ namespace MappingBreakDown
                 if (fv.IsFileValid())
                 {
                     PathToFile.Text = openFileDialog1.FileName;
-                    Console.WriteLine("Adding to table");
+                    Console.WriteLine("Adding entries to table...");
                     AddManyRegisters(fv.GetRegList(), fv.GetGroups());
                 }
             }
@@ -374,6 +374,7 @@ namespace MappingBreakDown
             }*/
             try
             {
+                Console.Write("Restoring registers from inner file 'registers.txt':");
                 fs = new FileStream(@"registers.txt", FileMode.Open, FileAccess.Read);
                 RegList = (List<RegisterEntry>)xs.Deserialize(fs);
                 fs.Close();
@@ -392,9 +393,11 @@ namespace MappingBreakDown
                     foreach (RegisterEntry field in fields)
                         UpdateTable(field);
                 }
+                Console.WriteLine(" DONE");
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine("Invalid restore file: " + e.Message + "\nRestarting list...");
                 RegList = new List<RegisterEntry>();
             }
         }
