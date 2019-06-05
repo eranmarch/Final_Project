@@ -18,7 +18,7 @@ namespace MappingBreakDown
         public XmlSerializer xs;
         //public XmlSerializer ls;
         List<RegisterEntry> RegList;
-        bool saved = false;
+        bool saved = true;
 
         public MappingPackageAutomation()
         {
@@ -209,13 +209,14 @@ namespace MappingBreakDown
             }
             else
             {
-                ErrorMessage.Text = "[#] Register named " + RegNameText.Text + " was added";
                 entry = new RegisterEntry(RegNameText.Text, -1, MAISOpts.Text, LSBOpts.Text, MSBOpts.Text, TypeOpts.Text, FPGAOpts.Text, InitText.Text, CommentText.Text, RegGroupOpts.Text);
             }
             if (!InputValidation(entry))
                 return;
             AddEntryToTable(entry);
+            ErrorMessage.Text = "[#] Register named " + RegNameText.Text + " was added";
             InitFields();
+            saved = false;
         }
 
         /* Open a file */
@@ -313,6 +314,7 @@ namespace MappingBreakDown
             OpenValidation();
             UpdateDataBase();
             EditCell(node, entry.GetTableEntry());
+            saved = false;
         }
 
         private void ColorNode(TreeGridNode node)
@@ -605,6 +607,7 @@ namespace MappingBreakDown
             searchBox.Text = "";
             OpenValidation();
             UpdateDataBase();
+            saved = false;
         }
 
         private void TextBox2_TextChanged(object sender, EventArgs e)
@@ -815,7 +818,10 @@ namespace MappingBreakDown
             if (PathToFile.Text.Equals(""))
                 return;
             if (saved)
+            {
                 PathToFile.Text = "";
+                File.WriteAllText(@"file_path.txt", "");
+            }
             else
             {
                 DialogResult dialogResult = MessageBox.Show("Are you sure you want to close the file without saving?", "Warning", MessageBoxButtons.YesNo);
@@ -823,6 +829,7 @@ namespace MappingBreakDown
                 {
                     //SaveButton_Click(sender, e);
                     PathToFile.Text = "";
+                    File.WriteAllText(@"file_path.txt", "");
                 }
                 else if (dialogResult == DialogResult.No)
                 {
