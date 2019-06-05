@@ -19,6 +19,7 @@ namespace MappingBreakDown
         //public XmlSerializer ls;
         List<RegisterEntry> RegList;
         bool saved = true;
+        //Dictionary<string, TreeGridNode> group_nodes;
 
         public MappingPackageAutomation()
         {
@@ -30,6 +31,7 @@ namespace MappingBreakDown
             treeGridView1.Nodes.Add("");
             ReadDataBase();
             ColorInValid();
+            //group_nodes = new Dictionary<string, TreeGridNode>();
         }
 
         /* Default values for each register */
@@ -85,7 +87,8 @@ namespace MappingBreakDown
                 }
             }
             RegGroupOpts.Items.Add(NewGroupText.Text);
-            treeGridView1.Nodes.Add(NewGroupText.Text);
+            TreeGridNode node = treeGridView1.Nodes.Add(NewGroupText.Text);
+            //group_nodes.Add(NewGroupText.Text, node);
             NewGroupText.Text = "";
         }
 
@@ -390,7 +393,8 @@ namespace MappingBreakDown
                     if (!RegGroupOpts.Items.Contains(group))
                     {
                         RegGroupOpts.Items.Add(group);
-                        treeGridView1.Nodes.Add(group);
+                        TreeGridNode node = treeGridView1.Nodes.Add(group);
+                        //group_nodes[group] = node;
                     }
 
                     UpdateTable(entry);
@@ -468,6 +472,8 @@ namespace MappingBreakDown
         private void AddEntryToTable(RegisterEntry entry, bool open = false)
         {
             bool isField = entry.GetRegType() == RegisterEntry.type_field.FIELD;
+            //TreeGridNode node = group_nodes[entry.GetGroup()];
+            //node.Expand();
             if (isField)
             {
                 RegList[entry.GetIndex()].AddField(entry);
@@ -476,6 +482,7 @@ namespace MappingBreakDown
             {
                 entry.SetIndex(RegList.Count); // only outer index
                 RegList.Add(entry);
+                //node.Nodes.Add(entry.GetTableEntry());
             }
             if (!open)
                 UpdateDataBase();
