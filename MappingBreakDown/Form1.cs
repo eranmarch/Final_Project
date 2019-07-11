@@ -18,7 +18,8 @@ namespace MappingBreakDown
         public XmlSerializer xs;
         //public XmlSerializer ls;
         List<RegisterEntry> RegList;
-        bool saved = false;
+        bool saved = true;
+        //Dictionary<string, TreeGridNode> group_nodes;
 
         public MappingPackageAutomation()
         {
@@ -30,6 +31,7 @@ namespace MappingBreakDown
             treeGridView1.Nodes.Add("");
             ReadDataBase();
             ColorInValid();
+            //group_nodes = new Dictionary<string, TreeGridNode>();
         }
 
         /* Default values for each register */
@@ -85,7 +87,8 @@ namespace MappingBreakDown
                 }
             }
             RegGroupOpts.Items.Add(NewGroupText.Text);
-            treeGridView1.Nodes.Add(NewGroupText.Text);
+            TreeGridNode node = treeGridView1.Nodes.Add(NewGroupText.Text);
+            //group_nodes.Add(NewGroupText.Text, node);
             NewGroupText.Text = "";
         }
 
@@ -209,12 +212,12 @@ namespace MappingBreakDown
             }
             else
             {
-                ErrorMessage.Text = "[#] Register named " + RegNameText.Text + " was added";
                 entry = new RegisterEntry(RegNameText.Text, -1, MAISOpts.Text, LSBOpts.Text, MSBOpts.Text, TypeOpts.Text, FPGAOpts.Text, InitText.Text, CommentText.Text, RegGroupOpts.Text);
             }
             if (!InputValidation(entry))
                 return;
             AddEntryToTable(entry);
+            ErrorMessage.Text = "[#] Register named " + RegNameText.Text + " was added";
             InitFields();
             saved = false;
         }
@@ -390,7 +393,8 @@ namespace MappingBreakDown
                     if (!RegGroupOpts.Items.Contains(group))
                     {
                         RegGroupOpts.Items.Add(group);
-                        treeGridView1.Nodes.Add(group);
+                        TreeGridNode node = treeGridView1.Nodes.Add(group);
+                        //group_nodes[group] = node;
                     }
 
                     UpdateTable(entry);
@@ -468,6 +472,8 @@ namespace MappingBreakDown
         private void AddEntryToTable(RegisterEntry entry, bool open = false)
         {
             bool isField = entry.GetRegType() == RegisterEntry.type_field.FIELD;
+            //TreeGridNode node = group_nodes[entry.GetGroup()];
+            //node.Expand();
             if (isField)
             {
                 RegList[entry.GetIndex()].AddField(entry);
@@ -476,6 +482,7 @@ namespace MappingBreakDown
             {
                 entry.SetIndex(RegList.Count); // only outer index
                 RegList.Add(entry);
+                //node.Nodes.Add(entry.GetTableEntry());
             }
             if (!open)
                 UpdateDataBase();
@@ -818,7 +825,10 @@ namespace MappingBreakDown
             if (PathToFile.Text.Equals(""))
                 return;
             if (saved)
+            {
                 PathToFile.Text = "";
+                File.WriteAllText(@"file_path.txt", "");
+            }
             else
             {
                 DialogResult dialogResult = MessageBox.Show("Are you sure you want to close the file without saving?", "Warning", MessageBoxButtons.YesNo);
@@ -826,6 +836,7 @@ namespace MappingBreakDown
                 {
                     //SaveButton_Click(sender, e);
                     PathToFile.Text = "";
+                    File.WriteAllText(@"file_path.txt", "");
                 }
                 else if (dialogResult == DialogResult.No)
                 {

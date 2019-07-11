@@ -166,6 +166,7 @@ namespace MappingBreakDown
                             if (!IsValidRegName(lines[k]))
                             {
                                 MessageBox.Show("COMPILATION 1: Parsing error at line " + (k + 1));
+                                Console.WriteLine("COMPILATION 1: Parsing error at line " + (k + 1) + "\nFinishing compilation...");
                                 return false;
                             }
                         }
@@ -185,6 +186,7 @@ namespace MappingBreakDown
                                     else
                                     {
                                         MessageBox.Show("COMPILATION 2: Address " + address + " doesn't exist (" + (k + 1) + ")");
+                                        Console.WriteLine("COMPILATION 2: Address " + address + " doesn't exist (" + (k + 1) + ")" + "\nFinishing compilation...");
                                         return false;
                                     }
                                 }
@@ -194,6 +196,7 @@ namespace MappingBreakDown
                             else
                             {
                                 MessageBox.Show("COMPILATION 3: Parsing error at line " + (k + 1));
+                                Console.WriteLine("COMPILATION 3: Parsing error at line " + (k + 1) + "\nFinishing compilation...");
                                 return false;
                             }
                         }
@@ -209,6 +212,7 @@ namespace MappingBreakDown
                     if (!lines_correct[j].Equals(lines[i]))
                     {
                         MessageBox.Show("COMPILATION 4: Invalid file\n" + lines[i] + "\n" + lines_correct[j]);
+                        Console.WriteLine("COMPILATION 4: Invalid file\n" + lines[i] + "!=" + lines_correct[j] + "\nFinishing compilation...");
                         return false;
                     }
                     j++;

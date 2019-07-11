@@ -14,12 +14,9 @@ namespace MappingBreakDown
         /* Globals */
         public enum type_field { RD, WR, RD_WR, FIELD };
         public enum fpga_field { G, D, A, B, C, ABC, ABCG };
-        public enum Reg_entry_field { Name, Address, MAIS, LSB, MSB, Type, FPGA, INIT, comment };
 
         public static string[] valid_type = { "RD", "WR", "RD_WR", "FIELD" };
         public static string[] valid_fpga = { "G", "D", "A", "B", "C", "ABC", "ABCG" };
-        public static string[] valid_type_lower = { "rd", "wr", "rd_wr", "field" };
-        public static string[] valid_fpga_lower = { "g", "d", "a", "b", "c", "abc", "abcg" };
 
         /* Class fields */
         public string Name { get; set; }
