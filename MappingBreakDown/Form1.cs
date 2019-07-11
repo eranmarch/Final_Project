@@ -216,6 +216,7 @@ namespace MappingBreakDown
                 return;
             AddEntryToTable(entry);
             InitFields();
+            saved = false;
         }
 
         /* Open a file */
@@ -313,6 +314,7 @@ namespace MappingBreakDown
             OpenValidation();
             UpdateDataBase();
             EditCell(node, entry.GetTableEntry());
+            saved = false;
         }
 
         private void ColorNode(TreeGridNode node)
@@ -605,6 +607,7 @@ namespace MappingBreakDown
             searchBox.Text = "";
             OpenValidation();
             UpdateDataBase();
+            saved = false;
         }
 
         private void TextBox2_TextChanged(object sender, EventArgs e)
