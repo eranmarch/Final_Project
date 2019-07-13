@@ -439,7 +439,7 @@ namespace MappingBreakDown
 
         public object[] GetTableEntry()
         {
-            return new object[] { Name, Address, MAIS, LSB, MSB, Type, FPGA, Init, Comment, Index, SecondaryIndex };
+            return new object[] { Group, Name, Address, MAIS, LSB, MSB, Type, FPGA, Init, Comment, Index, SecondaryIndex };
         }
 
         /*public int CompareTo(RegisterEntry other)

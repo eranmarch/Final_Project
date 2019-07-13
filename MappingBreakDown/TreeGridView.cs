@@ -310,6 +310,9 @@ namespace AdvancedDataGridView
 
 		internal protected virtual void SiteNode(TreeGridNode node)
 		{
+            //Console.WriteLine("NODE VERSION");
+            //Stopwatch sw = new Stopwatch();
+            //sw.Start();
 			//TODO: Raise exception if parent node is not the root or is not sited.
 			int rowIndex = -1;
 			TreeGridNode currentRow;
@@ -345,8 +348,11 @@ namespace AdvancedDataGridView
 
 			if (currentRow != null)
 			{
+                //Console.WriteLine("currentRow != null");
+                //int i = 0;
 				while (currentRow.Level >= node.Level)
 				{
+                    Console.WriteLine("currentRow.Level = " + currentRow.Level);
 					if (currentRow.RowIndex < base.Rows.Count - 1)
 					{
 						currentRow = base.Rows[currentRow.RowIndex + 1] as TreeGridNode;
@@ -355,7 +361,7 @@ namespace AdvancedDataGridView
 					else
 						// no more rows, site this node at the end.
 						break;
-
+                  //  Console.WriteLine("First loop iteration no. " + i++);
 				}
 				if (currentRow == node.Parent)
 					rowIndex = currentRow.RowIndex + 1;
@@ -366,35 +372,48 @@ namespace AdvancedDataGridView
 			}
 			else
 				rowIndex = 0;
+            Console.WriteLine("rowIndex = " + rowIndex);
+            //sw.Stop();
+            //Console.WriteLine("First time: " + sw.Elapsed);
 
-
+            //sw.Reset();
+            //sw.Start();
 			Debug.Assert(rowIndex != -1);
 			this.SiteNode(node, rowIndex);
+            //sw.Stop();
+            //Console.WriteLine("Second time: " + sw.Elapsed);
 
-			Debug.Assert(node.IsSited);
+            Debug.Assert(node.IsSited);
 			if (node.IsExpanded)
 			{
+                //int i = 0;
 				// add all child rows to display
 				foreach (TreeGridNode childNode in node.Nodes)
 				{
+                    //Console.WriteLine("Second Loop iteration no. " + i++);
 					//TODO: could use the more efficient SiteRow with index.
 					this.SiteNode(childNode);
 				}
+                //Console.WriteLine(i);
 			}
 		}
 
 
 		internal protected virtual void SiteNode(TreeGridNode node, int index)
 		{
+            //Console.WriteLine("INDEX VERSION");
 			if (index < base.Rows.Count)
 			{
-				base.Rows.Insert(index, node);
+                base.Rows.Insert(index, node);
+                //DataGridViewRow[] p = { node, node, node, node, node, node, node, node, node, node };
+                //base.Rows.InsertRange(index, p);
 			}
 			else
 			{
 				// for the last item.
 				base.Rows.Add(node);
-			}
+                //base.Rows.AddRange(node, node, node, node, node, node, node, node, node, node);
+            }
 		}
 
 		internal protected virtual bool ExpandNode(TreeGridNode node)

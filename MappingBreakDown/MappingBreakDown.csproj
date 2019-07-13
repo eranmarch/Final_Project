@@ -109,5 +109,11 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Desktop\שיט של אחרים\ערן ועידן\ערן לימודים\גיבוי פרויקט גמר\HierarchicalGrid\HierarchicalGrid.csproj">
+      <Project>{2EFE526F-79B3-49BC-9575-A7B258C59BB5}</Project>
+      <Name>HierarchicalGrid</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

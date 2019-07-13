@@ -9,6 +9,7 @@ using System.Xml.Serialization;
 using AdvancedDataGridView;
 using System.Runtime;
 using System.Drawing;
+using HierarchicalGrid;
 
 namespace MappingBreakDown
 {
@@ -16,10 +17,12 @@ namespace MappingBreakDown
     {
 
         public XmlSerializer xs;
-        //public XmlSerializer ls;
         List<RegisterEntry> RegList;
         bool saved = true;
-        //Dictionary<string, TreeGridNode> group_nodes;
+
+        DataTable dtgroups, dtregisters, dtfields;
+        List<string> displayColumns = new List<string>();
+        List<GroupColumn> groupColumns = new List<GroupColumn>();
 
         public MappingPackageAutomation()
         {
@@ -27,11 +30,60 @@ namespace MappingBreakDown
             InitFields();
             ErrorMessage.Text = "> ";
             xs = new XmlSerializer(typeof(List<RegisterEntry>));
-            //ls = new XmlSerializer(typeof(List<string>));
-            treeGridView1.Nodes.Add("");
+            InitDataBasesParams();
+            hierarchicalGridView1.Nodes.Add("");
             ReadDataBase();
             ColorInValid();
-            //group_nodes = new Dictionary<string, TreeGridNode>();
+        }
+
+        private void InitDataBasesParams()
+        {
+            dtgroups = new DataTable();
+            dtgroups.Columns.Add("Group", typeof(string));
+            dtregisters = new DataTable();
+            dtregisters.Columns.Add("Group", typeof(string));
+            dtregisters.Columns.Add("Name", typeof(string));
+            dtregisters.Columns.Add("Address", typeof(int));
+            dtregisters.Columns.Add("MAIS", typeof(int));
+            dtregisters.Columns.Add("LSB", typeof(int));
+            dtregisters.Columns.Add("MSB", typeof(int));
+            dtregisters.Columns.Add("Type", typeof(string));
+            dtregisters.Columns.Add("FPGA", typeof(string));
+            dtregisters.Columns.Add("Init", typeof(string));
+            dtregisters.Columns.Add("Comment", typeof(string));
+            dtregisters.Columns.Add("IsValid", typeof(bool));
+            dtregisters.Columns.Add("Reason", typeof(string));
+            dtregisters.Columns.Add("Index", typeof(int));
+            dtregisters.Columns.Add("SecondaryIndex", typeof(int));
+            dtfields = new DataTable();
+            dtfields.Columns.Add("Group", typeof(string));
+            dtfields.Columns.Add("Name", typeof(string));
+            dtfields.Columns.Add("Address", typeof(int));
+            dtfields.Columns.Add("MAIS", typeof(int));
+            dtfields.Columns.Add("LSB", typeof(int));
+            dtfields.Columns.Add("MSB", typeof(int));
+            dtfields.Columns.Add("Type", typeof(string));
+            dtfields.Columns.Add("FPGA", typeof(string));
+            dtfields.Columns.Add("Init", typeof(string));
+            dtfields.Columns.Add("Comment", typeof(string));
+            dtfields.Columns.Add("IsValid", typeof(bool));
+            dtfields.Columns.Add("Reason", typeof(string));
+            dtfields.Columns.Add("Index", typeof(int));
+            dtfields.Columns.Add("SecondaryIndex", typeof(int));
+            displayColumns.Add("Group");
+            displayColumns.Add("Name");
+            displayColumns.Add("Address");
+            displayColumns.Add("MAIS");
+            displayColumns.Add("LSB");
+            displayColumns.Add("MSB");
+            displayColumns.Add("Type");
+            displayColumns.Add("FPGA");
+            displayColumns.Add("Init");
+            displayColumns.Add("Comment");
+            displayColumns.Add("IsValid");
+            displayColumns.Add("Reason");
+            displayColumns.Add("Index");
+            displayColumns.Add("SecondaryIndex");
         }
 
         /* Default values for each register */
@@ -87,8 +139,7 @@ namespace MappingBreakDown
                 }
             }
             RegGroupOpts.Items.Add(NewGroupText.Text);
-            TreeGridNode node = treeGridView1.Nodes.Add(NewGroupText.Text);
-            //group_nodes.Add(NewGroupText.Text, node);
+            HierarchicalGridNode node = hierarchicalGridView1.Nodes.Add(NewGroupText.Text);
             NewGroupText.Text = "";
         }
 
@@ -242,8 +293,8 @@ namespace MappingBreakDown
         private void Load_Click(object sender, EventArgs e)
         {
             RegisterEntry re = null;
-            TreeGridNode node = null;
-            foreach (TreeGridNode item in treeGridView1.SelectedRows)
+            HierarchicalGridNode node = null;
+            foreach (HierarchicalGridNode item in hierarchicalGridView1.SelectedRows)
             {
                 try
                 {
@@ -320,14 +371,14 @@ namespace MappingBreakDown
             saved = false;
         }
 
-        private void ColorNode(TreeGridNode node)
+        private void ColorNode(HierarchicalGridNode node)
         {
-            int index = (int)node.Cells["IndexColumn"].Value, indexSec = (int)node.Cells["SecondaryIndexColumn"].Value;
+            int index = (int)node.Cells["Index"].Value, indexSec = (int)node.Cells["SecondaryIndex"].Value;
             RegisterEntry entry = RegList[index];
             //MessageBox.Show(entry.GetName() + ": [" + index + ", " + indexSec + "]");
             if (indexSec != -1)
                 entry = entry.GetFields()[indexSec];
-            for (int i = 0; i < treeGridView1.ColumnCount; i++)
+            for (int i = 0; i < hierarchicalGridView1.ColumnCount; i++)
                 if (entry.GetIsComment())
                     node.Cells[i].Style.BackColor = Color.LimeGreen;
                 else if (!entry.GetValid())
@@ -338,11 +389,11 @@ namespace MappingBreakDown
 
         private void ColorInValid()
         {
-            foreach (TreeGridNode group_node in treeGridView1.Nodes)
-                foreach (TreeGridNode register in group_node.Nodes)
+            foreach (HierarchicalGridNode group_node in hierarchicalGridView1.Nodes)
+                foreach (HierarchicalGridNode register in group_node.Nodes)
                 {
                     ColorNode(register);
-                    foreach (TreeGridNode field in register.Nodes)
+                    foreach (HierarchicalGridNode field in register.Nodes)
                         ColorNode(field);
                 }
         }
@@ -365,24 +416,9 @@ namespace MappingBreakDown
         private void ReadDataBase()
         {
             FileStream fs;
-            /*try
-            {
-                fs = new FileStream(@"groups.txt", FileMode.Open, FileAccess.Read);
-                List<string> groups = (List<string>)ls.Deserialize(fs);
-                foreach (string group in groups)
-                {
-                    RegGroupOpts.Items.Add(group);
-                    treeGridView1.Nodes.Add(group);
-                }
-                fs.Close();
-            }
-            catch (Exception)
-            {
-                treeGridView1.Nodes.Add("");
-            }*/
             try
             {
-                Console.Write("Restoring registers from inner file 'registers.txt':");
+                Console.WriteLine("Restoring registers from inner file 'registers.txt':");
                 fs = new FileStream(@"registers.txt", FileMode.Open, FileAccess.Read);
                 RegList = (List<RegisterEntry>)xs.Deserialize(fs);
                 fs.Close();
@@ -392,17 +428,35 @@ namespace MappingBreakDown
                     group = entry.GetGroup();
                     if (!RegGroupOpts.Items.Contains(group))
                     {
+                        Console.WriteLine("Adding group " + group);
                         RegGroupOpts.Items.Add(group);
-                        TreeGridNode node = treeGridView1.Nodes.Add(group);
-                        //group_nodes[group] = node;
+                        //TreeGridNode node = treeGridView1.Nodes.Add(group);
+                        dtgroups.Rows.Add(group);
                     }
-
-                    UpdateTable(entry);
+                    Console.WriteLine("Adding register " + entry.GetName());
+                    //UpdateTable(entry);
+                    object[] ent = entry.GetTableEntry();
+                    dtregisters.Rows.Add(ent);
                     List<RegisterEntry> fields = entry.GetFields();
                     foreach (RegisterEntry field in fields)
-                        UpdateTable(field);
+                    {
+                        Console.WriteLine("Adding field " + field.GetName() + " to register " + entry.GetName());
+                        //UpdateTable(field);
+                        dtfields.Rows.Add(field.GetTableEntry());
+                    }
                 }
-                Console.WriteLine(" SUCCESS");
+                DataSet dsDataset = new DataSet();
+                dsDataset.Tables.Add(dtgroups);
+                //dsDataset.Tables.Add(dtregisters);
+                //dsDataset.Tables.Add(dtfields);
+                //DataRelation groupsRegsRelation = new DataRelation("GroupsRegistersRelation", dsDataset.Tables[0].Columns[0], dsDataset.Tables[1].Columns[0], true);
+                //DataRelation regsFieldsRelation = new DataRelation("GroupsFieldsRelation", dsDataset.Tables[1].Columns[2], dsDataset.Tables[2].Columns[2], false);
+                //dsDataset.Relations.Add(groupsRegsRelation);
+                //dsDataset.Relations.Add(regsFieldsRelation);
+
+                DataGridSource newGridSource = new DataGridSource(dtgroups.DataSet, displayColumns, groupColumns);
+                hierarchicalGridView1.DataSource = newGridSource;
+                Console.WriteLine("SUCCESS");
             }
             catch (Exception e)
             {
@@ -422,7 +476,7 @@ namespace MappingBreakDown
             }
         }
 
-        private void EditCell(TreeGridNode cell, object[] ent)
+        private void EditCell(HierarchicalGridNode cell, object[] ent)
         {
             for (int i = 0; i < ent.Length; i++)
                 cell.Cells[i].Value = ent[i];
@@ -430,11 +484,11 @@ namespace MappingBreakDown
 
         private void UpdateTable(RegisterEntry entry)
         {
-            TreeGridNode node;
+            HierarchicalGridNode node;
             string group = entry.GetGroup();
             object[] ent = entry.GetTableEntry();
             bool b, isField = entry.GetRegType() == RegisterEntry.type_field.FIELD;
-            foreach (TreeGridNode group_node in treeGridView1.Nodes)
+            foreach (HierarchicalGridNode group_node in hierarchicalGridView1.Nodes)
             {
                 if (group_node.Cells["Registers"].Value.ToString().Equals(group))
                     if (!isField)
@@ -444,9 +498,9 @@ namespace MappingBreakDown
                     }
                     else
                     {
-                        TreeGridNode tmp = null;
+                        HierarchicalGridNode tmp = null;
                         group_node.Expand();
-                        foreach (TreeGridNode reg in group_node.Nodes)
+                        foreach (HierarchicalGridNode reg in group_node.Nodes)
                         {
                             b = reg.GetIsExpanded();
                             reg.Expand();
@@ -472,7 +526,6 @@ namespace MappingBreakDown
         private void AddEntryToTable(RegisterEntry entry, bool open = false)
         {
             bool isField = entry.GetRegType() == RegisterEntry.type_field.FIELD;
-            //TreeGridNode node = group_nodes[entry.GetGroup()];
             //node.Expand();
             if (isField)
             {
@@ -496,7 +549,7 @@ namespace MappingBreakDown
                 if (!RegGroupOpts.Items.Contains(group))
                 {
                     RegGroupOpts.Items.Add(group);
-                    treeGridView1.Nodes.Add(group);
+                    hierarchicalGridView1.Nodes.Add(group);
                 }
             Console.Write("DONE\n");
             List<RegisterEntry> fields;
@@ -541,7 +594,7 @@ namespace MappingBreakDown
             List<int> indices = new List<int>();
             List<Tuple<int, int>> s = new List<Tuple<int, int>>();
             List<RegisterEntry> fields;
-            foreach (TreeGridNode item in treeGridView1.SelectedRows)
+            foreach (HierarchicalGridNode item in hierarchicalGridView1.SelectedRows)
             {
                 try
                 {
@@ -556,9 +609,9 @@ namespace MappingBreakDown
                         indices.Add(i);
                         //MessageBox.Show(i.ToString());
                     }
-                    foreach (TreeGridNode group in treeGridView1.Nodes)
+                    foreach (HierarchicalGridNode group in hierarchicalGridView1.Nodes)
                     {
-                        foreach (TreeGridNode sibling in group.Nodes)
+                        foreach (HierarchicalGridNode sibling in group.Nodes)
                         {
                             if (j == -1)
                             {
@@ -566,7 +619,7 @@ namespace MappingBreakDown
                                 if ((int)sibling.Cells["IndexColumn"].Value > i)
                                 {
                                     sibling.Cells["IndexColumn"].Value = (int)sibling.Cells["IndexColumn"].Value - 1;
-                                    foreach (TreeGridNode field in sibling.Nodes)
+                                    foreach (HierarchicalGridNode field in sibling.Nodes)
                                         field.Cells["IndexColumn"].Value = (int)field.Cells["IndexColumn"].Value - 1;
                                 }
                             }
@@ -620,13 +673,13 @@ namespace MappingBreakDown
         private void TextBox2_TextChanged(object sender, EventArgs e)
         {
             string searchRes = searchBox.Text;
-            foreach (TreeGridNode group_node in treeGridView1.Nodes)
+            foreach (HierarchicalGridNode group_node in hierarchicalGridView1.Nodes)
             {
                 group_node.Expand();
-                foreach (TreeGridNode reg in group_node.Nodes)
+                foreach (HierarchicalGridNode reg in group_node.Nodes)
                 {
                     reg.Expand();
-                    foreach (TreeGridNode field in reg.Nodes)
+                    foreach (HierarchicalGridNode field in reg.Nodes)
                     {
                         field.Visible = field.Cells["Registers"].Value.ToString().Contains(searchRes);
                     }
@@ -635,12 +688,12 @@ namespace MappingBreakDown
             }
         }
 
-        private String GetSpaces(int x)
+        private string GetSpaces(int x)
         {
-            return String.Concat(Enumerable.Repeat(" ", x));
+            return string.Concat(Enumerable.Repeat(" ", x));
         }
 
-        private bool IsNum(String s)
+        private bool IsNum(string s)
         {
             return double.TryParse(s, out double num);
         }
@@ -670,10 +723,10 @@ namespace MappingBreakDown
                 doc += "<h2>" + date + "<br/>" + introDec + "</h2>";
                 doc += "<table style='width: 100 %'>";
                 doc += "<tr><th>Name</th><th>Group</th><th>Address</th><th>Mais</th><th>LSB</th><th>MSB</th><th>TYPE</th><th>FPGA</th><th>Init</th><th>Comment</th></tr>";
-                TreeGridNode last_node = null;
-                for (int i = treeGridView1.Nodes.Count - 1; i >= 0; i--)
+                HierarchicalGridNode last_node = null;
+                for (int i = hierarchicalGridView1.Nodes.Count - 1; i >= 0; i--)
                 {
-                    TreeGridNode last_group = treeGridView1.Nodes[i];
+                    HierarchicalGridNode last_group = hierarchicalGridView1.Nodes[i];
                     if (last_group.HasChildren)
                     {
                         last_node = last_group.Nodes[last_group.Nodes.Count - 1];
@@ -787,7 +840,7 @@ namespace MappingBreakDown
 
         private void Clear_Click(object sender, EventArgs e)
         {
-            foreach (TreeGridNode node in treeGridView1.Nodes)
+            foreach (HierarchicalGridNode node in hierarchicalGridView1.Nodes)
                 for (int i = node.Nodes.Count - 1; i >= 0; i--)
                     node.Nodes.Remove(node.Nodes[i]);
             for (int i = RegList.Count - 1; i >= 0; i--)
@@ -848,7 +901,7 @@ namespace MappingBreakDown
         private void TreeGridView1_SelectionChanged(object sender, EventArgs e)
         {
             RegisterEntry re = null;
-            foreach (TreeGridNode item in treeGridView1.SelectedRows)
+            foreach (TreeGridNode item in hierarchicalGridView1.SelectedRows)
             {
                 try
                 {
@@ -919,7 +972,7 @@ namespace MappingBreakDown
 
         private void frm_sizeChanged(object sender, EventArgs e)
         {
-            treeGridView1.Size = new Size(this.Size.Width, this.Size.Height - this.panel4.Size.Height - 45);
+            hierarchicalGridView1.Size = new Size(this.Size.Width, this.Size.Height - this.panel4.Size.Height - 45);
         }
 
         private void CommentButton_Click(object sender, EventArgs e)
@@ -928,7 +981,7 @@ namespace MappingBreakDown
             List<Tuple<int, int>> s = new List<Tuple<int, int>>();
             //List<RegisterEntry> fields;
             RegisterEntry entry;
-            foreach (TreeGridNode item in treeGridView1.SelectedRows)
+            foreach (TreeGridNode item in hierarchicalGridView1.SelectedRows)
             {
                 try
                 {
@@ -956,7 +1009,7 @@ namespace MappingBreakDown
             List<Tuple<int, int>> s = new List<Tuple<int, int>>();
             //List<RegisterEntry> fields;
             RegisterEntry entry;
-            foreach (TreeGridNode item in treeGridView1.SelectedRows)
+            foreach (TreeGridNode item in hierarchicalGridView1.SelectedRows)
             {
                 try
                 {
