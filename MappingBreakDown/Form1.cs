@@ -28,7 +28,7 @@ namespace MappingBreakDown
         {
             InitializeComponent();
             InitFields();
-            ErrorMessage.Text = "> ";
+            ErrorMessage.Text = "Message: ";
             xs = new XmlSerializer(typeof(List<RegisterEntry>));
             InitDataBasesParams();
             hierarchicalGridView1.Nodes.Add("");
@@ -258,7 +258,7 @@ namespace MappingBreakDown
             RegisterEntry entry;
             if (InitText.Text.Equals(""))
             {
-                ErrorMessage.Text = "[#] Init field is empty, resort to default (0)";
+                ErrorMessage.Text = "Message: Init field is empty, resort to default (0)";
                 entry = new RegisterEntry(RegNameText.Text, -1, MAISOpts.Text, LSBOpts.Text, MSBOpts.Text, TypeOpts.Text, FPGAOpts.Text, "0", CommentText.Text, RegGroupOpts.Text);
             }
             else
@@ -268,7 +268,7 @@ namespace MappingBreakDown
             if (!InputValidation(entry))
                 return;
             AddEntryToTable(entry);
-            ErrorMessage.Text = "[#] Register named " + RegNameText.Text + " was added";
+            ErrorMessage.Text = "Message: Register named " + RegNameText.Text + " was added";
             InitFields();
             saved = false;
         }
@@ -281,7 +281,8 @@ namespace MappingBreakDown
                 FileValidator fv = new FileValidator(openFileDialog1.FileName);
                 if (fv.IsFileValid())
                 {
-                    PathToFile.Text = openFileDialog1.FileName;
+                    PathToFile.Text = "Path: " + openFileDialog1.FileName;
+                    this.Text = openFileDialog1.FileName.Substring(openFileDialog1.FileName.LastIndexOf("\\")) + " - MappingBreakDown";
                     File.WriteAllText(@"file_path.txt", openFileDialog1.FileName);
                     Console.WriteLine("Adding entries to table...");
                     AddManyRegisters(fv.GetRegList(), fv.GetGroups());
@@ -824,7 +825,7 @@ namespace MappingBreakDown
                     //MessageBox.Show(Path.GetDirectoryName(PathToFile.Text) + "\\" + title + "_doc.txt");
                     File.WriteAllText(Path.GetDirectoryName(PathToFile.Text) + "\\" + title + "_doc.html", doc);
                     saved = true;
-                    ErrorMessage.Text = "[#] File Saved!";
+                    ErrorMessage.Text = "Message: File Saved!";
 
                 }
                 catch
@@ -956,11 +957,11 @@ namespace MappingBreakDown
                 RegGroupOpts.SelectedIndex = RegGroupOpts.FindStringExact(re.GetGroup());
 
                 if (re.GetIsComment())
-                    ErrorMessage.Text = "> ";
+                    ErrorMessage.Text = "Message: ";
                 else if (!re.GetValid())
-                    ErrorMessage.Text = "[@] " + re.GetReason();
+                    ErrorMessage.Text = "Message: " + re.GetReason();
                 else
-                    ErrorMessage.Text = "> ";
+                    ErrorMessage.Text = "Message: ";
             }
         }
 
@@ -972,8 +973,9 @@ namespace MappingBreakDown
 
         private void frm_sizeChanged(object sender, EventArgs e)
         {
-            hierarchicalGridView1.Size = new Size(this.Size.Width, this.Size.Height - this.panel4.Size.Height - 45);
+            //hierarchicalGridView1.Size = new Size(this.Size.Width, this.Size.Height - this.panel4.Size.Height - 45);
         }
+
 
         private void CommentButton_Click(object sender, EventArgs e)
         {
