@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -43,7 +44,7 @@ namespace MappingBreakDown
             InitText.Text = "";
             RegNameText.Text = "";
             CommentText.Text = "";
-            RegGroupOpts.SelectedIndex = 0;
+            //RegGroupOpts.SelectedIndex = 0;
             searchBox.Text = "";
         }
 
@@ -219,6 +220,20 @@ namespace MappingBreakDown
         }
 
         /* Open a file */
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                FileValidator fv = new FileValidator(openFileDialog1.FileName);
+                if (fv.IsFileValid())
+                {
+                    PathToFile.Text = openFileDialog1.FileName;
+                    File.WriteAllText(@"file_path.txt", openFileDialog1.FileName);
+                    Console.WriteLine("Adding entries to table...");
+                    AddManyRegisters(fv.GetRegList(), fv.GetGroups());
+                }
+            }
+        }
         private void OpenButton_Click(object sender, EventArgs e)
         {
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
@@ -414,6 +429,17 @@ namespace MappingBreakDown
                 Console.WriteLine("FAILED\nException caught: " + e.Message + "\nReseting path...");
                 PathToFile.Text = "";
             }
+            //DataGridViewRow[] new_rows = { new DataGridViewRow(), new DataGridViewRow() };
+            //treeGridView1.Rows.AddRange(InitializeArray<DataGridViewRow>(200));
+        }
+        T[] InitializeArray<T>(int length) where T : new()
+        {
+            T[] array = new T[length];
+            for (int i = 0; i < length; ++i)
+            {
+                array[i] = new T();
+            }
+            return array;
         }
 
         private void EditCell(TreeGridNode cell, object[] ent)
@@ -428,6 +454,7 @@ namespace MappingBreakDown
             string group = entry.GetGroup();
             object[] ent = entry.GetTableEntry();
             bool b, isField = entry.GetRegType() == RegisterEntry.type_field.FIELD;
+            treeGridView1.Rows.AddRange();
             foreach (TreeGridNode group_node in treeGridView1.Nodes)
             {
                 if (group_node.Cells["Registers"].Value.ToString().Equals(group))
@@ -480,6 +507,20 @@ namespace MappingBreakDown
             UpdateTable(entry);
         }
 
+        /*private void AddManyRegisters(List<RegisterEntry> entries, List<string> groups)
+        {
+            Console.Write("Adding groups: ");
+            Queue<Queue<>>
+
+            foreach (string group in groups)
+                if (!RegGroupOpts.Items.Contains(group))
+                {
+                    RegGroupOpts.Items.Add(group);
+                    treeGridView1.Nodes.Add(group);
+                }
+
+        }*/
+
         private void AddManyRegisters(List<RegisterEntry> entries, List<string> groups)
         {
             Console.Write("Adding groups: ");
@@ -509,7 +550,22 @@ namespace MappingBreakDown
             UpdateDataBase();
             Console.WriteLine("DONE");
         }
+        private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog
+            {
+                Filter = "VHD files (*.vhd)|*.vhd",
+                FilterIndex = 2,
+                RestoreDirectory = true
+            };
 
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                PathToFile.Text = saveFileDialog1.FileName;
+                File.WriteAllText(@"file_path.txt", saveFileDialog1.FileName);
+                SaveButton_Click(sender, e);
+            }
+        }
         private void SaveAsButton_Click(object sender, EventArgs e)
         {
             SaveFileDialog saveFileDialog1 = new SaveFileDialog
@@ -634,7 +690,147 @@ namespace MappingBreakDown
         {
             return double.TryParse(s, out double num);
         }
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            {
+                if (PathToFile.Text.Equals(""))
+                {
+                    SaveAsButton_Click(sender, e);
+                    return;
+                }
+                StreamReader file;
+                try
+                {
+                    file = new StreamReader("mycorrect.txt");
+                    string line;
+                    string res = "";
+                    string title = Path.GetFileNameWithoutExtension(PathToFile.Text);
+                    string date = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
+                    string introDec = "Original path: " + PathToFile.Text + "</br>The following is a documentation for " + title + ". The table " +
+                        "contains the registers created using the GUI.";
+                    //MessageBox.Show(Path.GetFileNameWithoutExtension(PathToFile.Text));
+                    string doc = "<html><head><title>" + title + " Documentation" + "</title>";
+                    doc += "<style>table, th, td { border: 1px solid black; } th, td {padding: 5px; text-align: center;}" + "</style></head><body>";
+                    doc += "<h1><font face = 'arial'><u>Documentation For " + title + "</h1></u>";
+                    doc += date;
+                    doc += "<h2>" + date + "<br/>" + introDec + "</h2>";
+                    doc += "<table style='width: 100 %'>";
+                    doc += "<tr><th>Name</th><th>Group</th><th>Address</th><th>Mais</th><th>LSB</th><th>MSB</th><th>TYPE</th><th>FPGA</th><th>Init</th><th>Comment</th></tr>";
+                    TreeGridNode last_node = null;
+                    for (int i = treeGridView1.Nodes.Count - 1; i >= 0; i--)
+                    {
+                        TreeGridNode last_group = treeGridView1.Nodes[i];
+                        if (last_group.HasChildren)
+                        {
+                            last_node = last_group.Nodes[last_group.Nodes.Count - 1];
+                            if (last_node.HasChildren)
+                            {
+                                last_node = last_node.Nodes[last_node.Nodes.Count - 1];
+                            }
+                            break;
+                        }
+                    }
+                    RegisterEntry last = RegList[(int)last_node.Cells["IndexColumn"].Value];
+                    int k = (int)last_node.Cells["SecondaryIndexColumn"].Value;
+                    if (k != -1)
+                    {
+                        last = last.GetFields()[k];
+                        //MessageBox.Show()
+                    }
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        if (line.Length == 0)
+                        {
+                            res += "\n";
+                            continue;
+                        }
+                        //System.Console.WriteLine(line);
+                        if ('#' == line[0])
+                            continue;
+                        if (line.Equals("0o0o0o0o0o0o0o0o0o0o0o0o0o00o0o0o0o0o0o00o0o0o0o0o0"))
+                            break;
+                        res += line + "\n";
+                    }
+                    string prop = "", names = "";
+                    foreach (string group in RegGroupOpts.Items)
+                    {
+                        names += "\t\t -- " + group + "\n";
+                        prop += "\t\t -- " + group + "\n";
+                        foreach (RegisterEntry l in RegList)
+                        {
+                            if (l.GetGroup().Equals(group))
+                            {
+                                List<RegisterEntry> fields = l.GetFields();
 
+                                names += l.toName();
+
+                                prop += l.ToEntry(l == last);
+
+                                doc += l.ToXMLstring();
+
+                                foreach (RegisterEntry f in fields)
+                                {
+                                    names += f.toName();
+
+                                    prop += f.ToEntry(f == last);
+
+                                    doc += f.ToXMLstring();
+                                }
+                            }
+                        }
+
+                    }
+
+                    doc += "</table></font></body></html>";
+                    res += names;
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        //System.Console.WriteLine(line);
+                        if (line.Length == 0)
+                        {
+                            res += "\n";
+                            continue;
+                        }
+                        if ('#' == line[0])
+                            continue;
+                        if (line.Equals("0o0o0o0o0o0o0o0o0o0o0o0o0o00o0o0o0o0o0o00o0o0o0o0o0"))
+                            break;
+                        res += line + '\n';
+                    }
+                    res += prop;
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        //System.Console.WriteLine(line);
+                        if (line.Length == 0)
+                        {
+                            res += "\n";
+                            continue;
+                        }
+                        if ('#' == line[0])
+                            continue;
+                        res += line + '\n';
+                    }
+                    file.Close();
+                    try
+                    {
+                        File.WriteAllText(PathToFile.Text, res);
+                        //MessageBox.Show(Path.GetDirectoryName(PathToFile.Text) + "\\" + title + "_doc.txt");
+                        File.WriteAllText(Path.GetDirectoryName(PathToFile.Text) + "\\" + title + "_doc.html", doc);
+                        saved = true;
+                        ErrorMessage.Text = "[#] File Saved!";
+
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Invalid Path to File");
+                    }
+                }
+                catch (IOException t)
+                {
+                    MessageBox.Show("ArgumentException " + t.ToString());
+                }
+            }
+        }
         private void SaveButton_Click(object sender, EventArgs e)
         {
             if (PathToFile.Text.Equals(""))
@@ -903,10 +1099,10 @@ namespace MappingBreakDown
                 Delete_Click(sender, e);
         }
 
-        private void frm_sizeChanged(object sender, EventArgs e)
-        {
-            treeGridView1.Size = new Size(this.Size.Width, this.Size.Height - this.panel4.Size.Height - 45);
-        }
+        //private void frm_sizeChanged(object sender, EventArgs e)
+        //{
+        //    treeGridView1.Size = new Size(this.Size.Width, this.Size.Height - this.panel4.Size.Height - 45);
+        //}
 
         private void CommentButton_Click(object sender, EventArgs e)
         {
@@ -961,6 +1157,10 @@ namespace MappingBreakDown
             searchBox.Text = "";
             OpenValidation();
             UpdateDataBase();
+        }
+        private void openManualToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Process.Start("C:\\Users\\Eli Zeltser\\Desktop\\TAU\\year_4\\eeproj\\Final_Project\\MappingBreakDown\\MappingBreakDownMan.pdf");
         }
     }
 }

@@ -48,8 +48,8 @@ namespace AdvancedDataGridView
 			// Control when edit occurs because edit mode shouldn't start when expanding/collapsing
 			this.EditMode = DataGridViewEditMode.EditProgrammatically;
             this.RowTemplate = new TreeGridNode() as DataGridViewRow;
-			// This sample does not support adding or deleting rows by the user.
-			this.AllowUserToAddRows = false;
+            // This sample does not support adding or deleting rows by the user.
+            this.AllowUserToAddRows = false;
 			this.AllowUserToDeleteRows = false;
 			this._root = new TreeGridNode(this);
 			this._root.IsRoot = true;

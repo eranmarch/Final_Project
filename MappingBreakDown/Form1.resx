@@ -120,92 +120,6 @@
   <metadata name="openFileDialog1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="UnCommentButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        Qk2GBQAAAAAAADYAAAAoAAAAFgAAABQAAAABABgAAAAAAAAAAADEDgAAxA4AAAAAAAAAAAAA////////
-        ////////////////////////////////////////////////////////////////////////////////
-        AADy7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y
-        7u7y7u7///8AAPLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu
-        7vLu7vLu7vLu7vLu7v///wAA8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7ui4mJi4mJi4mJi4mJi4mJ
-        i4mJi4mJi4mJi4mJi4mJ8u7u8u7u////AADy7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u5mZWVmZWVm
-        ZWVmZWVmZWVmZWVmZWVmZWVmZWVmZWXy7u7y7u7///8AAPLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu
-        7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7v///wAA8u7u8u7u8u7u8u7u8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u2NXVQEBAQEBAQEBAQEBAQEBAQEBA8u7u8u7u////AADy7u7y7u7y7u7y
-        7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7///8AAPLu
-        7vLu7vLu7vLu7vLu7vLu7uTVxubaze/p5vLu7vLu7qelpW9ubm9ubm9ubm9ubm9ubm9ubm9ubvLu7vLu
-        7v///wAA8u7u8u7u8u7u8u7u8u7u8u7u1LqdxZ902cOq7eXf8u7usq+vgYCAgYCAgYCAgYCAgYCAgYCA
-        gYCA8u7u8u7u////AADy7u7y7u7y7u7y7u7y7u7y7u7p4NemaiafWxHOr43p39fy7u7y7u7y7u7y7u7y
-        7u7y7u7y7u7y7u7y7u7y7u7///8AAPLu7vLu7vLu7vLu7vLu7vLu7vHt7NfCqq12OKVnIsWec+7n5NjV
-        1UBAQEBAQEBAQEBAQEBAQEBAQPLu7vLu7v///wAA8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u4c++tYJI
-        nVkM49TF8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u////AADy7u7y7u7y7u7y7u6hYRmhYRmsdDXD
-        nXLy7u7OrouYUQHOr47b19dTUlJTUlJTUlJTUlJTUlJTUlLy7u7y7u7///8AAPLu7vLu7vLu7vLu7phQ
-        AJhQAKRnIbmMWOHRwMqmf5pTBNS6n+bi4p6cnJ6cnJ6cnJ6cnJ6cnJ6cnPLu7vLu7v///wAA8u7u8u7u
-        8u7u8u7umlUHnFgLrnU1u4tXwJRjt4RLo2Mb6d/W8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u////
-        AADy7u7y7u7y7u7y7u6ygUfQsY/LqoSsczOaVAbBl2rey7jx7Ovy7u7y7u7y7u7y7u7y7u7y7u7y7u7y
-        7u7y7u7///8AAPLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu
-        7vLu7vLu7vLu7vLu7v///wAA8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u8u7u////AADy7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y
-        7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7///8AAA==
-</value>
-  </data>
-  <data name="CommentButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        Qk1SDAAAAAAAADYAAAAoAAAAIQAAAB8AAAABABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7uAPLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu
-        7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu
-        7vLu7vLu7vLu7vLu7gDy7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y
-        7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u4A8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7uAPLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu
-        7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu
-        7vLu7vLu7vLu7vLu7gDy7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y
-        7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u4A8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7uQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBA
-        QEBAQEBAQEBAQEBAQEBA8u7u8u7u8u7u8u7u8u7u8u7uAPLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu
-        7vLu7vLu7kBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQPLu7vLu
-        7vLu7vLu7vLu7vLu7gDy7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y
-        7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u4A8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7uAPLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu
-        7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7kBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQPLu7vLu
-        7vLu7vLu7vLu7vLu7gDy7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y
-        7u7y7u5AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEDy7u7y7u7y7u7y7u7y7u7y7u4A8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7uAPLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu
-        7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu
-        7vLu7vLu7vLu7vLu7gDy7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u4yhjYyhjYy
-        hjYyhjYyhjYyhjYyhjYyhjYyhjYyhjYyhjYyhjYyhjYyhjby7u7y7u7y7u7y7u7y7u7y7u4A8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7uMoY2MoY2MoY2MoY2MoY2MoY2MoY2MoY2MoY2
-        MoY2MoY2MoY2MoY2MoY28u7u8u7u8u7u8u7u8u7u8u7uAPLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu
-        7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu
-        7vLu7vLu7vLu7vLu7gDy7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y
-        7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u4A8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7uMoY2MoY2MoY2MoY2MoY2MoY2MoY2MoY2MoY2
-        MoY2MoY2MoY2MoY2MoY28u7u8u7u8u7u8u7u8u7u8u7uAPLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu
-        7vLu7vLu7vLu7vLu7jKGNjKGNjKGNjKGNjKGNjKGNjKGNjKGNjKGNjKGNjKGNjKGNjKGNjKGNvLu7vLu
-        7vLu7vLu7vLu7vLu7gDy7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y
-        7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u4A8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7uAPLu7vLu7vLu7vLu7vLu7vLu7vLu7kBAQEBA
-        QEBAQEBAQPLu7vLu7kBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQPLu7vLu
-        7vLu7vLu7vLu7vLu7gDy7u7y7u7y7u7y7u7y7u7y7u7y7u5AQEBAQEBAQEBAQEDy7u7y7u5AQEBAQEBA
-        QEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEDy7u7y7u7y7u7y7u7y7u7y7u4A8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7uAPLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu
-        7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu
-        7vLu7vLu7vLu7vLu7gDy7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y
-        7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u4A8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7uAPLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu
-        7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu7vLu
-        7vLu7vLu7vLu7vLu7gDy7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y
-        7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u7y7u4A8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u
-        8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7u8u7uAA==
-</value>
-  </data>
   <metadata name="Registers.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -239,7 +153,10 @@
   <metadata name="SecondaryIndexColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>157, 17</value>
+  </metadata>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>72</value>
+    <value>98</value>
   </metadata>
 </root>
