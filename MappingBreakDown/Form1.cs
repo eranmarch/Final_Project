@@ -446,7 +446,7 @@ namespace MappingBreakDown
                     }
                 }
                 DataSet dsDataset = new DataSet();
-                dsDataset.Tables.Add(dtgroups);
+                //dsDataset.Tables.Add(dtgroups);
                 dsDataset.Tables.Add(dtregisters);
                 //dsDataset.Tables.Add(dtfields);
                 //DataRelation groupsRegsRelation = new DataRelation("GroupsRegistersRelation", dsDataset.Tables[0].Columns[0], dsDataset.Tables[1].Columns[0], true);
