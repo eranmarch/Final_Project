@@ -1015,6 +1015,7 @@ namespace MappingBreakDown
             
             treeGridView1.Size = new Size(Size.Width - 40, Size.Height - 384);
             panel5.Size = new Size(Size.Width - 40, treeGridView1.Size.Height + 304);
+            ClearButton.Location = new Point(Size.Width - 68, 265);
         }
         private void AboutButton_Click(object sender, EventArgs e)
         {

@@ -575,7 +575,7 @@
             // 
             // ClearButton
             // 
-            this.ClearButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.ClearButton.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.ClearButton.Image = global::MappingBreakDown.Properties.Resources.Clearall;
             this.ClearButton.Location = new System.Drawing.Point(1047, 265);
             this.ClearButton.Name = "ClearButton";
