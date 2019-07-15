@@ -107,6 +107,7 @@
     <None Include="save.png" />
     <None Include="Close.png" />
     <None Include="help.png" />
+    <None Include="Clearall.png" />
     <Content Include="test.txt" />
   </ItemGroup>
   <ItemGroup>

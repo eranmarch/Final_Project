@@ -54,7 +54,6 @@
             this.LSBOpts = new System.Windows.Forms.ComboBox();
             this.MSBOpts = new System.Windows.Forms.ComboBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.ClearButton = new System.Windows.Forms.Button();
             this.label10 = new System.Windows.Forms.Label();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
@@ -63,8 +62,18 @@
             this.panel5 = new System.Windows.Forms.Panel();
             this.ErrorMessage = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.versionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ClearButton = new System.Windows.Forms.Button();
             this.UnCommentButton = new System.Windows.Forms.Button();
             this.CommentButton = new System.Windows.Forms.Button();
+            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openManualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.treeGridView1 = new AdvancedDataGridView.TreeGridView();
             this.Registers = new AdvancedDataGridView.TreeGridColumn();
             this.AddressColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -77,21 +86,12 @@
             this.CommentColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.IndexColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SecondaryIndexColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openManualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.versionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel3.SuspendLayout();
             this.panel4.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel5.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.treeGridView1)).BeginInit();
             this.menuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.treeGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -270,9 +270,9 @@
             // 
             // InsertButton
             // 
-            this.InsertButton.Location = new System.Drawing.Point(582, 313);
+            this.InsertButton.Location = new System.Drawing.Point(601, 262);
             this.InsertButton.Name = "InsertButton";
-            this.InsertButton.Size = new System.Drawing.Size(81, 24);
+            this.InsertButton.Size = new System.Drawing.Size(75, 25);
             this.InsertButton.TabIndex = 27;
             this.InsertButton.Text = "Insert";
             this.InsertButton.UseVisualStyleBackColor = true;
@@ -280,9 +280,9 @@
             // 
             // Delete
             // 
-            this.Delete.Location = new System.Drawing.Point(495, 313);
+            this.Delete.Location = new System.Drawing.Point(514, 262);
             this.Delete.Name = "Delete";
-            this.Delete.Size = new System.Drawing.Size(81, 24);
+            this.Delete.Size = new System.Drawing.Size(75, 25);
             this.Delete.TabIndex = 26;
             this.Delete.Text = "Delete";
             this.Delete.UseVisualStyleBackColor = true;
@@ -290,9 +290,9 @@
             // 
             // Load
             // 
-            this.Load.Location = new System.Drawing.Point(414, 313);
+            this.Load.Location = new System.Drawing.Point(433, 262);
             this.Load.Name = "Load";
-            this.Load.Size = new System.Drawing.Size(75, 24);
+            this.Load.Size = new System.Drawing.Size(75, 25);
             this.Load.TabIndex = 25;
             this.Load.Text = "Load";
             this.Load.UseVisualStyleBackColor = true;
@@ -333,7 +333,7 @@
             // 
             this.searchBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.1F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
             this.searchBox.ForeColor = System.Drawing.SystemColors.MenuHighlight;
-            this.searchBox.Location = new System.Drawing.Point(80, 315);
+            this.searchBox.Location = new System.Drawing.Point(99, 262);
             this.searchBox.Name = "searchBox";
             this.searchBox.Size = new System.Drawing.Size(240, 24);
             this.searchBox.TabIndex = 33;
@@ -429,22 +429,11 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
-            // ClearButton
-            // 
-            this.ClearButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.ClearButton.Location = new System.Drawing.Point(997, 313);
-            this.ClearButton.Name = "ClearButton";
-            this.ClearButton.Size = new System.Drawing.Size(75, 22);
-            this.ClearButton.TabIndex = 28;
-            this.ClearButton.Text = "Clear";
-            this.ClearButton.UseVisualStyleBackColor = true;
-            this.ClearButton.Click += new System.EventHandler(this.Clear_Click);
-            // 
             // label10
             // 
             this.label10.AutoSize = true;
             this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.Location = new System.Drawing.Point(19, 318);
+            this.label10.Location = new System.Drawing.Point(28, 265);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(55, 18);
             this.label10.TabIndex = 39;
@@ -476,9 +465,9 @@
             this.panel4.Controls.Add(this.panel2);
             this.panel4.Controls.Add(this.label1);
             this.panel4.Controls.Add(this.panel3);
-            this.panel4.Location = new System.Drawing.Point(4, 12);
+            this.panel4.Location = new System.Drawing.Point(0, 0);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(1072, 263);
+            this.panel4.Size = new System.Drawing.Size(1075, 226);
             this.panel4.TabIndex = 43;
             // 
             // PathToFile
@@ -510,6 +499,7 @@
             // 
             // panel5
             // 
+            this.panel5.Controls.Add(this.treeGridView1);
             this.panel5.Controls.Add(this.ErrorMessage);
             this.panel5.Controls.Add(this.label12);
             this.panel5.Controls.Add(this.ClearButton);
@@ -518,20 +508,19 @@
             this.panel5.Controls.Add(this.CommentButton);
             this.panel5.Controls.Add(this.Delete);
             this.panel5.Controls.Add(this.Load);
-            this.panel5.Controls.Add(this.treeGridView1);
             this.panel5.Controls.Add(this.panel4);
             this.panel5.Controls.Add(this.searchBox);
             this.panel5.Controls.Add(this.label10);
-            this.panel5.Location = new System.Drawing.Point(12, 27);
+            this.panel5.Location = new System.Drawing.Point(15, 27);
             this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(1076, 561);
+            this.panel5.Size = new System.Drawing.Size(1075, 560);
             this.panel5.TabIndex = 44;
             // 
             // ErrorMessage
             // 
             this.ErrorMessage.AutoSize = true;
             this.ErrorMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ErrorMessage.Location = new System.Drawing.Point(85, 292);
+            this.ErrorMessage.Location = new System.Drawing.Point(104, 239);
             this.ErrorMessage.Name = "ErrorMessage";
             this.ErrorMessage.Size = new System.Drawing.Size(0, 18);
             this.ErrorMessage.TabIndex = 46;
@@ -540,18 +529,67 @@
             // 
             this.label12.AutoSize = true;
             this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label12.Location = new System.Drawing.Point(6, 292);
+            this.label12.Location = new System.Drawing.Point(25, 239);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(73, 18);
             this.label12.TabIndex = 45;
             this.label12.Text = "Message:";
             // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem,
+            this.helpToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(1099, 24);
+            this.menuStrip1.TabIndex = 45;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // fileToolStripMenuItem
+            // 
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openToolStripMenuItem,
+            this.saveAsToolStripMenuItem,
+            this.saveToolStripMenuItem,
+            this.closeToolStripMenuItem});
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.fileToolStripMenuItem.Text = "File";
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openManualToolStripMenuItem,
+            this.versionToolStripMenuItem});
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.helpToolStripMenuItem.Text = "Help";
+            // 
+            // versionToolStripMenuItem
+            // 
+            this.versionToolStripMenuItem.Name = "versionToolStripMenuItem";
+            this.versionToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
+            this.versionToolStripMenuItem.Text = "About MappingBreakDown";
+            this.versionToolStripMenuItem.Click += new System.EventHandler(this.AboutButton_Click);
+            // 
+            // ClearButton
+            // 
+            this.ClearButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.ClearButton.Image = global::MappingBreakDown.Properties.Resources.Clearall;
+            this.ClearButton.Location = new System.Drawing.Point(1047, 265);
+            this.ClearButton.Name = "ClearButton";
+            this.ClearButton.Size = new System.Drawing.Size(25, 25);
+            this.ClearButton.TabIndex = 28;
+            this.ClearButton.UseVisualStyleBackColor = true;
+            this.ClearButton.Click += new System.EventHandler(this.Clear_Click);
+            // 
             // UnCommentButton
             // 
             this.UnCommentButton.Image = global::MappingBreakDown.Properties.Resources.uncommen;
-            this.UnCommentButton.Location = new System.Drawing.Point(357, 315);
+            this.UnCommentButton.Location = new System.Drawing.Point(376, 262);
             this.UnCommentButton.Name = "UnCommentButton";
-            this.UnCommentButton.Size = new System.Drawing.Size(25, 24);
+            this.UnCommentButton.Size = new System.Drawing.Size(25, 25);
             this.UnCommentButton.TabIndex = 42;
             this.UnCommentButton.UseVisualStyleBackColor = true;
             this.UnCommentButton.Click += new System.EventHandler(this.UnCommentButton_Click);
@@ -559,18 +597,56 @@
             // CommentButton
             // 
             this.CommentButton.Image = global::MappingBreakDown.Properties.Resources.comment;
-            this.CommentButton.Location = new System.Drawing.Point(326, 315);
+            this.CommentButton.Location = new System.Drawing.Point(345, 262);
             this.CommentButton.Name = "CommentButton";
-            this.CommentButton.Size = new System.Drawing.Size(25, 24);
+            this.CommentButton.Size = new System.Drawing.Size(25, 25);
             this.CommentButton.TabIndex = 41;
             this.CommentButton.UseVisualStyleBackColor = true;
             this.CommentButton.Click += new System.EventHandler(this.CommentButton_Click);
+            // 
+            // openToolStripMenuItem
+            // 
+            this.openToolStripMenuItem.Image = global::MappingBreakDown.Properties.Resources.file_open;
+            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+            this.openToolStripMenuItem.Text = "Open";
+            this.openToolStripMenuItem.Click += new System.EventHandler(this.OpenButton_Click);
+            // 
+            // saveAsToolStripMenuItem
+            // 
+            this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveAsToolStripMenuItem.Text = "Save As";
+            this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.SaveAsButton_Click);
+            // 
+            // saveToolStripMenuItem
+            // 
+            this.saveToolStripMenuItem.Image = global::MappingBreakDown.Properties.Resources.save;
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+            this.saveToolStripMenuItem.Text = "Save";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.SaveButton_Click);
+            // 
+            // closeToolStripMenuItem
+            // 
+            this.closeToolStripMenuItem.Image = global::MappingBreakDown.Properties.Resources.Close;
+            this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+            this.closeToolStripMenuItem.Text = "Close";
+            this.closeToolStripMenuItem.Click += new System.EventHandler(this.CloseButton_Click);
+            // 
+            // openManualToolStripMenuItem
+            // 
+            this.openManualToolStripMenuItem.Image = global::MappingBreakDown.Properties.Resources.help;
+            this.openManualToolStripMenuItem.Name = "openManualToolStripMenuItem";
+            this.openManualToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
+            this.openManualToolStripMenuItem.Text = "Open Manual";
+            this.openManualToolStripMenuItem.Click += new System.EventHandler(this.openManualToolStripMenuItem_Click);
             // 
             // treeGridView1
             // 
             this.treeGridView1.AllowUserToAddRows = false;
             this.treeGridView1.AllowUserToDeleteRows = false;
-            this.treeGridView1.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.treeGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.treeGridView1.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.treeGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -587,10 +663,10 @@
             this.SecondaryIndexColumn});
             this.treeGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.treeGridView1.ImageList = null;
-            this.treeGridView1.Location = new System.Drawing.Point(-2, 343);
+            this.treeGridView1.Location = new System.Drawing.Point(0, 294);
             this.treeGridView1.Margin = new System.Windows.Forms.Padding(1);
             this.treeGridView1.Name = "treeGridView1";
-            this.treeGridView1.Size = new System.Drawing.Size(1074, 217);
+            this.treeGridView1.Size = new System.Drawing.Size(1074, 265);
             this.treeGridView1.TabIndex = 42;
             this.treeGridView1.SelectionChanged += new System.EventHandler(this.TreeGridView1_SelectionChanged);
             this.treeGridView1.KeyUp += new System.Windows.Forms.KeyEventHandler(this.TreeGridView1_KeyUp);
@@ -684,97 +760,20 @@
             this.SecondaryIndexColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.SecondaryIndexColumn.Visible = false;
             // 
-            // menuStrip1
-            // 
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem,
-            this.helpToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1100, 24);
-            this.menuStrip1.TabIndex = 45;
-            this.menuStrip1.Text = "menuStrip1";
-            // 
-            // fileToolStripMenuItem
-            // 
-            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.openToolStripMenuItem,
-            this.saveAsToolStripMenuItem,
-            this.saveToolStripMenuItem,
-            this.closeToolStripMenuItem});
-            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-            this.fileToolStripMenuItem.Text = "File";
-            // 
-            // openToolStripMenuItem
-            // 
-            this.openToolStripMenuItem.Image = global::MappingBreakDown.Properties.Resources.file_open;
-            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
-            this.openToolStripMenuItem.Text = "Open";
-            this.openToolStripMenuItem.Click += new System.EventHandler(this.OpenButton_Click);
-            // 
-            // saveAsToolStripMenuItem
-            // 
-            this.saveAsToolStripMenuItem.Image = global::MappingBreakDown.Properties.Resources.save;
-            this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
-            this.saveAsToolStripMenuItem.Text = "Save As";
-            this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.SaveAsButton_Click);
-            // 
-            // saveToolStripMenuItem
-            // 
-            this.saveToolStripMenuItem.Image = global::MappingBreakDown.Properties.Resources.save;
-            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
-            this.saveToolStripMenuItem.Text = "Save";
-            this.saveToolStripMenuItem.Click += new System.EventHandler(this.SaveButton_Click);
-            // 
-            // closeToolStripMenuItem
-            // 
-            this.closeToolStripMenuItem.Image = global::MappingBreakDown.Properties.Resources.Close;
-            this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
-            this.closeToolStripMenuItem.Text = "Close";
-            this.closeToolStripMenuItem.Click += new System.EventHandler(this.CloseButton_Click);
-            // 
-            // helpToolStripMenuItem
-            // 
-            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.openManualToolStripMenuItem,
-            this.versionToolStripMenuItem});
-            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
-            this.helpToolStripMenuItem.Text = "Help";
-            // 
-            // openManualToolStripMenuItem
-            // 
-            this.openManualToolStripMenuItem.Image = global::MappingBreakDown.Properties.Resources.help;
-            this.openManualToolStripMenuItem.Name = "openManualToolStripMenuItem";
-            this.openManualToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
-            this.openManualToolStripMenuItem.Text = "Open Manual";
-            this.openManualToolStripMenuItem.Click += new System.EventHandler(this.openManualToolStripMenuItem_Click);
-            // 
-            // versionToolStripMenuItem
-            // 
-            this.versionToolStripMenuItem.Name = "versionToolStripMenuItem";
-            this.versionToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
-            this.versionToolStripMenuItem.Text = "About MappingBreakDown";
-            // 
             // MappingPackageAutomation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1100, 600);
+            this.ClientSize = new System.Drawing.Size(1099, 601);
             this.Controls.Add(this.panel5);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.MinimumSize = new System.Drawing.Size(1100, 557);
             this.Name = "MappingPackageAutomation";
             this.ShowIcon = false;
             this.Text = "Mapping Package Automation";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MappingPackageAutomation_FormClosing);
+            this.SizeChanged += new System.EventHandler(this.Size_Changed);
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
             this.panel4.ResumeLayout(false);
@@ -783,9 +782,9 @@
             this.panel2.PerformLayout();
             this.panel5.ResumeLayout(false);
             this.panel5.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.treeGridView1)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.treeGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

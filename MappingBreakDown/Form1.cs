@@ -944,11 +944,6 @@ namespace MappingBreakDown
                 Delete_Click(sender, e);
         }
 
-        //private void frm_sizeChanged(object sender, EventArgs e)
-        //{
-        //    treeGridView1.Size = new Size(this.Size.Width, this.Size.Height - this.panel4.Size.Height - 45);
-        //}
-
         private void CommentButton_Click(object sender, EventArgs e)
         {
             List<int> indices = new List<int>();
@@ -1013,6 +1008,17 @@ namespace MappingBreakDown
         private void MappingPackageAutomation_FormClosing(object sender, FormClosingEventArgs e)
         {
             CloseButton_Click(sender, e);
+        }
+
+        private void Size_Changed(object sender, System.EventArgs e)
+        {
+            
+            treeGridView1.Size = new Size(Size.Width - 40, Size.Height - 384);
+            panel5.Size = new Size(Size.Width - 40, treeGridView1.Size.Height + 304);
+        }
+        private void AboutButton_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("MappingPackageAutomation Version 1.0\nCreated By Eran Marchesky and Eli Zeltser as a final project\n\nAdvisors: Dan Shalom and Eli Parente");
         }
     }
 }
