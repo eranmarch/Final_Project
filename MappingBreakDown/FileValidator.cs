@@ -157,7 +157,7 @@ namespace MappingBreakDown
                                     Registers.Add(entry);
                                 curr_group = prev_group;
                             }
-                            else if (!Groups.Contains(curr_group))
+                            else if (!Groups.Contains(curr_group) && (curr_group == "" || curr_group[curr_group.Length - 1] != ','))
                                 Groups.Add(curr_group);
                         }
                         // Save Names
