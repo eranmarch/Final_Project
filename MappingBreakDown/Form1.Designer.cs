@@ -70,7 +70,6 @@
             this.UnCommentButton = new System.Windows.Forms.Button();
             this.CommentButton = new System.Windows.Forms.Button();
             this.hierarchicalGridView1 = new HierarchicalGrid.HierarchicalGridView();
-            this.Registers = new AdvancedDataGridView.TreeGridColumn();
             this.AddressColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.MAISColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.LSBColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -670,15 +669,6 @@
             this.hierarchicalGridView1.Size = new System.Drawing.Size(2891, 526);
             this.hierarchicalGridView1.TabIndex = 43;
             // 
-            // Registers
-            // 
-            this.Registers.DataPropertyName = "Registers";
-            this.Registers.DefaultNodeImage = null;
-            this.Registers.HeaderText = "Registers";
-            this.Registers.Name = "Registers";
-            this.Registers.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.Registers.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
             // AddressColumn
             // 
             this.AddressColumn.HeaderText = "Address";
@@ -924,7 +914,6 @@
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.Button CloseButton;
         private System.Windows.Forms.RichTextBox ErrorMessage;
-        private AdvancedDataGridView.TreeGridColumn Registers;
         private System.Windows.Forms.DataGridViewTextBoxColumn AddressColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn MAISColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn LSBColumn;

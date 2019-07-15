@@ -31,7 +31,7 @@ namespace MappingBreakDown
             ErrorMessage.Text = "> ";
             xs = new XmlSerializer(typeof(List<RegisterEntry>));
             InitDataBasesParams();
-            hierarchicalGridView1.Nodes.Add("");
+            //hierarchicalGridView1.Nodes.Add("");
             ReadDataBase();
             ColorInValid();
         }
@@ -446,15 +446,21 @@ namespace MappingBreakDown
                     }
                 }
                 DataSet dsDataset = new DataSet();
-                //dsDataset.Tables.Add(dtgroups);
+                dsDataset.Tables.Add(dtgroups);
                 dsDataset.Tables.Add(dtregisters);
                 //dsDataset.Tables.Add(dtfields);
                 //DataRelation groupsRegsRelation = new DataRelation("GroupsRegistersRelation", dsDataset.Tables[0].Columns[0], dsDataset.Tables[1].Columns[0], true);
                 //DataRelation regsFieldsRelation = new DataRelation("GroupsFieldsRelation", dsDataset.Tables[1].Columns[2], dsDataset.Tables[2].Columns[2], false);
                 //dsDataset.Relations.Add(groupsRegsRelation);
                 //dsDataset.Relations.Add(regsFieldsRelation);
+                DataSet tmp = dtgroups.DataSet;
+                Console.WriteLine(tmp.GetXml());
+                Console.WriteLine(displayColumns);
+                Console.WriteLine(groupColumns);
+                List<string> lst = new List<string> { "Group" };
 
-                DataGridSource newGridSource = new DataGridSource(dtregisters.DataSet, displayColumns, groupColumns);
+                hierarchicalGridView1.AutoGenerateColumns = true;
+                DataGridSource newGridSource = new DataGridSource(dtgroups.DataSet, displayColumns, groupColumns);
                 hierarchicalGridView1.DataSource = newGridSource;
                 Console.WriteLine("SUCCESS");
             }
