@@ -19,7 +19,7 @@ namespace MappingBreakDown
         public XmlSerializer xs;
         //public XmlSerializer ls;
         List<RegisterEntry> RegList;
-        bool saved = false;
+        bool saved = true;
 
         public MappingPackageAutomation()
         {
@@ -1005,7 +1005,9 @@ namespace MappingBreakDown
         }
         private void openManualToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Process.Start("C:\\Users\\Eli Zeltser\\Desktop\\TAU\\year_4\\eeproj\\Final_Project\\MappingBreakDown\\MappingBreakDownMan.pdf");
+            string workingDir = Environment.CurrentDirectory;
+            string projectDirectory = Directory.GetParent(workingDir).Parent.FullName;
+            Process.Start(projectDirectory + "\\MappingBreakDownMan.pdf");
         }
 
         private void MappingPackageAutomation_FormClosing(object sender, FormClosingEventArgs e)
