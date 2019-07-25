@@ -128,13 +128,15 @@ namespace HierarchicalGrid
                     relationCol = relColList.Contains(curCol);
 
                     if (relationCol) {
+                        //Console.WriteLine("Contains " + curCol);
                         HierarchicalGridColumn newCol = new HierarchicalGridColumn();
                         relationCol = false;
                         newCol.Name = curCol;
                         newCol.HeaderText = curCol;
                         this.Columns.Add(newCol);
                     }
-                    else { 
+                    else {
+                        //Console.WriteLine("Not Contains " + curCol);
                         DataGridViewTextBoxColumn newCol = new DataGridViewTextBoxColumn();
                         newCol.Name = curCol;
                         newCol.HeaderText = curCol;
@@ -157,7 +159,7 @@ namespace HierarchicalGrid
                 Dictionary<DataRow, HierarchicalGridNode> map = new Dictionary<DataRow, HierarchicalGridNode>();
                 foreach (DataRelation curRelation in dsRelations)
                 {
-                    Console.WriteLine(curRelation.RelationName);
+                    //Console.WriteLine(curRelation.RelationName);
                     DataTable dtParent = curRelation.ParentTable;
                     DataTable dtChild = curRelation.ChildTable;
                     foreach (DataRow curRow in dtParent.Rows)
@@ -215,9 +217,13 @@ namespace HierarchicalGrid
                             curObj = 0;
                             foreach (DataGridViewColumn curCol in this.Columns)
                             {
+                                //Console.WriteLine(curCol.Name + ": " + dtChild.Columns.Contains(curCol.Name));
                                 if (dtChild.Columns.Contains(curCol.Name))
                                 {
                                     valuesToAdd[curObj] = curChildRow[curCol.Name];
+                                    //Console.WriteLine(curCol.Name + ": " + curChildRow[curCol.Name]);
+                                    //if (curCol.Name.Equals("Index"))
+                                    //    Console.WriteLine(curChildRow[curCol.Name].ToString().Length);
                                 }
                                 else
                                 {

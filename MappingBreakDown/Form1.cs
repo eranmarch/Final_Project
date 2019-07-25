@@ -85,7 +85,7 @@ namespace MappingBreakDown
             displayColumns.Add("Reason");
             displayColumns.Add("Index");
             displayColumns.Add("SecondaryIndex");
-        }
+        } 
 
         /* Default values for each register */
         private void InitFields()
@@ -436,27 +436,36 @@ namespace MappingBreakDown
                         dtgroups.Rows.Add(group);
                     }
                     Console.WriteLine("Adding register " + entry.GetName());
+                    //Console.WriteLine(entry.GetIndex());
                     //UpdateTable(entry);
                     object[] ent = entry.GetTableEntry();
                     dtregisters.Rows.Add(ent);
+
                     List<RegisterEntry> fields = entry.GetFields();
                     foreach (RegisterEntry field in fields)
                     {
                         Console.WriteLine("Adding field " + field.GetName() + " to register " + entry.GetName());
                         //UpdateTable(field);
                         dtfields.Rows.Add(field.GetTableEntry());
+                        //Console.WriteLine(field.GetIndex() + ", " + field.GetSecondaryIndex());
                     }
                 }
                 DataSet dsDataset = new DataSet();
                 dsDataset.Tables.Add(dtgroups);
                 dsDataset.Tables.Add(dtregisters);
-                //dsDataset.Tables.Add(dtfields);
-                DataRelation groupsRegsRelation = new DataRelation("GroupsRegistersRelation", dsDataset.Tables[0].Columns[0], dsDataset.Tables[1].Columns[0], true);
-                //DataRelation regsFieldsRelation = new DataRelation("GroupsFieldsRelation", dsDataset.Tables[1].Columns[2], dsDataset.Tables[2].Columns[2], false);
+                dsDataset.Tables.Add(dtfields);
+                DataRelation groupsRegsRelation = new DataRelation("GroupsRegistersRelation", dsDataset.Tables[0].Columns["Group"], dsDataset.Tables[1].Columns["Group"], true);
+                DataRelation regsFieldsRelation = new DataRelation("GroupsFieldsRelation", dsDataset.Tables[1].Columns["Index"] , dsDataset.Tables[2].Columns["Index"] , true);
+                groupsRegsRelation.Nested = true;
+                regsFieldsRelation.Nested = true;
                 dsDataset.Relations.Add(groupsRegsRelation);
-                //dsDataset.Relations.Add(regsFieldsRelation);
+                dsDataset.Relations.Add(regsFieldsRelation);
                 DataGridSource newGridSource = new DataGridSource(dsDataset, displayColumns, groupColumns);
                 hierarchicalGridView1.DataSource = newGridSource;
+                hierarchicalGridView1.Columns["Reason"].Visible = false;
+                hierarchicalGridView1.Columns["IsValid"].Visible = false;
+                hierarchicalGridView1.Columns["Index"].Visible = false;
+                hierarchicalGridView1.Columns["SecondaryIndex"].Visible = false;
                 Console.WriteLine("SUCCESS");
             }
             catch (Exception e)
