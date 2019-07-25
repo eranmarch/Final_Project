@@ -554,6 +554,8 @@
             this.hierarchicalGridView1.Name = "hierarchicalGridView1";
             this.hierarchicalGridView1.Size = new System.Drawing.Size(2803, 410);
             this.hierarchicalGridView1.TabIndex = 43;
+            this.hierarchicalGridView1.SelectionChanged += new System.EventHandler(this.HierarchialGridView1_SelectionChanged);
+            this.hierarchicalGridView1.KeyUp += new System.Windows.Forms.KeyEventHandler(this.HierarchialGridView1_KeyUp);
             // 
             // menuStrip1
             // 

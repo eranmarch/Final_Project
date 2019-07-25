@@ -31,9 +31,8 @@ namespace MappingBreakDown
             ErrorMessage.Text = "Message: ";
             xs = new XmlSerializer(typeof(List<RegisterEntry>));
             InitDataBasesParams();
-            //hierarchicalGridView1.Nodes.Add("");
             ReadDataBase();
-           // ColorInValid();
+            ColorInValid();
         }
 
         private void InitDataBasesParams()
@@ -300,8 +299,8 @@ namespace MappingBreakDown
             {
                 try
                 {
-                    re = RegList[(int)item.Cells["IndexColumn"].Value];
-                    int index = (int)item.Cells["SecondaryIndexColumn"].Value;
+                    re = RegList[(int)item.Cells["Index"].Value];
+                    int index = (int)item.Cells["SecondaryIndex"].Value;
                     if (index != -1)
                         re = re.GetFields()[index];
                     node = item;
@@ -375,7 +374,7 @@ namespace MappingBreakDown
 
         private void ColorNode(HierarchicalGridNode node)
         {
-            int index = (int)node.Cells["Index"].Value, indexSec = (int)node.Cells["SecondaryIndex"].Value;
+            int index = (int)node.Cells[12].Value, indexSec = (int)node.Cells[13].Value;
             RegisterEntry entry = RegList[index];
             //MessageBox.Show(entry.GetName() + ": [" + index + ", " + indexSec + "]");
             if (indexSec != -1)
@@ -432,11 +431,10 @@ namespace MappingBreakDown
                     {
                         Console.WriteLine("Adding group " + group);
                         RegGroupOpts.Items.Add(group);
-                        //TreeGridNode node = treeGridView1.Nodes.Add(group);
+                        //HierarchicalGridNode node = hierarchialGridView1.Nodes.Add(group);
                         dtgroups.Rows.Add(group);
                     }
                     Console.WriteLine("Adding register " + entry.GetName());
-                    //Console.WriteLine(entry.GetIndex());
                     //UpdateTable(entry);
                     object[] ent = entry.GetTableEntry();
                     dtregisters.Rows.Add(ent);
@@ -447,7 +445,6 @@ namespace MappingBreakDown
                         Console.WriteLine("Adding field " + field.GetName() + " to register " + entry.GetName());
                         //UpdateTable(field);
                         dtfields.Rows.Add(field.GetTableEntry());
-                        //Console.WriteLine(field.GetIndex() + ", " + field.GetSecondaryIndex());
                     }
                 }
                 DataSet dsDataset = new DataSet();
@@ -472,6 +469,7 @@ namespace MappingBreakDown
             {
                 Console.WriteLine("FAILED\nException caught: " + e.Message + "\nReseting list...");
                 RegList = new List<RegisterEntry>();
+                hierarchicalGridView1.Nodes.Add("");
             }
             try
             {
@@ -500,7 +498,7 @@ namespace MappingBreakDown
             bool b, isField = entry.GetRegType() == RegisterEntry.type_field.FIELD;
             foreach (HierarchicalGridNode group_node in hierarchicalGridView1.Nodes)
             {
-                if (group_node.Cells["Registers"].Value.ToString().Equals(group))
+                if (group_node.Cells["Group"].Value.ToString().Equals(group))
                     if (!isField)
                     {
                         node = group_node.Nodes.Add(ent);
@@ -514,7 +512,7 @@ namespace MappingBreakDown
                         {
                             b = reg.GetIsExpanded();
                             reg.Expand();
-                            if ((int)reg.Cells["IndexColumn"].Value == entry.GetIndex())
+                            if ((int)reg.Cells["Index"].Value == entry.GetIndex())
                             {
                                 tmp = reg;
                                 break;
@@ -608,7 +606,7 @@ namespace MappingBreakDown
             {
                 try
                 {
-                    int i = (int)item.Cells["IndexColumn"].Value, j = (int)item.Cells["SecondaryIndexColumn"].Value;
+                    int i = (int)item.Cells["Index"].Value, j = (int)item.Cells["SecondaryIndex"].Value;
                     if (j != -1)
                     {
                         s.Add(new Tuple<int, int>(i, j));
@@ -625,19 +623,19 @@ namespace MappingBreakDown
                         {
                             if (j == -1)
                             {
-                                //MessageBox.Show(sibling.Cells["IndexColumn"].Value.ToString());
-                                if ((int)sibling.Cells["IndexColumn"].Value > i)
+                                //MessageBox.Show(sibling.Cells["Index"].Value.ToString());
+                                if ((int)sibling.Cells["Index"].Value > i)
                                 {
-                                    sibling.Cells["IndexColumn"].Value = (int)sibling.Cells["IndexColumn"].Value - 1;
+                                    sibling.Cells["Index"].Value = (int)sibling.Cells["Index"].Value - 1;
                                     foreach (HierarchicalGridNode field in sibling.Nodes)
-                                        field.Cells["IndexColumn"].Value = (int)field.Cells["IndexColumn"].Value - 1;
+                                        field.Cells["Index"].Value = (int)field.Cells["Index"].Value - 1;
                                 }
                             }
                             else
                             {
-                                //MessageBox.Show(sibling.Cells["SecondaryIndexColumn"].Value.ToString());
-                                if ((int)sibling.Cells["SecondaryIndexColumn"].Value > i)
-                                    sibling.Cells["SecondaryIndexColumn"].Value = (int)sibling.Cells["SecondaryIndexColumn"].Value - 1;
+                                //MessageBox.Show(sibling.Cells["SecondaryIndex"].Value.ToString());
+                                if ((int)sibling.Cells["SecondaryIndex"].Value > i)
+                                    sibling.Cells["SecondaryIndex"].Value = (int)sibling.Cells["SecondaryIndex"].Value - 1;
                             }
                         }
                     }
@@ -747,8 +745,8 @@ namespace MappingBreakDown
                         break;
                     }
                 }
-                RegisterEntry last = RegList[(int)last_node.Cells["IndexColumn"].Value];
-                int k = (int)last_node.Cells["SecondaryIndexColumn"].Value;
+                RegisterEntry last = RegList[(int)last_node.Cells["Index"].Value];
+                int k = (int)last_node.Cells["SecondaryIndex"].Value;
                 if (k != -1)
                 {
                     last = last.GetFields()[k];
@@ -908,15 +906,15 @@ namespace MappingBreakDown
             }
         }
 
-        private void TreeGridView1_SelectionChanged(object sender, EventArgs e)
+        private void HierarchialGridView1_SelectionChanged(object sender, EventArgs e)
         {
             RegisterEntry re = null;
-            foreach (TreeGridNode item in hierarchicalGridView1.SelectedRows)
+            foreach (HierarchicalGridNode item in hierarchicalGridView1.SelectedRows)
             {
                 try
                 {
-                    re = RegList[(int)item.Cells["IndexColumn"].Value];
-                    int index = (int)item.Cells["SecondaryIndexColumn"].Value;
+                    re = RegList[(int)item.Cells["Index"].Value];
+                    int index = (int)item.Cells["SecondaryIndex"].Value;
                     if (index != -1)
                     {
                         re = re.GetFields()[index];
@@ -974,7 +972,7 @@ namespace MappingBreakDown
             }
         }
 
-        private void TreeGridView1_KeyUp(object sender, KeyEventArgs e)
+        private void HierarchialGridView1_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Delete)
                 Delete_Click(sender, e);
@@ -992,11 +990,11 @@ namespace MappingBreakDown
             List<Tuple<int, int>> s = new List<Tuple<int, int>>();
             //List<RegisterEntry> fields;
             RegisterEntry entry;
-            foreach (TreeGridNode item in hierarchicalGridView1.SelectedRows)
+            foreach (HierarchicalGridNode item in hierarchicalGridView1.SelectedRows)
             {
                 try
                 {
-                    int i = (int)item.Cells["IndexColumn"].Value, j = (int)item.Cells["SecondaryIndexColumn"].Value;
+                    int i = (int)item.Cells["Index"].Value, j = (int)item.Cells["SecondaryIndex"].Value;
                     entry = RegList[i];
                     if (j != -1)
                         entry = entry.GetFields()[j];
@@ -1020,11 +1018,11 @@ namespace MappingBreakDown
             List<Tuple<int, int>> s = new List<Tuple<int, int>>();
             //List<RegisterEntry> fields;
             RegisterEntry entry;
-            foreach (TreeGridNode item in hierarchicalGridView1.SelectedRows)
+            foreach (HierarchicalGridNode item in hierarchicalGridView1.SelectedRows)
             {
                 try
                 {
-                    int i = (int)item.Cells["IndexColumn"].Value, j = (int)item.Cells["SecondaryIndexColumn"].Value;
+                    int i = (int)item.Cells["Index"].Value, j = (int)item.Cells["SecondaryIndex"].Value;
                     entry = RegList[i];
                     if (j != -1)
                         entry = entry.GetFields()[j];

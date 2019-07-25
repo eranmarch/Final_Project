@@ -159,7 +159,6 @@ namespace HierarchicalGrid
                 Dictionary<DataRow, HierarchicalGridNode> map = new Dictionary<DataRow, HierarchicalGridNode>();
                 foreach (DataRelation curRelation in dsRelations)
                 {
-                    //Console.WriteLine(curRelation.RelationName);
                     DataTable dtParent = curRelation.ParentTable;
                     DataTable dtChild = curRelation.ChildTable;
                     foreach (DataRow curRow in dtParent.Rows)
@@ -198,7 +197,6 @@ namespace HierarchicalGrid
                             }
                             curObj++;
                         }
-                        //Console.Write("Looking for " + curRow["Id"] + ": ");
                         if (!map.ContainsKey(curRow))
                         {
                             curNode = this.Nodes.Add(valuesToAdd);
@@ -206,7 +204,6 @@ namespace HierarchicalGrid
                         }
                         else
                         {
-                            //Console.WriteLine("TRUE");
                             curNode = map[curRow];
                         }
                         DataRow[] childRows  = dtChild.Select(childFilter);
@@ -217,13 +214,9 @@ namespace HierarchicalGrid
                             curObj = 0;
                             foreach (DataGridViewColumn curCol in this.Columns)
                             {
-                                //Console.WriteLine(curCol.Name + ": " + dtChild.Columns.Contains(curCol.Name));
                                 if (dtChild.Columns.Contains(curCol.Name))
                                 {
                                     valuesToAdd[curObj] = curChildRow[curCol.Name];
-                                    //Console.WriteLine(curCol.Name + ": " + curChildRow[curCol.Name]);
-                                    //if (curCol.Name.Equals("Index"))
-                                    //    Console.WriteLine(curChildRow[curCol.Name].ToString().Length);
                                 }
                                 else
                                 {
