@@ -21,6 +21,7 @@ namespace MappingBreakDown
         bool saved = true;
 
         DataTable dtgroups, dtregisters, dtfields;
+        DataGridSource GridSource;
         List<string> displayColumns = new List<string>();
         List<GroupColumn> groupColumns = new List<GroupColumn>();
 
@@ -346,7 +347,6 @@ namespace MappingBreakDown
             if (entry.GetIsComment())
             {
                 MessageBox.Show("This register is a comment and can't be edited");
-                //InitFields();
                 return;
             }
             Enum.TryParse(type, out RegisterEntry.type_field t);
@@ -361,7 +361,6 @@ namespace MappingBreakDown
             if (!RegisterEntry.IsValidLsbMsb(msb, lsb))
             {
                 MessageBox.Show("Can't edit an entry to have LSB > MSB");
-                //InitFields();
                 return;
             }
             Enum.TryParse(fpga, out RegisterEntry.fpga_field r);
@@ -376,7 +375,6 @@ namespace MappingBreakDown
         {
             int index = (int)node.Cells[12].Value, indexSec = (int)node.Cells[13].Value;
             RegisterEntry entry = RegList[index];
-            //MessageBox.Show(entry.GetName() + ": [" + index + ", " + indexSec + "]");
             if (indexSec != -1)
                 entry = entry.GetFields()[indexSec];
             for (int i = 0; i < hierarchicalGridView1.ColumnCount; i++)
@@ -404,12 +402,6 @@ namespace MappingBreakDown
             FileStream fs = new FileStream(@"registers.txt", FileMode.Create, FileAccess.Write);
             xs.Serialize(fs, RegList);
             fs.Close();
-            /*fs = new FileStream(@"groups.txt", FileMode.Create, FileAccess.Write);
-            List<string> groups = new List<string>();
-            foreach (string group in RegGroupOpts.Items)
-                groups.Add(group);
-            ls.Serialize(fs, groups);
-            fs.Close();*/
             File.WriteAllText(@"file_path.txt", PathToFile.Text);
 
         }
@@ -423,46 +415,7 @@ namespace MappingBreakDown
                 fs = new FileStream(@"registers.txt", FileMode.Open, FileAccess.Read);
                 RegList = (List<RegisterEntry>)xs.Deserialize(fs);
                 fs.Close();
-                string group;
-                foreach (RegisterEntry entry in RegList)
-                {
-                    group = entry.GetGroup();
-                    if (!RegGroupOpts.Items.Contains(group))
-                    {
-                        Console.WriteLine("Adding group " + group);
-                        RegGroupOpts.Items.Add(group);
-                        //HierarchicalGridNode node = hierarchialGridView1.Nodes.Add(group);
-                        dtgroups.Rows.Add(group);
-                    }
-                    Console.WriteLine("Adding register " + entry.GetName());
-                    //UpdateTable(entry);
-                    object[] ent = entry.GetTableEntry();
-                    dtregisters.Rows.Add(ent);
-
-                    List<RegisterEntry> fields = entry.GetFields();
-                    foreach (RegisterEntry field in fields)
-                    {
-                        Console.WriteLine("Adding field " + field.GetName() + " to register " + entry.GetName());
-                        //UpdateTable(field);
-                        dtfields.Rows.Add(field.GetTableEntry());
-                    }
-                }
-                DataSet dsDataset = new DataSet();
-                dsDataset.Tables.Add(dtgroups);
-                dsDataset.Tables.Add(dtregisters);
-                dsDataset.Tables.Add(dtfields);
-                DataRelation groupsRegsRelation = new DataRelation("GroupsRegistersRelation", dsDataset.Tables[0].Columns["Group"], dsDataset.Tables[1].Columns["Group"], true);
-                DataRelation regsFieldsRelation = new DataRelation("GroupsFieldsRelation", dsDataset.Tables[1].Columns["Index"] , dsDataset.Tables[2].Columns["Index"] , true);
-                groupsRegsRelation.Nested = true;
-                regsFieldsRelation.Nested = true;
-                dsDataset.Relations.Add(groupsRegsRelation);
-                dsDataset.Relations.Add(regsFieldsRelation);
-                DataGridSource newGridSource = new DataGridSource(dsDataset, displayColumns, groupColumns);
-                hierarchicalGridView1.DataSource = newGridSource;
-                hierarchicalGridView1.Columns["Reason"].Visible = false;
-                hierarchicalGridView1.Columns["IsValid"].Visible = false;
-                hierarchicalGridView1.Columns["Index"].Visible = false;
-                hierarchicalGridView1.Columns["SecondaryIndex"].Visible = false;
+                UpdateTable();
                 Console.WriteLine("SUCCESS");
             }
             catch (Exception e)
@@ -490,51 +443,50 @@ namespace MappingBreakDown
                 cell.Cells[i].Value = ent[i];
         }
 
-        private void UpdateTable(RegisterEntry entry)
+        private void UpdateTable()
         {
-            HierarchicalGridNode node;
-            string group = entry.GetGroup();
-            object[] ent = entry.GetTableEntry();
-            bool b, isField = entry.GetRegType() == RegisterEntry.type_field.FIELD;
-            foreach (HierarchicalGridNode group_node in hierarchicalGridView1.Nodes)
+            string group;
+            foreach (RegisterEntry entry in RegList)
             {
-                if (group_node.Cells["Group"].Value.ToString().Equals(group))
-                    if (!isField)
-                    {
-                        node = group_node.Nodes.Add(ent);
-                        group_node.Expand();
-                    }
-                    else
-                    {
-                        HierarchicalGridNode tmp = null;
-                        group_node.Expand();
-                        foreach (HierarchicalGridNode reg in group_node.Nodes)
-                        {
-                            b = reg.GetIsExpanded();
-                            reg.Expand();
-                            if ((int)reg.Cells["Index"].Value == entry.GetIndex())
-                            {
-                                tmp = reg;
-                                break;
-                            }
-                            else if (!b)
-                                reg.Collapse();
-                        }
-                        if (tmp != null)
-                        {
-                            node = tmp.Nodes.Add(ent);
-                            //group_node.Expand();
-                            tmp.Expand();
-                        }
-                        break;
-                    }
+                group = entry.GetGroup();
+                if (!RegGroupOpts.Items.Contains(group))
+                {
+                    Console.WriteLine("Adding group " + group);
+                    RegGroupOpts.Items.Add(group);
+                    dtgroups.Rows.Add(group);
+                }
+                Console.WriteLine("Adding register " + entry.GetName());
+                object[] ent = entry.GetTableEntry();
+                dtregisters.Rows.Add(ent);
+
+                List<RegisterEntry> fields = entry.GetFields();
+                foreach (RegisterEntry field in fields)
+                {
+                    Console.WriteLine("Adding field " + field.GetName() + " to register " + entry.GetName());
+                    dtfields.Rows.Add(field.GetTableEntry());
+                }
             }
+            DataSet dsDataset = new DataSet();
+            dsDataset.Tables.Add(dtgroups);
+            dsDataset.Tables.Add(dtregisters);
+            dsDataset.Tables.Add(dtfields);
+            DataRelation groupsRegsRelation = new DataRelation("GroupsRegistersRelation", dsDataset.Tables[0].Columns["Group"], dsDataset.Tables[1].Columns["Group"], true);
+            DataRelation regsFieldsRelation = new DataRelation("GroupsFieldsRelation", dsDataset.Tables[1].Columns["Index"], dsDataset.Tables[2].Columns["Index"], true);
+            groupsRegsRelation.Nested = true;
+            regsFieldsRelation.Nested = true;
+            dsDataset.Relations.Add(groupsRegsRelation);
+            dsDataset.Relations.Add(regsFieldsRelation);
+            GridSource = new DataGridSource(dsDataset, displayColumns, groupColumns);
+            hierarchicalGridView1.DataSource = GridSource;
+            hierarchicalGridView1.Columns["Reason"].Visible = false;
+            hierarchicalGridView1.Columns["IsValid"].Visible = false;
+            hierarchicalGridView1.Columns["Index"].Visible = false;
+            hierarchicalGridView1.Columns["SecondaryIndex"].Visible = false;
         }
 
         private void AddEntryToTable(RegisterEntry entry, bool open = false)
         {
             bool isField = entry.GetRegType() == RegisterEntry.type_field.FIELD;
-            //node.Expand();
             if (isField)
             {
                 RegList[entry.GetIndex()].AddField(entry);
@@ -543,11 +495,12 @@ namespace MappingBreakDown
             {
                 entry.SetIndex(RegList.Count); // only outer index
                 RegList.Add(entry);
-                //node.Nodes.Add(entry.GetTableEntry());
             }
             if (!open)
                 UpdateDataBase();
-            UpdateTable(entry);
+            dtregisters.Rows.Add(entry.GetTableEntry());
+            hierarchicalGridView1.DataSource = GridSource;
+            
         }
 
         private void AddManyRegisters(List<RegisterEntry> entries, List<string> groups)
@@ -557,7 +510,7 @@ namespace MappingBreakDown
                 if (!RegGroupOpts.Items.Contains(group))
                 {
                     RegGroupOpts.Items.Add(group);
-                    hierarchicalGridView1.Nodes.Add(group);
+                    dtgroups.Rows.Add(group);
                 }
             Console.Write("DONE\n");
             List<RegisterEntry> fields;
@@ -565,13 +518,10 @@ namespace MappingBreakDown
             foreach (RegisterEntry entry in entries)
             {
                 AddEntryToTable(entry, true);
-                //MessageBox.Show(entry.GetName() + ", " + entry.GetSecondaryIndex().ToString());
                 fields = entry.GetFields();
                 foreach (RegisterEntry field in fields)
                 {
-                    //MessageBox.Show(field.GetName());
                     field.SetIndex(entry.GetIndex());
-                    UpdateTable(field);
                 }
             }
             Console.Write("DONE\nValidating logic with table: ");
@@ -610,12 +560,10 @@ namespace MappingBreakDown
                     if (j != -1)
                     {
                         s.Add(new Tuple<int, int>(i, j));
-                        //MessageBox.Show(i.ToString() + ", " + j.ToString());
                     }
                     else
                     {
                         indices.Add(i);
-                        //MessageBox.Show(i.ToString());
                     }
                     foreach (HierarchicalGridNode group in hierarchicalGridView1.Nodes)
                     {

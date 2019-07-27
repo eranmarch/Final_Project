@@ -92,10 +92,19 @@ namespace HierarchicalGrid
         }
         #endregion
 
+        #region INotifyPropertyChanged
+        public interface INotifyPropertyChanged
+        {
+            // Summary:
+            //     Occurs when a property value changes.
+            event PropertyChangedEventHandler PropertyChanged;
+        }
+        #endregion
+
         #region Shadow and hide DGV properties - NEW DATASOURCE
 
         // This sample does not support databinding
-		[Browsable(false),
+        [Browsable(false),
 		DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden),
 		EditorBrowsable(EditorBrowsableState.Never)]
 		public new object DataSource
@@ -233,9 +242,9 @@ namespace HierarchicalGrid
                     }
                 }
             }
-		}
+        }
 
-            [Browsable(false),
+        [Browsable(false),
             DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden),
 		EditorBrowsable(EditorBrowsableState.Never)]
 		public new object DataMember
