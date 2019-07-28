@@ -689,9 +689,9 @@ namespace MappingBreakDown
                     reg.Expand();
                     foreach (HierarchicalGridNode field in reg.Nodes)
                     {
-                        field.Visible = field.Cells["Registers"].Value.ToString().Contains(searchRes);
+                        field.Visible = field.Cells["Name"].Value.ToString().Contains(searchRes);
                     }
-                    reg.Visible = reg.Cells["Registers"].Value.ToString().Contains(searchRes);
+                    reg.Visible = reg.Cells["Name"].Value.ToString().Contains(searchRes);
                 }
             }
         }
