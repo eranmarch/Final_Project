@@ -105,15 +105,15 @@ namespace MappingBreakDown
         /* Upon Insert to the table, allocate a new address to the register */
         private int FindAddress()
         {
-            int i = 1, x;
+            int i = 1, y;
             bool found;
             for (; i <= 1024; i++)
             {
                 found = true;
-                foreach (RegisterEntry l in RegList)
+                foreach (DataRow x in dtregisters.Rows)
                 {
-                    x = l.GetAddress();
-                    if (x == i)
+                    y = x.Field<int>("Address");
+                    if (y == i)
                     {
                         found = false;
                         break;
@@ -130,8 +130,9 @@ namespace MappingBreakDown
         {
             if (NewGroupText.Text.Equals(""))
                 return;
-            foreach (string item in RegGroupOpts.Items)
+            foreach (DataRow grp in dtgroups.Rows)
             {
+                string item = grp.Field<string>("Group");
                 if (item.Equals(NewGroupText.Text))
                 {
                     MessageBox.Show("Group " + NewGroupText.Text + " already exists");
@@ -139,8 +140,8 @@ namespace MappingBreakDown
                     return;
                 }
             }
-            RegGroupOpts.Items.Add(NewGroupText.Text);
-            HierarchicalGridNode node = hierarchicalGridView1.Nodes.Add(NewGroupText.Text);
+            dtgroups.Rows.Add(NewGroupText.Text);
+
             NewGroupText.Text = "";
         }
 
@@ -148,8 +149,9 @@ namespace MappingBreakDown
         {
             int addr_new = new_entry.GetAddress();
             string name_new = new_entry.GetName();
-            foreach (RegisterEntry item in RegList)
+            foreach (DataRow row in dtregisters.Rows)
             {
+                RegisterEntry item = new RegisterEntry(row);
                 if (item.GetIsComment() || item == new_entry)
                     continue;
                 if (item.GetName().Equals(name_new))
