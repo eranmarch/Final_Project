@@ -10,6 +10,7 @@ using AdvancedDataGridView;
 using System.Runtime;
 using System.Drawing;
 using HierarchicalGrid;
+using System.Diagnostics;
 
 namespace MappingBreakDown
 {
@@ -85,7 +86,18 @@ namespace MappingBreakDown
             displayColumns.Add("Reason");
             displayColumns.Add("Index");
             displayColumns.Add("SecondaryIndex");
-        } 
+            DataSet dsDataset = new DataSet();
+            dsDataset.Tables.Add(dtgroups);
+            dsDataset.Tables.Add(dtregisters);
+            dsDataset.Tables.Add(dtfields);
+            DataRelation groupsRegsRelation = new DataRelation("GroupsRegistersRelation", dsDataset.Tables[0].Columns["Group"], dsDataset.Tables[1].Columns["Group"], true);
+            DataRelation regsFieldsRelation = new DataRelation("GroupsFieldsRelation", dsDataset.Tables[1].Columns["Index"], dsDataset.Tables[2].Columns["Index"], true);
+            groupsRegsRelation.Nested = true;
+            regsFieldsRelation.Nested = true;
+            dsDataset.Relations.Add(groupsRegsRelation);
+            dsDataset.Relations.Add(regsFieldsRelation);
+            GridSource = new DataGridSource(dsDataset, displayColumns, groupColumns);
+        }
 
         /* Default values for each register */
         private void InitFields()
@@ -141,7 +153,9 @@ namespace MappingBreakDown
                 }
             }
             dtgroups.Rows.Add(NewGroupText.Text);
-
+            //RegGroupOpts.DataSource = dtgroups.AsEnumerable().Select(r => r.Field<string>("Group")).ToList();
+            RegGroupOpts.Items.Add(NewGroupText.Text);
+            hierarchicalGridView1.DataSource = GridSource;
             NewGroupText.Text = "";
         }
 
@@ -149,23 +163,26 @@ namespace MappingBreakDown
         {
             int addr_new = new_entry.GetAddress();
             string name_new = new_entry.GetName();
-            foreach (DataRow row in dtregisters.Rows)
+            foreach (RegisterEntry item in RegList)
             {
-                RegisterEntry item = new RegisterEntry(row);
-                if (item.GetIsComment() || item == new_entry)
-                    continue;
-                if (item.GetName().Equals(name_new))
-                {
-                    new_entry.SetReason("Name " + name_new + " is already in the list at address " + item.GetAddress().ToString());
-                    new_entry.SetValid(false);
-                    return false;
-                }
-                if (item.GetAddress() == addr_new)
-                {
-                    new_entry.SetReason("Address " + addr_new + " is already in the list at register " + item.GetName());
-                    new_entry.SetValid(false);
-                    return false;
-                }
+                //foreach (DataRow row in dtregisters.Rows)
+                //{
+                    //RegisterEntry item = new RegisterEntry(row);
+                    if (item.GetIsComment() || item == new_entry)
+                        continue;
+                    if (item.GetName().Equals(name_new))
+                    {
+                        new_entry.SetReason("Name " + name_new + " is already in the list at address " + item.GetAddress().ToString());
+                        new_entry.SetValid(false);
+                        return false;
+                    }
+                    if (item.GetAddress() == addr_new)
+                    {
+                        new_entry.SetReason("Address " + addr_new + " is already in the list at register " + item.GetName());
+                        new_entry.SetValid(false);
+                        return false;
+                    }
+                //}
             }
             return true;
         }
@@ -405,7 +422,6 @@ namespace MappingBreakDown
             xs.Serialize(fs, RegList);
             fs.Close();
             File.WriteAllText(@"file_path.txt", PathToFile.Text);
-
         }
 
         private void ReadDataBase()
@@ -468,17 +484,8 @@ namespace MappingBreakDown
                     dtfields.Rows.Add(field.GetTableEntry());
                 }
             }
-            DataSet dsDataset = new DataSet();
-            dsDataset.Tables.Add(dtgroups);
-            dsDataset.Tables.Add(dtregisters);
-            dsDataset.Tables.Add(dtfields);
-            DataRelation groupsRegsRelation = new DataRelation("GroupsRegistersRelation", dsDataset.Tables[0].Columns["Group"], dsDataset.Tables[1].Columns["Group"], true);
-            DataRelation regsFieldsRelation = new DataRelation("GroupsFieldsRelation", dsDataset.Tables[1].Columns["Index"], dsDataset.Tables[2].Columns["Index"], true);
-            groupsRegsRelation.Nested = true;
-            regsFieldsRelation.Nested = true;
-            dsDataset.Relations.Add(groupsRegsRelation);
-            dsDataset.Relations.Add(regsFieldsRelation);
-            GridSource = new DataGridSource(dsDataset, displayColumns, groupColumns);
+            //RegGroupOpts.DataSource = dtgroups.AsEnumerable().Select(r => r.Field<string>("Group")).ToList();
+            
             hierarchicalGridView1.DataSource = GridSource;
             hierarchicalGridView1.Columns["Reason"].Visible = false;
             hierarchicalGridView1.Columns["IsValid"].Visible = false;
@@ -492,17 +499,19 @@ namespace MappingBreakDown
             if (isField)
             {
                 RegList[entry.GetIndex()].AddField(entry);
+                dtfields.Rows.Add(entry.GetTableEntry());
             }
             else
             {
                 entry.SetIndex(RegList.Count); // only outer index
+                dtregisters.Rows.Add(entry.GetTableEntry());
                 RegList.Add(entry);
             }
             if (!open)
+            {
                 UpdateDataBase();
-            dtregisters.Rows.Add(entry.GetTableEntry());
-            hierarchicalGridView1.DataSource = GridSource;
-            
+                hierarchicalGridView1.DataSource = GridSource;
+            }
         }
 
         private void AddManyRegisters(List<RegisterEntry> entries, List<string> groups)
@@ -514,6 +523,7 @@ namespace MappingBreakDown
                     RegGroupOpts.Items.Add(group);
                     dtgroups.Rows.Add(group);
                 }
+            //RegGroupOpts.DataSource = dtgroups.AsEnumerable().Select(r => r.Field<string>("Group")).ToList();
             Console.Write("DONE\n");
             List<RegisterEntry> fields;
             Console.Write("Adding registers: ");
@@ -524,11 +534,18 @@ namespace MappingBreakDown
                 foreach (RegisterEntry field in fields)
                 {
                     field.SetIndex(entry.GetIndex());
+                    dtfields.Rows.Add(field.GetTableEntry());
                 }
             }
             Console.Write("DONE\nValidating logic with table: ");
             OpenValidation();
             UpdateDataBase();
+            hierarchicalGridView1.DataSource = GridSource;
+            hierarchicalGridView1.Columns["Reason"].Visible = false;
+            hierarchicalGridView1.Columns["IsValid"].Visible = false;
+            hierarchicalGridView1.Columns["Index"].Visible = false;
+            hierarchicalGridView1.Columns["SecondaryIndex"].Visible = false;
+            ColorInValid();
             Console.WriteLine("DONE");
         }
 
@@ -798,13 +815,13 @@ namespace MappingBreakDown
 
         private void Clear_Click(object sender, EventArgs e)
         {
-            foreach (HierarchicalGridNode node in hierarchicalGridView1.Nodes)
-                for (int i = node.Nodes.Count - 1; i >= 0; i--)
-                    node.Nodes.Remove(node.Nodes[i]);
-            for (int i = RegList.Count - 1; i >= 0; i--)
-                RegList.RemoveAt(i);
+            RegList.Clear();
+            dtfields.Clear();
+            dtregisters.Clear();
+            //dtgroups.Clear(); //might update to allow removing groups
             UpdateDataBase();
             InitFields();
+            hierarchicalGridView1.DataSource = GridSource;
         }
 
         private void RegNameText_KeyUp(object sender, KeyEventArgs e)
