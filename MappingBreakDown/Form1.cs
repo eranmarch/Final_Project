@@ -290,6 +290,44 @@ namespace MappingBreakDown
             AddEntryToTable(entry);
             ErrorMessage.Text = "Message: Register named " + RegNameText.Text + " was added";
             InitFields();
+            bool finish = false;
+            foreach (HierarchicalGridNode group_node in hierarchicalGridView1.Nodes)
+            {
+                if (group_node.Cells["Group"].Value.ToString().Equals(entry.Group))
+                {
+                    group_node.Expand();
+                    foreach (HierarchicalGridNode register_node in group_node.Nodes)
+                    {
+                        bool finish_inner = false;
+                        if (register_node.Cells["Index"].Value.Equals(entry.Index)){
+                            if (entry.SecondaryIndex != -1) // field
+                            {
+                                register_node.Expand();
+                                foreach (HierarchicalGridNode field_node in register_node.Nodes)
+                                {
+                                    if (field_node.Cells["SecondaryIndex"].Value.Equals(entry.SecondaryIndex))
+                                    {
+                                        hierarchicalGridView1.FirstDisplayedScrollingRowIndex = field_node.Index + register_node.Index + group_node.Index;
+                                        finish = true;
+                                        finish_inner = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            else // register
+                            {
+                                hierarchicalGridView1.FirstDisplayedScrollingRowIndex = register_node.Index + group_node.Index;
+                                finish = true;
+                                break;
+                            }
+                        }
+                        if (finish_inner)
+                            break;
+                    }
+                }
+                if (finish)
+                    break;
+            }
             saved = false;
         }
 
@@ -301,7 +339,7 @@ namespace MappingBreakDown
                 FileValidator fv = new FileValidator(openFileDialog1.FileName);
                 if (fv.IsFileValid())
                 {
-                    PathToFile.Text = "Path: " + openFileDialog1.FileName;
+                    PathToFile.Text = openFileDialog1.FileName;
                     this.Text = openFileDialog1.FileName.Substring(openFileDialog1.FileName.LastIndexOf("\\")) + " - MappingBreakDown";
                     File.WriteAllText(@"file_path.txt", openFileDialog1.FileName);
                     Console.WriteLine("Adding entries to table...");
@@ -474,6 +512,7 @@ namespace MappingBreakDown
                     dtgroups.Rows.Add(group);
                 }
                 Console.WriteLine("Adding register " + entry.GetName());
+                //entry.Index = RegList.IndexOf(entry);
                 object[] ent = entry.GetTableEntry();
                 dtregisters.Rows.Add(ent);
 
@@ -481,6 +520,8 @@ namespace MappingBreakDown
                 foreach (RegisterEntry field in fields)
                 {
                     Console.WriteLine("Adding field " + field.GetName() + " to register " + entry.GetName());
+                    //field.Index = entry.Index;
+                    //field.SecondaryIndex = entry.GetFields().IndexOf(field);
                     dtfields.Rows.Add(field.GetTableEntry());
                 }
             }
@@ -591,18 +632,18 @@ namespace MappingBreakDown
                             if (j == -1)
                             {
                                 //MessageBox.Show(sibling.Cells["Index"].Value.ToString());
-                                if ((int)sibling.Cells["Index"].Value > i)
+                                if ((int)sibling.Cells[12].Value > i)
                                 {
-                                    sibling.Cells["Index"].Value = (int)sibling.Cells["Index"].Value - 1;
+                                    sibling.Cells[12].Value = (int)sibling.Cells[12].Value - 1;
                                     foreach (HierarchicalGridNode field in sibling.Nodes)
-                                        field.Cells["Index"].Value = (int)field.Cells["Index"].Value - 1;
+                                        field.Cells[12].Value = (int)field.Cells[12].Value - 1;
                                 }
                             }
                             else
                             {
                                 //MessageBox.Show(sibling.Cells["SecondaryIndex"].Value.ToString());
-                                if ((int)sibling.Cells["SecondaryIndex"].Value > i)
-                                    sibling.Cells["SecondaryIndex"].Value = (int)sibling.Cells["SecondaryIndex"].Value - 1;
+                                if ((int)sibling.Cells[13].Value > i)
+                                    sibling.Cells[13].Value = (int)sibling.Cells[13].Value - 1;
                             }
                         }
                     }
@@ -712,8 +753,8 @@ namespace MappingBreakDown
                         break;
                     }
                 }
-                RegisterEntry last = RegList[(int)last_node.Cells["Index"].Value];
-                int k = (int)last_node.Cells["SecondaryIndex"].Value;
+                RegisterEntry last = RegList[(int)last_node.Cells[12].Value];
+                int k = (int)last_node.Cells[13].Value;
                 if (k != -1)
                 {
                     last = last.GetFields()[k];

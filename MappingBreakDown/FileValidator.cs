@@ -157,7 +157,7 @@ namespace MappingBreakDown
                                     Registers.Add(entry);
                                 curr_group = prev_group;
                             }
-                            else if (!Groups.Contains(curr_group))
+                            else if (!Groups.Contains(curr_group) && run_state == (int)Cmp_mod.Reg_entrys)
                                 Groups.Add(curr_group);
                         }
                         // Save Names

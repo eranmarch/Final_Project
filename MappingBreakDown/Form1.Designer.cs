@@ -56,9 +56,8 @@
             this.label10 = new System.Windows.Forms.Label();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
-            this.PathToFile = new System.Windows.Forms.Label();
+            this.PathToFileLabel = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.hierarchicalGridView1 = new HierarchicalGrid.HierarchicalGridView();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -73,17 +72,7 @@
             this.ClearButton = new System.Windows.Forms.Button();
             this.UnCommentButton = new System.Windows.Forms.Button();
             this.CommentButton = new System.Windows.Forms.Button();
-            this.Registers = new AdvancedDataGridView.TreeGridColumn();
-            this.AddressColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.MAISColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.LSBColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.MSBColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.TypeColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.FPGAColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.InitColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.CommentColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.IndexColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.SecondaryIndexColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.hierarchicalGridView1 = new HierarchicalGrid.HierarchicalGridView();
             this.Group = new HierarchicalGrid.HierarchicalGridColumn();
             this.NameColumn = new HierarchicalGrid.HierarchicalGridColumn();
             this.Address = new HierarchicalGrid.HierarchicalGridColumn();
@@ -98,12 +87,24 @@
             this.Reason = new HierarchicalGrid.HierarchicalGridColumn();
             this.Index = new HierarchicalGrid.HierarchicalGridColumn();
             this.SecondaryIndex = new HierarchicalGrid.HierarchicalGridColumn();
+            this.Registers = new AdvancedDataGridView.TreeGridColumn();
+            this.AddressColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.MAISColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.LSBColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.MSBColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TypeColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.FPGAColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.InitColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.CommentColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.IndexColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.SecondaryIndexColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.PathToFile = new System.Windows.Forms.Label();
             this.panel3.SuspendLayout();
             this.panel4.SuspendLayout();
             this.panel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.hierarchicalGridView1)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.panel5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.hierarchicalGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // label2
@@ -489,6 +490,7 @@
             // 
             this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel4.Controls.Add(this.PathToFile);
+            this.panel4.Controls.Add(this.PathToFileLabel);
             this.panel4.Controls.Add(this.panel2);
             this.panel4.Controls.Add(this.panel3);
             this.panel4.Location = new System.Drawing.Point(8, 7);
@@ -498,16 +500,16 @@
             this.panel4.TabIndex = 43;
             this.panel4.Resize += new System.EventHandler(this.frm_sizeChanged);
             // 
-            // PathToFile
+            // PathToFileLabel
             // 
-            this.PathToFile.AutoSize = true;
-            this.PathToFile.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.PathToFile.Location = new System.Drawing.Point(27, 19);
-            this.PathToFile.Margin = new System.Windows.Forms.Padding(8, 0, 8, 0);
-            this.PathToFile.Name = "PathToFile";
-            this.PathToFile.Size = new System.Drawing.Size(105, 42);
-            this.PathToFile.TabIndex = 45;
-            this.PathToFile.Text = "Path:";
+            this.PathToFileLabel.AutoSize = true;
+            this.PathToFileLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.PathToFileLabel.Location = new System.Drawing.Point(27, 19);
+            this.PathToFileLabel.Margin = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this.PathToFileLabel.Name = "PathToFileLabel";
+            this.PathToFileLabel.Size = new System.Drawing.Size(105, 42);
+            this.PathToFileLabel.TabIndex = 45;
+            this.PathToFileLabel.Text = "Path:";
             // 
             // panel2
             // 
@@ -527,35 +529,6 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(797, 455);
             this.panel2.TabIndex = 41;
-            // 
-            // hierarchicalGridView1
-            // 
-            this.hierarchicalGridView1.AllowUserToAddRows = false;
-            this.hierarchicalGridView1.AllowUserToDeleteRows = false;
-            this.hierarchicalGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Group,
-            this.NameColumn,
-            this.Address,
-            this.MAIS,
-            this.LSB,
-            this.MSB,
-            this.Type,
-            this.FPGA,
-            this.Init,
-            this.Comment,
-            this.IsValid,
-            this.Reason,
-            this.Index,
-            this.SecondaryIndex});
-            this.hierarchicalGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this.hierarchicalGridView1.ImageList = null;
-            this.hierarchicalGridView1.Location = new System.Drawing.Point(32, 758);
-            this.hierarchicalGridView1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.hierarchicalGridView1.Name = "hierarchicalGridView1";
-            this.hierarchicalGridView1.Size = new System.Drawing.Size(2803, 410);
-            this.hierarchicalGridView1.TabIndex = 43;
-            this.hierarchicalGridView1.SelectionChanged += new System.EventHandler(this.HierarchialGridView1_SelectionChanged);
-            this.hierarchicalGridView1.KeyUp += new System.Windows.Forms.KeyEventHandler(this.HierarchialGridView1_KeyUp);
             // 
             // menuStrip1
             // 
@@ -698,94 +671,34 @@
             this.CommentButton.UseVisualStyleBackColor = true;
             this.CommentButton.Click += new System.EventHandler(this.CommentButton_Click);
             // 
-            // Registers
+            // hierarchicalGridView1
             // 
-            this.Registers.DataPropertyName = "Registers";
-            this.Registers.DefaultNodeImage = null;
-            this.Registers.HeaderText = "Registers";
-            this.Registers.Name = "Registers";
-            this.Registers.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.Registers.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // AddressColumn
-            // 
-            this.AddressColumn.HeaderText = "Address";
-            this.AddressColumn.Name = "AddressColumn";
-            this.AddressColumn.ReadOnly = true;
-            this.AddressColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.AddressColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // MAISColumn
-            // 
-            this.MAISColumn.HeaderText = "MAIS";
-            this.MAISColumn.Name = "MAISColumn";
-            this.MAISColumn.ReadOnly = true;
-            this.MAISColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.MAISColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // LSBColumn
-            // 
-            this.LSBColumn.HeaderText = "LSB";
-            this.LSBColumn.Name = "LSBColumn";
-            this.LSBColumn.ReadOnly = true;
-            this.LSBColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.LSBColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // MSBColumn
-            // 
-            this.MSBColumn.HeaderText = "MSB";
-            this.MSBColumn.Name = "MSBColumn";
-            this.MSBColumn.ReadOnly = true;
-            this.MSBColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.MSBColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // TypeColumn
-            // 
-            this.TypeColumn.HeaderText = "Type";
-            this.TypeColumn.Name = "TypeColumn";
-            this.TypeColumn.ReadOnly = true;
-            this.TypeColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.TypeColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // FPGAColumn
-            // 
-            this.FPGAColumn.HeaderText = "FPGA";
-            this.FPGAColumn.Name = "FPGAColumn";
-            this.FPGAColumn.ReadOnly = true;
-            this.FPGAColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.FPGAColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // InitColumn
-            // 
-            this.InitColumn.HeaderText = "Init";
-            this.InitColumn.Name = "InitColumn";
-            this.InitColumn.ReadOnly = true;
-            this.InitColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.InitColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // CommentColumn
-            // 
-            this.CommentColumn.HeaderText = "Comment";
-            this.CommentColumn.Name = "CommentColumn";
-            this.CommentColumn.ReadOnly = true;
-            this.CommentColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.CommentColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // IndexColumn
-            // 
-            this.IndexColumn.HeaderText = "Index";
-            this.IndexColumn.Name = "IndexColumn";
-            this.IndexColumn.ReadOnly = true;
-            this.IndexColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.IndexColumn.Visible = false;
-            // 
-            // SecondaryIndexColumn
-            // 
-            this.SecondaryIndexColumn.HeaderText = "SecondaryIndex";
-            this.SecondaryIndexColumn.Name = "SecondaryIndexColumn";
-            this.SecondaryIndexColumn.ReadOnly = true;
-            this.SecondaryIndexColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.SecondaryIndexColumn.Visible = false;
+            this.hierarchicalGridView1.AllowUserToAddRows = false;
+            this.hierarchicalGridView1.AllowUserToDeleteRows = false;
+            this.hierarchicalGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Group,
+            this.NameColumn,
+            this.Address,
+            this.MAIS,
+            this.LSB,
+            this.MSB,
+            this.Type,
+            this.FPGA,
+            this.Init,
+            this.Comment,
+            this.IsValid,
+            this.Reason,
+            this.Index,
+            this.SecondaryIndex});
+            this.hierarchicalGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
+            this.hierarchicalGridView1.ImageList = null;
+            this.hierarchicalGridView1.Location = new System.Drawing.Point(32, 758);
+            this.hierarchicalGridView1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.hierarchicalGridView1.Name = "hierarchicalGridView1";
+            this.hierarchicalGridView1.Size = new System.Drawing.Size(2803, 410);
+            this.hierarchicalGridView1.TabIndex = 43;
+            this.hierarchicalGridView1.SelectionChanged += new System.EventHandler(this.HierarchialGridView1_SelectionChanged);
+            this.hierarchicalGridView1.KeyUp += new System.Windows.Forms.KeyEventHandler(this.HierarchialGridView1_KeyUp);
             // 
             // Group
             // 
@@ -901,6 +814,105 @@
             this.SecondaryIndex.ReadOnly = true;
             this.SecondaryIndex.Visible = false;
             // 
+            // Registers
+            // 
+            this.Registers.DataPropertyName = "Registers";
+            this.Registers.DefaultNodeImage = null;
+            this.Registers.HeaderText = "Registers";
+            this.Registers.Name = "Registers";
+            this.Registers.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.Registers.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // AddressColumn
+            // 
+            this.AddressColumn.HeaderText = "Address";
+            this.AddressColumn.Name = "AddressColumn";
+            this.AddressColumn.ReadOnly = true;
+            this.AddressColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.AddressColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // MAISColumn
+            // 
+            this.MAISColumn.HeaderText = "MAIS";
+            this.MAISColumn.Name = "MAISColumn";
+            this.MAISColumn.ReadOnly = true;
+            this.MAISColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.MAISColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // LSBColumn
+            // 
+            this.LSBColumn.HeaderText = "LSB";
+            this.LSBColumn.Name = "LSBColumn";
+            this.LSBColumn.ReadOnly = true;
+            this.LSBColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.LSBColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // MSBColumn
+            // 
+            this.MSBColumn.HeaderText = "MSB";
+            this.MSBColumn.Name = "MSBColumn";
+            this.MSBColumn.ReadOnly = true;
+            this.MSBColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.MSBColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // TypeColumn
+            // 
+            this.TypeColumn.HeaderText = "Type";
+            this.TypeColumn.Name = "TypeColumn";
+            this.TypeColumn.ReadOnly = true;
+            this.TypeColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.TypeColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // FPGAColumn
+            // 
+            this.FPGAColumn.HeaderText = "FPGA";
+            this.FPGAColumn.Name = "FPGAColumn";
+            this.FPGAColumn.ReadOnly = true;
+            this.FPGAColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.FPGAColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // InitColumn
+            // 
+            this.InitColumn.HeaderText = "Init";
+            this.InitColumn.Name = "InitColumn";
+            this.InitColumn.ReadOnly = true;
+            this.InitColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.InitColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // CommentColumn
+            // 
+            this.CommentColumn.HeaderText = "Comment";
+            this.CommentColumn.Name = "CommentColumn";
+            this.CommentColumn.ReadOnly = true;
+            this.CommentColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.CommentColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // IndexColumn
+            // 
+            this.IndexColumn.HeaderText = "Index";
+            this.IndexColumn.Name = "IndexColumn";
+            this.IndexColumn.ReadOnly = true;
+            this.IndexColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.IndexColumn.Visible = false;
+            // 
+            // SecondaryIndexColumn
+            // 
+            this.SecondaryIndexColumn.HeaderText = "SecondaryIndex";
+            this.SecondaryIndexColumn.Name = "SecondaryIndexColumn";
+            this.SecondaryIndexColumn.ReadOnly = true;
+            this.SecondaryIndexColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.SecondaryIndexColumn.Visible = false;
+            // 
+            // PathToFile
+            // 
+            this.PathToFile.AutoSize = true;
+            this.PathToFile.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.PathToFile.Location = new System.Drawing.Point(148, 19);
+            this.PathToFile.Margin = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this.PathToFile.Name = "PathToFile";
+            this.PathToFile.Size = new System.Drawing.Size(0, 42);
+            this.PathToFile.TabIndex = 46;
+            // 
             // MappingPackageAutomation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(16F, 31F);
@@ -922,11 +934,11 @@
             this.panel4.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.hierarchicalGridView1)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.panel5.ResumeLayout(false);
             this.panel5.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.hierarchicalGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -987,7 +999,7 @@
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.Panel panel5;
         private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Label PathToFile;
+        private System.Windows.Forms.Label PathToFileLabel;
         private System.Windows.Forms.Label ErrorMessage;
         private HierarchicalGrid.HierarchicalGridColumn Group;
         private HierarchicalGrid.HierarchicalGridColumn NameColumn;
@@ -1003,6 +1015,7 @@
         private HierarchicalGrid.HierarchicalGridColumn Reason;
         private HierarchicalGrid.HierarchicalGridColumn Index;
         private HierarchicalGrid.HierarchicalGridColumn SecondaryIndex;
+        private System.Windows.Forms.Label PathToFile;
         //private System.Windows.Forms.OpenFileDialog openFileDialog1;
     }
 }
