@@ -14,7 +14,7 @@ using System.Diagnostics;
 
 namespace MappingBreakDown
 {
-    public partial class MappingPackageAutomation : Form
+    public partial class MappingBreakDown : Form
     {
 
         public XmlSerializer xs;
@@ -26,7 +26,7 @@ namespace MappingBreakDown
         List<string> displayColumns = new List<string>();
         List<GroupColumn> groupColumns = new List<GroupColumn>();
 
-        public MappingPackageAutomation()
+        public MappingBreakDown()
         {
             InitializeComponent();
             InitFields();
@@ -339,6 +339,11 @@ namespace MappingBreakDown
                 FileValidator fv = new FileValidator(openFileDialog1.FileName);
                 if (fv.IsFileValid())
                 {
+                    DialogResult res = MessageBox.Show("Would you like to clear current table (without saving!)","Warning", MessageBoxButtons.YesNo);
+                    if (res == DialogResult.Yes)
+                    {
+                        Clear_Click(sender, e);
+                    }
                     PathToFile.Text = openFileDialog1.FileName;
                     this.Text = openFileDialog1.FileName.Substring(openFileDialog1.FileName.LastIndexOf("\\")) + " - MappingBreakDown";
                     File.WriteAllText(@"file_path.txt", openFileDialog1.FileName);
@@ -892,11 +897,12 @@ namespace MappingBreakDown
         private void CloseButton_Click(object sender, EventArgs e)
         {
             if (PathToFile.Text.Equals(""))
-                return;
+                Close();
             if (saved)
             {
                 PathToFile.Text = "";
                 File.WriteAllText(@"file_path.txt", "");
+                Close();
             }
             else
             {
@@ -906,6 +912,7 @@ namespace MappingBreakDown
                     //SaveButton_Click(sender, e);
                     PathToFile.Text = "";
                     File.WriteAllText(@"file_path.txt", "");
+                    Close();
                 }
                 else if (dialogResult == DialogResult.No)
                 {
@@ -988,7 +995,11 @@ namespace MappingBreakDown
 
         private void frm_sizeChanged(object sender, EventArgs e)
         {
-            //hierarchicalGridView1.Size = new Size(this.Size.Width, this.Size.Height - this.panel4.Size.Height - 45);
+            Size margin_panel_size = new Size(Width - 40,Height - 80);
+            Size table_size = new Size(margin_panel_size.Width-6, margin_panel_size.Height - 320);
+            panel5.Size = margin_panel_size;
+            hierarchicalGridView1.Size = table_size;
+            ClearButton.Location = new Point(Width - 70, ClearButton.Location.Y);
         }
 
 
@@ -1045,6 +1056,23 @@ namespace MappingBreakDown
             searchBox.Text = "";
             OpenValidation();
             UpdateDataBase();
+        }
+
+        private void help_MenuButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                Process.Start(@"man\\MappingBreakDownMan.pdf");
+            }
+            catch(IOException t)
+            {
+                MessageBox.Show("Could not find manual");
+            }
+        }
+        private void About_MenuButtonClick(object senedr, EventArgs e)
+        {
+            MessageBox.Show(
+                    "MappingPackageAutomation Version 1.0\nCreated By Eran Marchesky and Eli Zeltser as a final project\n\nAdvisors: Dan Shalom and Eli Parente");
         }
     }
 }

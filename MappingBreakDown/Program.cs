@@ -16,7 +16,7 @@ namespace MappingBreakDown
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MappingPackageAutomation());
+            Application.Run(new MappingBreakDown());
         }
     }
 }
