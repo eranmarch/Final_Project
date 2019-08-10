@@ -22,7 +22,7 @@ namespace MappingBreakDown
             this.Chosen_address = 0;
             foreach (RegisterEntry reg in registers)
             {
-                if (!reg.GetRegType().Equals(RegisterEntry.type_field.FIELD))
+                if (!reg.GetRegType().Equals("FIELD"))
                     AddressOpts.Items.Add(reg.GetName());
             }
         }

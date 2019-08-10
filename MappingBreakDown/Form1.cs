@@ -20,6 +20,7 @@ namespace MappingBreakDown
         public XmlSerializer xs;
         List<RegisterEntry> RegList;
         bool saved = true;
+        bool changed = false;
 
         DataTable dtgroups, dtregisters, dtfields;
         DataGridSource GridSource;
@@ -208,7 +209,7 @@ namespace MappingBreakDown
                 MessageBox.Show("Register name can't begin with a digit");
                 return false;
             }
-            if (entry.GetRegType() != RegisterEntry.type_field.FIELD)
+            if (!entry.GetRegType().Equals("FIELD"))
             {
                 int index = -1;
                 for (int i = 0; i < RegList.Count; i++)
@@ -288,6 +289,7 @@ namespace MappingBreakDown
             if (!InputValidation(entry))
                 return;
             AddEntryToTable(entry);
+            changed = true;
             ErrorMessage.Text = "Message: Register named " + RegNameText.Text + " was added";
             InitFields();
             bool finish = false;
@@ -337,17 +339,20 @@ namespace MappingBreakDown
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 FileValidator fv = new FileValidator(openFileDialog1.FileName);
-                if (fv.IsFileValid())
+                //fv.IsFileValid1();
+                if (fv.IsFileValid1())
                 {
-                    DialogResult res = MessageBox.Show("Would you like to clear current table (without saving!)","Warning", MessageBoxButtons.YesNo);
-                    if (res == DialogResult.Yes)
+                    TypeOpts.DataSource = fv.f_type;
+                    FPGAOpts.DataSource = fv.field_type1;
+                    if (changed)
                     {
-                        Clear_Click(sender, e);
+                        DialogResult res = MessageBox.Show("Would you like to clear current table (without saving!)", "Warning", MessageBoxButtons.YesNo);
+                        if (res == DialogResult.Yes)
+                            Clear_Click(sender, e);
                     }
                     PathToFile.Text = openFileDialog1.FileName;
                     this.Text = openFileDialog1.FileName.Substring(openFileDialog1.FileName.LastIndexOf("\\")) + " - MappingBreakDown";
                     File.WriteAllText(@"file_path.txt", openFileDialog1.FileName);
-                    Console.WriteLine("Adding entries to table...");
                     AddManyRegisters(fv.GetRegList(), fv.GetGroups());
                 }
             }
@@ -411,13 +416,15 @@ namespace MappingBreakDown
                 MessageBox.Show("This register is a comment and can't be edited");
                 return;
             }
-            Enum.TryParse(type, out RegisterEntry.type_field t);
+            /*Enum.TryParse(type, out RegisterEntry.type_field t);
             RegisterEntry.type_field s = entry.GetRegType();
             if ((s == RegisterEntry.type_field.FIELD && t != RegisterEntry.type_field.FIELD) ||
-                s != RegisterEntry.type_field.FIELD && t == RegisterEntry.type_field.FIELD)
+                s != RegisterEntry.type_field.FIELD && t == RegisterEntry.type_field.FIELD)*/
+            if (entry.GetRegType().Equals("FIELD") && !type.Equals("FIELD")||
+                !entry.GetRegType().Equals("FIELD") && type.Equals("FIELD"))
             {
                 MessageBox.Show("Can't edit a field or create one using Load");
-                TypeOpts.SelectedIndex = (int)s;
+                //TypeOpts.SelectedIndex = (int)s;
                 return;
             }
             if (!RegisterEntry.IsValidLsbMsb(msb, lsb))
@@ -425,8 +432,7 @@ namespace MappingBreakDown
                 MessageBox.Show("Can't edit an entry to have LSB > MSB");
                 return;
             }
-            Enum.TryParse(fpga, out RegisterEntry.fpga_field r);
-            entry.EditRegister(mais, lsb, msb, t, r, init, comment, group);
+            entry.EditRegister(mais, lsb, msb, type, fpga, init, comment, group);
             OpenValidation();
             UpdateDataBase();
             EditCell(node, entry.GetTableEntry());
@@ -472,28 +478,22 @@ namespace MappingBreakDown
             FileStream fs;
             try
             {
-                Console.WriteLine("Restoring registers from inner file 'registers.txt':");
                 fs = new FileStream(@"registers.txt", FileMode.Open, FileAccess.Read);
                 RegList = (List<RegisterEntry>)xs.Deserialize(fs);
                 fs.Close();
                 UpdateTable();
-                Console.WriteLine("SUCCESS");
             }
             catch (Exception e)
             {
-                Console.WriteLine("FAILED\nException caught: " + e.Message + "\nReseting list...");
                 RegList = new List<RegisterEntry>();
                 hierarchicalGridView1.Nodes.Add("");
             }
             try
             {
-                Console.Write("Restoring opened file from 'file_path.txt': ");
                 PathToFile.Text = File.ReadAllText(@"file_path.txt");
-                Console.WriteLine("SUCCESS");
             }
             catch (Exception e)
             {
-                Console.WriteLine("FAILED\nException caught: " + e.Message + "\nReseting path...");
                 PathToFile.Text = "";
             }
         }
@@ -512,11 +512,9 @@ namespace MappingBreakDown
                 group = entry.GetGroup();
                 if (!RegGroupOpts.Items.Contains(group))
                 {
-                    Console.WriteLine("Adding group " + group);
                     RegGroupOpts.Items.Add(group);
                     dtgroups.Rows.Add(group);
                 }
-                Console.WriteLine("Adding register " + entry.GetName());
                 //entry.Index = RegList.IndexOf(entry);
                 object[] ent = entry.GetTableEntry();
                 dtregisters.Rows.Add(ent);
@@ -524,7 +522,6 @@ namespace MappingBreakDown
                 List<RegisterEntry> fields = entry.GetFields();
                 foreach (RegisterEntry field in fields)
                 {
-                    Console.WriteLine("Adding field " + field.GetName() + " to register " + entry.GetName());
                     //field.Index = entry.Index;
                     //field.SecondaryIndex = entry.GetFields().IndexOf(field);
                     dtfields.Rows.Add(field.GetTableEntry());
@@ -541,7 +538,7 @@ namespace MappingBreakDown
 
         private void AddEntryToTable(RegisterEntry entry, bool open = false)
         {
-            bool isField = entry.GetRegType() == RegisterEntry.type_field.FIELD;
+            bool isField = entry.GetRegType().ToUpper().Equals("FIELD");
             if (isField)
             {
                 RegList[entry.GetIndex()].AddField(entry);
@@ -562,7 +559,6 @@ namespace MappingBreakDown
 
         private void AddManyRegisters(List<RegisterEntry> entries, List<string> groups)
         {
-            Console.Write("Adding groups: ");
             foreach (string group in groups)
                 if (!RegGroupOpts.Items.Contains(group))
                 {
@@ -570,9 +566,7 @@ namespace MappingBreakDown
                     dtgroups.Rows.Add(group);
                 }
             //RegGroupOpts.DataSource = dtgroups.AsEnumerable().Select(r => r.Field<string>("Group")).ToList();
-            Console.Write("DONE\n");
             List<RegisterEntry> fields;
-            Console.Write("Adding registers: ");
             foreach (RegisterEntry entry in entries)
             {
                 AddEntryToTable(entry, true);
@@ -583,7 +577,6 @@ namespace MappingBreakDown
                     dtfields.Rows.Add(field.GetTableEntry());
                 }
             }
-            Console.Write("DONE\nValidating logic with table: ");
             OpenValidation();
             UpdateDataBase();
             hierarchicalGridView1.DataSource = GridSource;
@@ -592,7 +585,6 @@ namespace MappingBreakDown
             hierarchicalGridView1.Columns["Index"].Visible = false;
             hierarchicalGridView1.Columns["SecondaryIndex"].Visible = false;
             ColorInValid();
-            Console.WriteLine("DONE");
         }
 
         private void SaveAsButton_Click(object sender, EventArgs e)
@@ -864,10 +856,11 @@ namespace MappingBreakDown
             RegList.Clear();
             dtfields.Clear();
             dtregisters.Clear();
-            //dtgroups.Clear(); //might update to allow removing groups
+            //dtgroups.Clear(); 
             UpdateDataBase();
             InitFields();
             hierarchicalGridView1.DataSource = GridSource;
+            changed = false;
         }
 
         private void RegNameText_KeyUp(object sender, KeyEventArgs e)
@@ -1072,7 +1065,7 @@ namespace MappingBreakDown
         private void About_MenuButtonClick(object senedr, EventArgs e)
         {
             MessageBox.Show(
-                    "MappingPackageAutomation Version 1.0\nCreated By Eran Marchesky and Eli Zeltser as a final project\n\nAdvisors: Dan Shalom and Eli Parente");
+                    "MappingPackageAutomation Version 1.2\nCreated By Eran Marchesky and Eli Zeltser as a final project\n\nAdvisors: Dan Shalom and Eli Parente");
         }
     }
 }
