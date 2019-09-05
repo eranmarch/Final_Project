@@ -60,7 +60,7 @@ namespace HierarchicalGrid
             { _dataSet = value; }
         }
 
-        public List<String> DisplayColumns
+        public List<string> DisplayColumns
         {
             get
             {

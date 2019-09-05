@@ -51,7 +51,6 @@
             this.AddressOpts.Name = "AddressOpts";
             this.AddressOpts.Size = new System.Drawing.Size(145, 21);
             this.AddressOpts.TabIndex = 1;
-            this.AddressOpts.SelectedIndexChanged += new System.EventHandler(this.AddressOpts_SelectedIndexChanged);
             // 
             // OKButton
             // 
@@ -73,7 +72,6 @@
             this.Controls.Add(this.label1);
             this.Name = "ChooseAddressPrompt";
             this.Text = "Form2";
-            this.Load += new System.EventHandler(this.ChooseAddressPrompt_Load_1);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -9,12 +9,9 @@ using System.IO;
 
 namespace MappingBreakDown
 {
-    public class RegisterEntry //: IComparable<RegisterEntry>
+    public class RegisterEntry 
     {
         /* Globals */
-        //public enum type_field { RD, WR, RD_WR, FIELD };
-        //public enum fpga_field { G, D, A, B, C, ABC, ABCG };
-
         public static string[] valid_type = { "RD", "WR", "RD_WR", "FIELD" } ;
         public static string[] valid_fpga = { "G", "D", "A", "B", "C", "ABC", "ABCG" };
 
@@ -25,14 +22,13 @@ namespace MappingBreakDown
         public int LSB { get; set; }
         public int MSB { get; set; }
         public string Type;
-        //public type_field Type { get; set; }
         public string FPGA;
-        //public fpga_field FPGA { get; set; }
         public string Init { get; set; }
         public string Comment { get; set; }
         public string Group { get; set; }
         public List<RegisterEntry> Fields { get; set; }
         public bool IsValid { get; set; }
+        public bool IsReserved { get; set; }
         public bool IsComment { get; set; }
         public string Reason { get; set; }
         public int Index { get; set; }
@@ -40,9 +36,12 @@ namespace MappingBreakDown
 
         public static string pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124])[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*,[ \t]*(--[ \t]*(.*)[ \t]*)*";
         public static string final_pattern = @"^[ \t]*\(([a-zA-Z][a-zA-Z0-9_]*)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([0124])[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*(\d+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*([a-zA-Z_]+)[ \t]*,[ \t]*(\w+)[ \t]*\)[ \t]*(--[ \t]*(.*)[ \t]*)*";
+        public static bool last_flag = false;
 
         /* Constructors */
         public RegisterEntry() : this("", -1, 0, 0, 31, "RD", "G", "", "", "") { }
+
+        public RegisterEntry(string comment, string group) : this("", -1, 0, 0, 31, "", "", "", comment, group) { }
 
         public RegisterEntry(string Name, int Address, int MAIS, int LSB, int MSB,
             string Type, string FPGA, string Init, string Comment, string Group)
@@ -67,15 +66,19 @@ namespace MappingBreakDown
 
         public RegisterEntry(string Name, int Address, string MAIS, string LSB, string MSB,
             string type, string FPGA, string Init, string Comment, string Group) :
-            /*this(Name, Address, int.Parse(MAIS), int.Parse(LSB), int.Parse(MSB),
-                (type_field)Enum.Parse(typeof(type_field), type, true),
-                (fpga_field)Enum.Parse(typeof(fpga_field), FPGA, true),
-                Init, Comment, Group)*/
-                this(Name,Address,int.Parse(MAIS),int.Parse(LSB),int.Parse(MSB),type,FPGA,Init,Comment,Group)
-        { }
+                this(Name,
+                    Address,
+                    int.Parse(MAIS),
+                    int.Parse(LSB),
+                    int.Parse(MSB),
+                    type,
+                    FPGA,
+                    Init,
+                    Comment,
+                    Group) { }
 
         /* Get and Set functions */
-        public String GetName()
+        public string GetName()
         {
             return Name;
         }
@@ -155,7 +158,7 @@ namespace MappingBreakDown
             this.Init = Init;
         }
 
-        public String GetComment()
+        public string GetComment()
         {
             return Comment;
         }
@@ -165,7 +168,7 @@ namespace MappingBreakDown
             this.Comment = Comment;
         }
 
-        public String GetGroup()
+        public string GetGroup()
         {
             return Group;
         }
@@ -222,6 +225,20 @@ namespace MappingBreakDown
             this.IsComment = IsComment;
         }
 
+        public bool GetIsReserved()
+        {
+            return IsReserved;
+        }
+
+        public void SetIsReserved(bool IsReserved)
+        {
+            this.IsReserved = IsReserved;
+            foreach (RegisterEntry field in Fields)
+            {
+                field.SetIsReserved(IsReserved);
+            }
+        }
+
         public int GetIndex()
         {
             return Index;
@@ -240,6 +257,11 @@ namespace MappingBreakDown
         public void SetSecondaryIndex(int index)
         {
             SecondaryIndex = index;
+        }
+
+        public static void ResetLastFlag()
+        {
+            last_flag = false;
         }
 
         /* Validation Functions */
@@ -312,7 +334,7 @@ namespace MappingBreakDown
             return string.Concat(Enumerable.Repeat(" ", x));
         }
 
-        public static RegisterEntry RegEntryParse(String str_entry, String group, bool last)
+        /*public static RegisterEntry RegEntryParse(string str_entry, string group, bool last)
         {
             string actual = pattern;
             if (last)
@@ -328,22 +350,66 @@ namespace MappingBreakDown
                 return new RegisterEntry(fields[1], Int32.Parse(fields[2]), fields[3], fields[4], fields[5], fields[6], fields[7], fields[8], comment, group);
             }
             return null;
-        }
+        }*/
 
         public static RegisterEntry RegEntryParse(string str_entry)
         {
-            string actual = @"\s*\(\s*([A-Za-z][A-Za-z0-9_]*)\s*,\s*(\d*)\s*,\s*([0-4])\s*\s*,\s*(\d)+\s*,\s*(\d)+\s*,\s*([a-zA-Z0-9_]*)\s*,\s*(\w+)\s*,\s*(.+)\s*\),?\s*(?:--\s*(.*))?";
-            string[] fields = Regex.Split(str_entry, actual);
-            if (fields.Length > 1)
+            //string actual = @"\s*\(\s*([A-Za-z][A-Za-z0-9_]*)\s*,\s*(\d+)\s*,\s*([0-4])\s*\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([a-zA-Z0-9_]*)\s*,\s*(\w+)\s*,\s*(.+)\s*\),?\s*(--\s*(.*))*";
+            string entry_pattern = @"\s*(--)?([Rr])?\s*\(";        // is reserved
+            entry_pattern += @"([A-Za-z][A-Za-z0-9_]*)\s*,";    // name
+            entry_pattern += @"\s*(\d+)\s*,";                   // addres
+            entry_pattern += @"\s*([0-4])\s*,";                 // MAIS
+            entry_pattern += @"\s*(\d+)\s*,";                   // LSB 
+            entry_pattern += @"\s*(\d+)\s*,";                   // MSB
+            entry_pattern += @"\s*([A-Z_]*)\s*,";               // Type
+            entry_pattern += @"\s*([A-Z_]*)\s*,";               // FPGA
+            entry_pattern += @"\s*(.+)\)";                      // init
+
+            entry_pattern += @"(,)?(?:[ \t]*--\s*(.*)[ \t]*)?";   // possible comment
+
+            // Split by regex
+            Match match = Regex.Match(str_entry, entry_pattern);
+
+            if (!match.Success)
+                return null;
+
+            GroupCollection fields = match.Groups;
+            string comment = "";
+
+            if (!IsValidType(fields[8].ToString()) || !IsValidFPGA(fields[9].ToString()))
+                return null;
+
+            if (!last_flag && !fields[11].Success)
+                last_flag = true;
+
+            if (fields[12].Success)
+                comment = fields[12].ToString();
+
+            RegisterEntry res =  new RegisterEntry(
+                fields[3].ToString(),
+                Int32.Parse(fields[4].ToString()),
+                fields[5].ToString(),
+                fields[6].ToString(),
+                fields[7].ToString(),
+                fields[8].ToString(),
+                fields[9].ToString(),
+                fields[10].ToString(),
+                comment,
+                "");
+
+            if (fields[1].Success && !fields[2].Success)
+                return null;
+
+            if (fields[1].Success)
             {
-                string comment = "";
-                if (fields.Length == 12)
-                    comment = fields[10];
-                if (!IsValidType(fields[6]) || !IsValidFPGA(fields[7]))
-                    return null;
-                return new RegisterEntry(fields[1], Int32.Parse(fields[2]), fields[3], fields[4], fields[5], fields[6], fields[7], fields[8], comment, "");
+                res.IsReserved = true;
+                last_flag = false;
             }
-            return null;
+            else
+                res.IsReserved = false;
+
+            return res;
+
         }
         public void EditRegister(string mais, string lsb, string msb, string t, string r, string init, string comment, string group)
         {
@@ -363,7 +429,10 @@ namespace MappingBreakDown
             string res = "";
 
             if (IsComment)
-                res += "--";
+                return "\t\t-- " + Comment + "\n";
+
+            if (IsReserved)
+                res += "--R";
 
             if (!Type.ToUpper().Equals("FIELD"))
                 res += "\t\t\t\t" + Name + ",\n";
@@ -375,10 +444,16 @@ namespace MappingBreakDown
         public string ToXMLstring()
         {
             string res = "";
+
             if (IsComment)
                 res += "<tr bgcolor = 'green'>";
+
+            else if (IsReserved)
+                res += "<tr bgcolor = 'blue'>";
+
             else if (!IsValid)
                 res += "<tr bgcolor = 'red'>";
+
             else
                 res += "<tr>";
             res += "<td>" + Name;
@@ -397,10 +472,16 @@ namespace MappingBreakDown
         public string ToEntry(bool last = false)
         {
             string res = "";
+
             if (IsComment)
-                res += "--";
+                return "\t\t-- " + Comment + "\n";
+
+            if (IsReserved)
+                res += "--R";
+
             if (Type.ToUpper().Equals("FIELD"))
                 res += "\t\t\t\t\t" + "(" + Name + getSpaces(35 - Name.Length) + ",";
+
             else
                 res += "\t\t\t\t" + "(" + Name + getSpaces(39 - Name.Length) + ",";
 
@@ -430,57 +511,43 @@ namespace MappingBreakDown
 
         public object[] GetTableEntry()
         {
-            return new object[] { Group, Name, Address, MAIS, LSB, MSB, Type, FPGA, Init, Comment, IsValid, Reason, Index, SecondaryIndex };
+            if (!IsComment)
+                return new object[] {
+                    Group,
+                    Name,
+                    Address.ToString(),
+                    MAIS.ToString(),
+                    LSB.ToString(),
+                    MSB.ToString(),
+                    Type,
+                    FPGA,
+                    Init,
+                    Comment,
+                    IsComment,
+                    IsReserved,
+                    IsValid,
+                    Reason,
+                    Index,
+                    SecondaryIndex
+            };
+            else
+                return new object[] {
+                    Group,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    Comment,
+                    true,
+                    false,
+                    true,
+                    "Comment line",
+                    Index,
+                    SecondaryIndex };
         }
-
-        /*public int CompareTo(RegisterEntry other)
-        {
-            int comp = Name.CompareTo(other.GetName());
-            if (comp < 0)
-                return -1;
-            else if (comp > 0)
-                return 1;
-            comp = Address.CompareTo(other.GetAddress());
-            if (comp < 0)
-                return -1;
-            else if (comp > 0)
-                return 1;
-            comp = MAIS.CompareTo(other.GetMAIS());
-            if (comp < 0)
-                return -1;
-            else if (comp > 0)
-                return 1;
-            comp = LSB.CompareTo(other.GetLSB());
-            if (comp < 0)
-                return -1;
-            else if (comp > 0)
-                return 1;
-            comp = MSB.CompareTo(other.GetMSB());
-            if (comp < 0)
-                return -1;
-            else if (comp > 0)
-                return 1;
-            comp = Type.CompareTo(other.GetRegType());
-            if (comp < 0)
-                return -1;
-            else if (comp > 0)
-                return 1;
-            comp = FPGA.CompareTo(other.GetFPGA());
-            if (comp < 0)
-                return -1;
-            else if (comp > 0)
-                return 1;
-            comp = Init.CompareTo(other.GetInit());
-            if (comp < 0)
-                return -1;
-            else if (comp > 0)
-                return 1;
-            comp = Group.CompareTo(other.GetGroup());
-            if (comp < 0)
-                return -1;
-            else if (comp > 0)
-                return 1;
-            return 0;
-        }*/
     }
 }

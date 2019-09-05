@@ -18,21 +18,20 @@ namespace MappingBreakDown
 
         public List<string> f_type { get; set; }
         public List<string> fpga_type { get; set; }
-        public List<string> field_type1 { get; set; }
 
-        private String path_to_file;
+        private string path_to_file;
         private char[] charsToTrimGlobal = { ' ', '\t' , '\r'};
-        private String[] keywords = { "signal", "bus", "component", "wait" };
-        private String[] field_type = { "name", "address", "MAIS", "LSB", "MSB", "type", "FPGA", "INIT" };
-        private String[] valid_type = { "rd", "wr", "rd_wr", "field" };
-        private String[] valid_fpga = { "g", "d", "a", "b", "c", "abc", "abcg" };
-        private String path_to_correct = "mycorrect.txt";
+        private string[] keywords = { "signal", "bus", "component", "wait" };
+        private string[] field_type = { "name", "address", "MAIS", "LSB", "MSB", "type", "FPGA", "INIT" };
+        private string[] valid_type = { "rd", "wr", "rd_wr", "field" };
+        private string[] valid_fpga = { "g", "d", "a", "b", "c", "abc", "abcg" };
+        private string path_to_correct = "mycorrect.txt";
         readonly string pattern = @"^[ \t]*--[ \t]*(.*)[ \t]*";
         private string[] vhdl_names = { "abs", "access", "after", "alias", "all", "and", "architecture", "array", "assert", "attribute", "begin", "block", "body", "buffer", "bus", "case", "component", "configuration", "constant", "disconnect", "downto", "else", "elsif", "end", "entity", "exit", "file", "for", "function", "generate", "generic", "group", "guarded", "if", "impure", "in", "inertial", "inout", "is", "label", "library", "linkage", "literal", "loop", "map", "mod", "nand", "new", "next", "nor", "not", "null", "of", "on", "open", "or", "others", "out", "package", "port", "postponed", "procedure", "process", "pure", "range", "record", "register", "reject", "rem", "report", "return", "rol", "ror", "select", "severity", "signal", "shared", "sla", "sll", "sra", "srl", "subtype", "then", "to", "transport", "type", "unaffected", "units", "until", "use", "variable", "wait", "when", "while", "with", "xnor", "xor" };
 
         enum Cmp_mod { Start, Reg_names, Middle, Reg_entrys, End };
 
-        public FileValidator(String path_to_file)
+        public FileValidator(string path_to_file)
         {
             this.path_to_file = path_to_file;
             Registers = new List<RegisterEntry>();
@@ -55,14 +54,14 @@ namespace MappingBreakDown
             return names;
         }
 
-        private String TrimAndLower(String str)
+        private string TrimAndLower(string str)
         {
             str = str.Trim(charsToTrimGlobal);
             str = str.ToLower();
             return str;
         }
 
-        private String RemoveComment(String str)
+        private string RemoveComment(string str)
         {
             int comment_index = 0;
             if (-1 != (comment_index = str.IndexOf("--")))
@@ -72,26 +71,22 @@ namespace MappingBreakDown
             return str;
         }
 
-        private bool IsNotComment(String str)
+        private bool IsNotComment(string str)
         {
             return !str.StartsWith("#");
         }
 
-        private bool isNotCommentMakaf(String str)
-        {
-            return !str.StartsWith("--");
-        }
-
-        private bool IsValidRegName(String reg_name)
+        private bool IsValidRegName(string reg_name)
         {
             string pattern = @"^[ \t]*([a-zA-Z][a-zA-Z0-9_]*)[ \t]*,[ \t]*";
             Match result = Regex.Match(reg_name, pattern);
             if (result.Success)
             {
                 string[] substrings = Regex.Split(reg_name, pattern);
+
                 if (vhdl_names.Contains(substrings[1]))
                     return false;
-                //MessageBox.Show(substrings[1] + " " + substrings[1].Length.ToString());
+
                 names.Add(substrings[1]);
                 return true;
             }
@@ -101,8 +96,11 @@ namespace MappingBreakDown
         private RegisterEntry FindAtAdress(int i)
         {
             foreach (RegisterEntry entry in Enumerable.Reverse(Registers))
+            {
                 if (entry.GetAddress() == i)
                     return entry;
+            }
+
             return null;
         }
 
@@ -111,108 +109,175 @@ namespace MappingBreakDown
             string input = File.ReadAllText(path_to_file);
             
             // Get list of name definitions
-            Match sliced = Regex.Match(input, @"type\s+avalon_map_defenition\s+is\s+\((.*?)\s+last_deff\s*\)\s*;", RegexOptions.Singleline);
+            Match sliced = Regex.Match(input, @"type\s+avalon_map_defenition\s+is\s+\((.*?)\s+last_deff\s*\)\s*;",
+                RegexOptions.Singleline);
+
             if (!sliced.Success)
             {
                 MessageBox.Show("COMPILATION 1: could not find name definitions");
                 return false;
             }
-            string cur_pattern = @"([a-zA-Z][a-zA-Z0-9_]*)\s*,";
-            MatchCollection matches = Regex.Matches(sliced.Groups[1].ToString(), cur_pattern);
+
+            //string cur_pattern = @"\s*(?:--[Rr])?\s*([a-zA-Z][a-zA-Z0-9_]*)\s*,";
+            string cur_pattern = @"^\s*([a-zA-Z][a-zA-Z0-9_]*)\s*,";
+            MatchCollection matches = Regex.Matches(sliced.Groups[1].ToString(), cur_pattern,RegexOptions.Multiline);
+
             foreach (Match match in matches)
                 names.Add(match.Groups[1].Value);
 
             // Get list of RW_type
             f_type = new List<string>();
             sliced = Regex.Match(input, @"type\s+RW_type\s+is\s+\(((?:.*?)\))", RegexOptions.Singleline);
+
             if (!sliced.Success)
             {
                 MessageBox.Show("COMPILATION 1: could not find RW_type");
+                names = new List<string>();
                 return false;
             }
+
             cur_pattern = @"([A-Z_]*)[,)]";
             matches = Regex.Matches(sliced.Groups[1].ToString(), cur_pattern);
+
             foreach (Match match in matches)
                 f_type.Add(match.Groups[1].Value);
 
             RegisterEntry.valid_type = f_type.ToArray();
+            
             // Get list of fpga_type
             fpga_type = new List<string>();
             sliced = Regex.Match(input, @"type\s+fpga_type\s+is\s+\(((?:.*?)\))\s*;");
+
             if (!sliced.Success)
             {
                 MessageBox.Show("COMPILATION 1: could not find fpga_type");
+                names = new List<string>();
+                f_type = new List<string>();
                 return false;
             }
+
             cur_pattern = @"([A-Z]*)[,\)]";
             matches = Regex.Matches(sliced.Groups[1].ToString(), cur_pattern);
-            foreach(Match match in matches)
+
+            foreach (Match match in matches)
                 fpga_type.Add(match.Groups[1].ToString());
 
             RegisterEntry.valid_fpga = fpga_type.ToArray();
+            
             // Get the register entries
             sliced = Regex.Match(input, @"constant\s+avalon_fields_table\s*:\s*fields_table_type\s*:=\s*\((.*?)\)\s*;",RegexOptions.Singleline);
+
+	    if (!sliced.Success){
+		    MessageBox.Show("COMPILATION 1: could not find avalon field table");
+		    names = new List<string>();
+		    f_type = new List<string>();
+		    fpga_type = new List<string>();
+		    return false;
+	    }
+
             string[] string_entries = sliced.Groups[1].ToString().Split("\n".ToCharArray());
-            string curr_group = "", prev_group = ""; 
+            string group = "";
+
             for (int i = 0; i < string_entries.Length; i++)
             {
                 string_entries[i] = string_entries[i].Trim(charsToTrimGlobal);
-                if (string_entries[i].Equals("") || string_entries[i].Equals("--"))
+
+                if (string_entries[i].Equals(""))
                     continue;
 
-                // skip this as group
+                // skip this comment - its always the first line of the table for formatting
                 if (Regex.Match(string_entries[i], @"^--\s*field name or port name").Success)
                     continue;
-                Match match = Regex.Match(string_entries[i], @"^\s*--\s*(.*)\s*");
-                RegisterEntry entry = RegisterEntry.RegEntryParse(string_entries[i]);
 
-                if (match.Success)
-                    curr_group = match.Groups[1].ToString();
+                // Check if "Group" comment
+                Match match = Regex.Match(string_entries[i], @"^\s*--[Gg]\s*(.*)\s*");
 
-                // interpret as a group name
-                if (match.Success && entry == null) { 
-                    if (!Groups.Contains(curr_group))
-                        Groups.Add(curr_group);
-                    prev_group = curr_group;
+                if (match.Success) {
+                    group = match.Groups[1].ToString();
+                    if (!Groups.Contains(group))
+                        Groups.Add(group);
+
                     continue;
                 }
-                if (entry != null)
+                // Try parsing the line as a register or field. possibly a commented
+                RegisterEntry entry = RegisterEntry.RegEntryParse(string_entries[i]);
+                if (entry == null) // failed to parse as an entry
                 {
-                    curr_group = prev_group;
-                    entry.SetGroup(curr_group);
-                    // parse as commented entry
+                    // Check if line is a simple comment
+                    match = Regex.Match(string_entries[i], @"^\s*--\s*(.*)\s*");
                     if (match.Success)
-                        entry.SetIsComment(true);
+                    {
+                        RegisterEntry.ResetLastFlag();
+                        RegisterEntry comment = new RegisterEntry(match.Groups[1].ToString(), group);
+                        comment.SetIsComment(true);
+                        Registers.Add(comment);
+                    }
+
+                    else
+                    {
+                        MessageBox.Show("COMPILATION 2: cannot parse " + string_entries[i]);
+                        return false;
+                    }
+                }
+                else // parsed as a register or field
+                {
+                    entry.SetGroup(group);
 
                     string type = entry.GetRegType().ToString();
-                    // Add to fields
+
+                    // Add to fields of the register
                     if (type.ToLower().Equals("field"))
                     {
                         int address = entry.GetAddress();
                         RegisterEntry re = FindAtAdress(address);
+
                         if (null != FindAtAdress(address))
                             re.AddField(entry);
+
                         else
                         {
                             MessageBox.Show("COMPILATION 2: cannot parse " + string_entries[i]);
                             return false;
                         }
                     }
-                    else // regular add
+                    else // add as a register
                         Registers.Add(entry);
-                }
-                else
-                {
-                    MessageBox.Show("COMPILATION 2: cannot parse " + string_entries[i]);
-                    return false;
+
+                    if (RegisterEntry.last_flag)
+                        break;
                 }
             }
-            if (!NamesCrossValid())
+            // 
+            if (!RegisterEntry.last_flag)
+            {
+                MessageBox.Show("COMPILATION 3: invalid format of last entry, check for '),' ");
+                RegisterEntry.ResetLastFlag();
                 return false;
+            }
+            // Logic Check
+            if (!NamesCrossValid())
+            {
+                RegisterEntry.ResetLastFlag();
+                return false;
+            }
             ValidRegLogic();
+
+            // write template file
+            string template = Regex.Replace(
+                input,
+                @"type\s+avalon_map_defenition\s+is\s+\((.*?)\s+last_deff\s*\)\s*;",
+                "type        avalon_map_defenition  is  (\n0o0o0o0o0o0o0o0o0o0o0o0o0o00o0o0o0o0o0o00o0o0o0o0o0\n                last_deff) ;",
+                RegexOptions.Singleline);
+            template = Regex.Replace(
+                template,
+                @"constant\s+avalon_fields_table\s*:\s*fields_table_type\s*:=\s*\((.*?)\)\s*;",
+                "constant    avalon_fields_table     : fields_table_type :=  (\n--               field name or port name, ADDRESS, MAIS, LSB, MSB, TYPE, FPGA, INIT\n0o0o0o0o0o0o0o0o0o0o0o0o0o00o0o0o0o0o0o00o0o0o0o0o0\n                );",
+                RegexOptions.Singleline);
+            File.WriteAllText(@"template.txt", template);
             return true;
         }
-        public bool IsFileValid()
+
+        /*public bool IsFileValid()
         {
             // Prepare texts for comparison: remove comments and convert to lower case
             Console.WriteLine("Preparing to compile " + path_to_file);
@@ -337,7 +402,7 @@ namespace MappingBreakDown
             ValidRegLogic(); // Sematic Analysis, add everything from here
             Console.WriteLine("Compilation is complete");
             return true;
-        }
+        }*/
 
         private void AddressDuplicate()
         {
@@ -368,7 +433,7 @@ namespace MappingBreakDown
             string nameReg, nameField;
             foreach (RegisterEntry entry in Registers)
             {
-                if (entry.GetIsComment())
+                if (entry.GetIsComment() || entry.GetIsReserved())
                     continue;
                 nameReg = entry.GetName().Trim();
                 if (!names.Contains(nameReg))
@@ -379,7 +444,7 @@ namespace MappingBreakDown
                 List<RegisterEntry> fields = entry.GetFields();
                 foreach (RegisterEntry field in fields)
                 {
-                    if (field.GetIsComment())
+                    if (field.GetIsComment() || field.GetIsReserved())
                         continue;
                     nameField = field.GetName().Trim();
                     if (!names.Contains(nameField))
@@ -422,8 +487,9 @@ namespace MappingBreakDown
 
         public static bool ValidEntry(RegisterEntry entry)
         {
-            if (entry.GetIsComment())
+            if (entry.GetIsComment() || entry.GetIsReserved())
                 return true;
+
             bool b = true;
             if (!entry.IsValidAddress())
             {
