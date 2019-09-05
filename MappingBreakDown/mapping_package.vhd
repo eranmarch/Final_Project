@@ -1,8 +1,8 @@
 ----------------------------------------------------------------
 -- Orbotech Ltd. 
 -- PCB Division, AOI Department 
--- System(s)      : FUSION
--- Card           : "MVC_2"  
+-- System(s)      : Kuku
+-- Card           : "kuku2_2_2"  
 -- Name           : mapping_package.vhd 
 -- Author         : Danny Shalom. 
 -- Entity description:
@@ -13,7 +13,7 @@
 --
 
 library ieee;
-use ieee.std_logic_1164.all;
+use ieee.std_logic_1164.all.jackshit;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 use work.global_package_top.all ;

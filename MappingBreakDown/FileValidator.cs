@@ -299,9 +299,19 @@ namespace MappingBreakDown
             for (int i = 0; i < lines.Length; i++)
             {
                 // Skip empty lines
-                lines_correct[j] = RemoveComment(lines_correct[j]);
-                while (j < lines_correct.Length && lines_correct[j].Equals(""))
+                //lines_correct[j] = RemoveComment(lines_correct[j]);
+                string line = lines_correct[j];
+                //bool b1 = Regex.Match(lines_correct[j], @"^[ \t\r\n]*").Success;
+                bool b1 = string.IsNullOrWhiteSpace(lines_correct[j]);
+                bool b2 = Regex.Match(lines_correct[j], @"^[ \t]*--(.*)").Success;
+                while (j < lines_correct.Length && (lines_correct[j].Equals("") || b1 || b2))
+                {
                     j++;
+                    line = lines_correct[j];
+                    b1 = string.IsNullOrWhiteSpace(lines_correct[j]);
+                    //b1 = Regex.Match(lines_correct[j], @"^[\r\n]*").Success;
+                    b2 = Regex.Match(lines_correct[j], @"^[ \t]*--(.*)").Success;
+                }
                 // Finished current state
                 if (lines_correct[j].Equals("0o0o0o0o0o0o0o0o0o0o0o0o0o00o0o0o0o0o0o00o0o0o0o0o0"))
                 {
@@ -384,9 +394,18 @@ namespace MappingBreakDown
                 }
                 else
                 {
-                    lines[i] = RemoveComment(lines[i]);
-                    while (i < lines.Length && lines[i].Equals(""))
+                    //lines[i] = RemoveComment(lines[i]);
+                    //Match result = Regex.Match(lines[i], @"^[\s]--(.*)");
+                    b1 = string.IsNullOrWhiteSpace(lines[i]);
+                    b2 = Regex.Match(lines[i], @"^[ \t]*--(.*)").Success;
+                    bool b3 = Regex.Match(lines[i], @"^use(.)*").Success || Regex.Match(lines[i], @"^library(.*)").Success;
+                    while (i < lines.Length && (lines[i].Equals("") || b1 || b2 || b3))
+                    {
                         i++;
+                        b1 = string.IsNullOrWhiteSpace(lines[i]);
+                        b2 = Regex.Match(lines[i], @"^[ \t]*--(.*)").Success;
+                        b3 = Regex.Match(lines[i], @"^use(.)*").Success || Regex.Match(lines[i], @"^library(.*)").Success;
+                    }
                     if (!lines_correct[j].Equals(lines[i]))
                     {
                         MessageBox.Show("COMPILATION 4: Invalid file\n" + lines[i] + "\n" + lines_correct[j]);
@@ -397,8 +416,8 @@ namespace MappingBreakDown
                 }
             }
             Console.WriteLine("Logic analysis...");
-             if (!NamesCrossValid())
-               return false;
+            if (!NamesCrossValid())
+                return false;
             ValidRegLogic(); // Sematic Analysis, add everything from here
             Console.WriteLine("Compilation is complete");
             return true;
@@ -474,7 +493,7 @@ namespace MappingBreakDown
                             test = true;
                             break;
                         }
-                    }  
+                    }
                 }
                 if (!test)
                 {
