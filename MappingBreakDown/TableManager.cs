@@ -250,77 +250,6 @@ namespace MappingBreakDown
             collection.Rows.Add(new_row);
         }
 
-
-
-        /*public void AddRegister(string Name, int Address, string MAIS, string LSB, string MSB,
-            string Type, string FPGA, string Init, string Comment, string Group)
-        {            
-            DataRow new_row = dtregisters.NewRow();
-            new_row["Name"] = Name;
-            new_row["Address"] = Address.ToString();
-            new_row["MAIS"] = MAIS;
-            new_row["LSB"] = LSB;
-            new_row["MSB"] = MSB;
-            new_row["Type"] = Type;
-            new_row["FPGA"] = FPGA;
-            new_row["Init"] = Init;
-            new_row["Comment"] = Comment;
-            new_row["Group"] = Group;
-            new_row["Index"] = regsCount();
-            new_row["SecondaryIndex"] = -1;
-            new_row["Reason"] = "";
-            new_row["IsComment"] = false;
-            new_row["IsReserved"] = false;
-            new_row["IsValid"] = true;
-            dtregisters.Rows.Add(new_row);
-        }
-
-        public void AddReserved(string Name, int Address, string MAIS, string LSB, string MSB,
-            string Type, string FPGA, string Init, string Comment, string Group)
-        {
-            DataRow new_row = dtregisters.NewRow();
-            new_row["Name"] = Name;
-            new_row["Address"] = Address.ToString();
-            new_row["MAIS"] = MAIS;
-            new_row["LSB"] = LSB;
-            new_row["MSB"] = MSB;
-            new_row["Type"] = Type;
-            new_row["FPGA"] = FPGA;
-            new_row["Init"] = Init;
-            new_row["Comment"] = Comment;
-            new_row["Group"] = Group;
-            new_row["Index"] = regsCount();
-            new_row["SecondaryIndex"] = -1;
-            new_row["Reason"] = "";
-            new_row["IsComment"] = false;
-            new_row["IsReserved"] = true;
-            new_row["IsValid"] = true;
-            dtregisters.Rows.Add(new_row);
-        }
-
-        public void AddField(string Name, string MAIS, string LSB, string MSB, string FPGA,
-            string Init, string Comment, int Index)
-        {
-            DataRow new_row = dtfields.NewRow();
-            new_row["Name"] = Name;
-            new_row["Address"] = dtregisters.Rows[Index].Field<string>("Address");
-            new_row["MAIS"] = MAIS;
-            new_row["LSB"] = LSB;
-            new_row["MSB"] = MSB;
-            new_row["Type"] = "FIELD";
-            new_row["FPGA"] = FPGA;
-            new_row["Init"] = Init;
-            new_row["Comment"] = Comment;
-            new_row["Group"] = dtregisters.Rows[Index].Field<string>("Group");
-            new_row["Index"] = Index;
-            new_row["SecondaryIndex"] = fieldCount(Index);
-            new_row["Reason"] = "";
-            new_row["IsComment"] = false;
-            new_row["IsReserved"] = false;
-            new_row["IsValid"] = true;
-            dtfields.Rows.Add(new_row);
-        }*/
-
         // Add as a register
         public void AddComment(string Group, string Comment)
         {
@@ -342,30 +271,6 @@ namespace MappingBreakDown
             new_row["IsReserved"] = false;
             new_row["IsValid"] = true;
             dtregisters.Rows.Add(new_row);
-        }
-
-        // Add as a field
-        public void AddComment(string Comment, int Index)
-        {
-            DataRow new_row = dtfields.NewRow();
-            DataRow father_reg = getRegisters()[Index];
-            new_row["Name"] = "";
-            new_row["Address"] = "";
-            new_row["MAIS"] = "";
-            new_row["LSB"] = "";
-            new_row["MSB"] = "";
-            new_row["Type"] = "";
-            new_row["FPGA"] = "";
-            new_row["Init"] = "";
-            new_row["Comment"] = Comment;
-            new_row["Group"] = father_reg.Field<string>("Group");
-            new_row["Index"] = Index;
-            new_row["SecondaryIndex"] = father_reg.GetChildRows("GroupsFieldsRelation").Length;
-            new_row["Reason"] = "";
-            new_row["IsComment"] = false;
-            new_row["IsReserved"] = false;
-            new_row["IsValid"] = true;
-            dtfields.Rows.Add(new_row);
         }
 
         public bool nameValid(string new_name)
@@ -859,17 +764,6 @@ namespace MappingBreakDown
         {
             return dtregisters.Rows.Count;
         }
-
-        /*public int fieldCount(int Index)
-        {
-            int cnt = 0;
-
-            foreach (DataRow field in dtfields.Rows)
-                if (Index == field.Field<int>("Index"))
-                    cnt++;
-            
-            return cnt;
-        }*/
 
         public DataRowCollection getGroups()
         {

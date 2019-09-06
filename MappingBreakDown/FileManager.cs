@@ -514,7 +514,7 @@ namespace MappingBreakDown
             bool last_found = false;
 
             DataRowCollection groups = dbMan.getGroups();
-            for (int k = groups.Count - 1; k>=0; k++)
+            for (int k = groups.Count - 1; k>=0; k--)
             {
                 if (groups[k].GetChildRows("GroupsRegistersRelation").Length == 0)
                     continue;

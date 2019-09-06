@@ -58,11 +58,18 @@
             this.IsCommentCheckBox = new System.Windows.Forms.CheckBox();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.manualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel5 = new System.Windows.Forms.Panel();
+            this.ExpandAll = new System.Windows.Forms.Button();
             this.ErrorMessage = new System.Windows.Forms.Label();
+            this.ClearButton = new System.Windows.Forms.Button();
+            this.UnCommentButton = new System.Windows.Forms.Button();
             this.hierarchicalGridView1 = new HierarchicalGrid.HierarchicalGridView();
             this.Group = new HierarchicalGrid.HierarchicalGridColumn();
             this.NameColumn = new HierarchicalGrid.HierarchicalGridColumn();
@@ -78,6 +85,7 @@
             this.Reason = new HierarchicalGrid.HierarchicalGridColumn();
             this.Index = new HierarchicalGrid.HierarchicalGridColumn();
             this.SecondaryIndex = new HierarchicalGrid.HierarchicalGridColumn();
+            this.CommentButton = new System.Windows.Forms.Button();
             this.Registers = new AdvancedDataGridView.TreeGridColumn();
             this.AddressColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.MAISColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -89,14 +97,6 @@
             this.CommentColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.IndexColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SecondaryIndexColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ExpandAll = new System.Windows.Forms.Button();
-            this.ClearButton = new System.Windows.Forms.Button();
-            this.UnCommentButton = new System.Windows.Forms.Button();
-            this.CommentButton = new System.Windows.Forms.Button();
-            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.manualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel3.SuspendLayout();
             this.panel2.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -144,7 +144,7 @@
             "4"});
             this.MAISOpts.Location = new System.Drawing.Point(60, 83);
             this.MAISOpts.Name = "MAISOpts";
-            this.MAISOpts.Size = new System.Drawing.Size(77, 26);
+            this.MAISOpts.Size = new System.Drawing.Size(88, 26);
             this.MAISOpts.TabIndex = 10;
             // 
             // lable5
@@ -184,7 +184,7 @@
             this.FPGAOpts.FormattingEnabled = true;
             this.FPGAOpts.Location = new System.Drawing.Point(60, 150);
             this.FPGAOpts.Name = "FPGAOpts";
-            this.FPGAOpts.Size = new System.Drawing.Size(77, 26);
+            this.FPGAOpts.Size = new System.Drawing.Size(88, 26);
             this.FPGAOpts.TabIndex = 18;
             // 
             // label3
@@ -204,7 +204,7 @@
             this.TypeOpts.FormattingEnabled = true;
             this.TypeOpts.Location = new System.Drawing.Point(60, 118);
             this.TypeOpts.Name = "TypeOpts";
-            this.TypeOpts.Size = new System.Drawing.Size(77, 26);
+            this.TypeOpts.Size = new System.Drawing.Size(88, 26);
             this.TypeOpts.TabIndex = 20;
             this.TypeOpts.DataSourceChanged += new System.EventHandler(this.TypeOpts_DataSourceChanged);
             // 
@@ -345,7 +345,7 @@
             "31"});
             this.LSBOpts.Location = new System.Drawing.Point(60, 15);
             this.LSBOpts.Name = "LSBOpts";
-            this.LSBOpts.Size = new System.Drawing.Size(77, 26);
+            this.LSBOpts.Size = new System.Drawing.Size(88, 26);
             this.LSBOpts.TabIndex = 35;
             // 
             // MSBOpts
@@ -388,7 +388,7 @@
             "31"});
             this.MSBOpts.Location = new System.Drawing.Point(60, 50);
             this.MSBOpts.Name = "MSBOpts";
-            this.MSBOpts.Size = new System.Drawing.Size(77, 26);
+            this.MSBOpts.Size = new System.Drawing.Size(88, 26);
             this.MSBOpts.TabIndex = 36;
             // 
             // openFileDialog1
@@ -421,7 +421,7 @@
             this.panel3.Location = new System.Drawing.Point(327, 36);
             this.panel3.Margin = new System.Windows.Forms.Padding(1);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(148, 192);
+            this.panel3.Size = new System.Drawing.Size(164, 192);
             this.panel3.TabIndex = 40;
             // 
             // PathToFileLabel
@@ -484,12 +484,36 @@
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
+            // saveToolStripMenuItem
+            // 
+            this.saveToolStripMenuItem.Image = global::MappingBreakDown.Properties.Resources.save;
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+            this.saveToolStripMenuItem.Text = "Save";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.SaveButton_Click);
+            // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
             this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
             this.saveAsToolStripMenuItem.Text = "Save As";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.SaveAsButton_Click);
+            // 
+            // openToolStripMenuItem
+            // 
+            this.openToolStripMenuItem.Image = global::MappingBreakDown.Properties.Resources.open;
+            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+            this.openToolStripMenuItem.Text = "Open";
+            this.openToolStripMenuItem.Click += new System.EventHandler(this.OpenButton_Click);
+            // 
+            // closeToolStripMenuItem
+            // 
+            this.closeToolStripMenuItem.Image = global::MappingBreakDown.Properties.Resources.close;
+            this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+            this.closeToolStripMenuItem.Text = "Close";
+            this.closeToolStripMenuItem.Click += new System.EventHandler(this.CloseButton_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -499,6 +523,14 @@
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.helpToolStripMenuItem.Text = "Help";
+            // 
+            // manualToolStripMenuItem
+            // 
+            this.manualToolStripMenuItem.Image = global::MappingBreakDown.Properties.Resources.help;
+            this.manualToolStripMenuItem.Name = "manualToolStripMenuItem";
+            this.manualToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+            this.manualToolStripMenuItem.Text = "Manual";
+            this.manualToolStripMenuItem.Click += new System.EventHandler(this.help_MenuButtonClick);
             // 
             // aboutToolStripMenuItem
             // 
@@ -528,6 +560,16 @@
             this.panel5.Size = new System.Drawing.Size(1075, 560);
             this.panel5.TabIndex = 45;
             // 
+            // ExpandAll
+            // 
+            this.ExpandAll.Image = global::MappingBreakDown.Properties.Resources.expand;
+            this.ExpandAll.Location = new System.Drawing.Point(347, 290);
+            this.ExpandAll.Name = "ExpandAll";
+            this.ExpandAll.Size = new System.Drawing.Size(23, 22);
+            this.ExpandAll.TabIndex = 46;
+            this.ExpandAll.UseVisualStyleBackColor = true;
+            this.ExpandAll.Click += new System.EventHandler(this.ExpandAll_Click);
+            // 
             // ErrorMessage
             // 
             this.ErrorMessage.AutoSize = true;
@@ -537,6 +579,26 @@
             this.ErrorMessage.Size = new System.Drawing.Size(73, 18);
             this.ErrorMessage.TabIndex = 44;
             this.ErrorMessage.Text = "Message:";
+            // 
+            // ClearButton
+            // 
+            this.ClearButton.Image = global::MappingBreakDown.Properties.Resources.clear;
+            this.ClearButton.Location = new System.Drawing.Point(1041, 291);
+            this.ClearButton.Name = "ClearButton";
+            this.ClearButton.Size = new System.Drawing.Size(22, 21);
+            this.ClearButton.TabIndex = 28;
+            this.ClearButton.UseVisualStyleBackColor = true;
+            this.ClearButton.Click += new System.EventHandler(this.Clear_Click);
+            // 
+            // UnCommentButton
+            // 
+            this.UnCommentButton.Image = global::MappingBreakDown.Properties.Resources.uncomment;
+            this.UnCommentButton.Location = new System.Drawing.Point(318, 290);
+            this.UnCommentButton.Name = "UnCommentButton";
+            this.UnCommentButton.Size = new System.Drawing.Size(23, 22);
+            this.UnCommentButton.TabIndex = 42;
+            this.UnCommentButton.UseVisualStyleBackColor = true;
+            this.UnCommentButton.Click += new System.EventHandler(this.UnCommentButton_Click);
             // 
             // hierarchicalGridView1
             // 
@@ -683,6 +745,16 @@
             this.SecondaryIndex.ReadOnly = true;
             this.SecondaryIndex.Visible = false;
             // 
+            // CommentButton
+            // 
+            this.CommentButton.Image = global::MappingBreakDown.Properties.Resources.comment;
+            this.CommentButton.Location = new System.Drawing.Point(289, 290);
+            this.CommentButton.Name = "CommentButton";
+            this.CommentButton.Size = new System.Drawing.Size(23, 22);
+            this.CommentButton.TabIndex = 41;
+            this.CommentButton.UseVisualStyleBackColor = true;
+            this.CommentButton.Click += new System.EventHandler(this.CommentButton_Click);
+            // 
             // Registers
             // 
             this.Registers.DataPropertyName = "Registers";
@@ -771,78 +843,6 @@
             this.SecondaryIndexColumn.ReadOnly = true;
             this.SecondaryIndexColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.SecondaryIndexColumn.Visible = false;
-            // 
-            // ExpandAll
-            // 
-            this.ExpandAll.Image = global::MappingBreakDown.Properties.Resources.expand;
-            this.ExpandAll.Location = new System.Drawing.Point(347, 290);
-            this.ExpandAll.Name = "ExpandAll";
-            this.ExpandAll.Size = new System.Drawing.Size(23, 22);
-            this.ExpandAll.TabIndex = 46;
-            this.ExpandAll.UseVisualStyleBackColor = true;
-            this.ExpandAll.Click += new System.EventHandler(this.ExpandAll_Click);
-            // 
-            // ClearButton
-            // 
-            this.ClearButton.Image = global::MappingBreakDown.Properties.Resources.clear;
-            this.ClearButton.Location = new System.Drawing.Point(1041, 291);
-            this.ClearButton.Name = "ClearButton";
-            this.ClearButton.Size = new System.Drawing.Size(22, 21);
-            this.ClearButton.TabIndex = 28;
-            this.ClearButton.UseVisualStyleBackColor = true;
-            this.ClearButton.Click += new System.EventHandler(this.Clear_Click);
-            // 
-            // UnCommentButton
-            // 
-            this.UnCommentButton.Image = global::MappingBreakDown.Properties.Resources.uncomment;
-            this.UnCommentButton.Location = new System.Drawing.Point(318, 290);
-            this.UnCommentButton.Name = "UnCommentButton";
-            this.UnCommentButton.Size = new System.Drawing.Size(23, 22);
-            this.UnCommentButton.TabIndex = 42;
-            this.UnCommentButton.UseVisualStyleBackColor = true;
-            this.UnCommentButton.Click += new System.EventHandler(this.UnCommentButton_Click);
-            // 
-            // CommentButton
-            // 
-            this.CommentButton.Image = global::MappingBreakDown.Properties.Resources.comment;
-            this.CommentButton.Location = new System.Drawing.Point(289, 290);
-            this.CommentButton.Name = "CommentButton";
-            this.CommentButton.Size = new System.Drawing.Size(23, 22);
-            this.CommentButton.TabIndex = 41;
-            this.CommentButton.UseVisualStyleBackColor = true;
-            this.CommentButton.Click += new System.EventHandler(this.CommentButton_Click);
-            // 
-            // saveToolStripMenuItem
-            // 
-            this.saveToolStripMenuItem.Image = global::MappingBreakDown.Properties.Resources.save;
-            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
-            this.saveToolStripMenuItem.Text = "Save";
-            this.saveToolStripMenuItem.Click += new System.EventHandler(this.SaveButton_Click);
-            // 
-            // openToolStripMenuItem
-            // 
-            this.openToolStripMenuItem.Image = global::MappingBreakDown.Properties.Resources.open;
-            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
-            this.openToolStripMenuItem.Text = "Open";
-            this.openToolStripMenuItem.Click += new System.EventHandler(this.OpenButton_Click);
-            // 
-            // closeToolStripMenuItem
-            // 
-            this.closeToolStripMenuItem.Image = global::MappingBreakDown.Properties.Resources.close;
-            this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
-            this.closeToolStripMenuItem.Text = "Close";
-            this.closeToolStripMenuItem.Click += new System.EventHandler(this.CloseButton_Click);
-            // 
-            // manualToolStripMenuItem
-            // 
-            this.manualToolStripMenuItem.Image = global::MappingBreakDown.Properties.Resources.help;
-            this.manualToolStripMenuItem.Name = "manualToolStripMenuItem";
-            this.manualToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
-            this.manualToolStripMenuItem.Text = "Manual";
-            this.manualToolStripMenuItem.Click += new System.EventHandler(this.help_MenuButtonClick);
             // 
             // MappingBreakDown
             // 

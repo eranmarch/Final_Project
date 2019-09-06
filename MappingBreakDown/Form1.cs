@@ -164,17 +164,6 @@ namespace MappingBreakDown
                     CommentText.Text,
                     grp,
                     address);
-                //tbMan.AddRegister(
-                //    RegNameText.Text,
-                //    address,
-                //    MAISOpts.Text,
-                //    LSBOpts.Text,
-                //    MSBOpts.Text,
-                //    TypeOpts.Text,
-                //    FPGAOpts.Text,
-                //    init_string,
-                //    CommentText.Text,
-                //    grp);
             }
             else
             {
@@ -206,15 +195,6 @@ namespace MappingBreakDown
                             CommentText.Text,
                             grp,
                             int.Parse(tbMan.getRegisters()[prompt.Index].Field<string>("Address")));
-                        //tbMan.AddField(
-                        //    RegNameText.Text,
-                        //    MAISOpts.Text,
-                        //    LSBOpts.Text,
-                        //    MSBOpts.Text,
-                        //    FPGAOpts.Text,
-                        //    init_string,
-                        //    CommentText.Text,
-                        //    prompt.Index);
                     }
 
                     else
