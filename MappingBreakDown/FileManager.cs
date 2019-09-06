@@ -507,6 +507,48 @@ namespace MappingBreakDown
         {
             string res = "";
             int total_reg_count = 0;
+
+            // Find the last entry that is not a comment
+            Tuple<int, int> last_index_pair = new Tuple<int, int>(-1,-1);
+            int accumulated_reg_index = dbMan.getRegisters().Count - 1;
+            bool last_found = false;
+
+            DataRowCollection groups = dbMan.getGroups();
+            for (int k = groups.Count - 1; k>=0; k++)
+            {
+                if (groups[k].GetChildRows("GroupsRegistersRelation").Length == 0)
+                    continue;
+                DataRow[] regs = groups[k].GetChildRows("GroupsRegistersRelation");
+                for (int i = regs.Length - 1; i >= 0; i--, accumulated_reg_index--)
+                {
+                    if (regs[i].Field<bool>("IsComment") ||
+                        regs[i].Field<bool>("IsReserved"))
+                        continue;
+
+                    DataRow[] fields = regs[i].GetChildRows("GroupsFieldsRelation");
+                    for (int j = fields.Length - 1; j >= 0; j--)
+                    {
+
+                        if (fields[j].Field<bool>("IsComment") ||
+                            fields[j].Field<bool>("IsReserved"))
+                            continue;
+
+                        last_found = true;
+                        last_index_pair = new Tuple<int, int>(accumulated_reg_index, j);
+                        break;
+
+                    }
+                    if (last_found)
+                        break;
+                    
+                    last_index_pair = new Tuple<int, int>(accumulated_reg_index, -1);
+                    break;
+
+                }
+                if (last_found)
+                    break;
+            }
+
             foreach (DataRow g in dbMan.getGroups())
             {
                 if (g.GetChildRows("GroupsRegistersRelation").Length == 0)
@@ -518,14 +560,25 @@ namespace MappingBreakDown
 
                 for (int i = 0; i< regs.Length; i++, total_reg_count++)
                 {
-                    DataRow[] fields = regs[i].GetChildRows("GroupsRegistersRelation");
-                    res += entryToString(regs[i],
-                        total_reg_count == dbMan.regsCount() - 1 && fields.Length == 0);
-                    
+                    DataRow[] fields = regs[i].GetChildRows("GroupsFieldsRelation");
+
+                    // Add register entry
+                    if (last_index_pair.Item2 == -1)    // i.e last isn't a field
+                        res += entryToString(regs[i],
+                            total_reg_count == last_index_pair.Item1);
+
+                    else
+                        res += entryToString(regs[i]);
+
                     for (int j = 0; j < fields.Length; j++)
                     {
-                        res += entryToString(fields[j],
-                            total_reg_count == dbMan.regsCount() - 1 && j == fields.Length - 1);
+                        // Add field entry
+                        if (last_index_pair.Item2 == -1)    // i.e last isn't a field
+                            res += entryToString(fields[j]);
+
+                        else
+                            res += entryToString(fields[j],
+                                total_reg_count == last_index_pair.Item1 && j == last_index_pair.Item2);
                     }
                 }
             }
@@ -556,10 +609,7 @@ namespace MappingBreakDown
                 res += "\t\t\t\t\t" + "(" + Name + getSpaces(35 - Name.Length) + ",";
 
             else
-                res += "\t\t\t\t" + "(";
-            
-            res += Name;
-            res += getSpaces(39 - Name.Length) + ",";
+                res += "\t\t\t\t" + "(" + Name + getSpaces(39 - Name.Length) + ",";
 
             res += getSpaces(8 - adrs.Length) + adrs + ",";
             res += "  " + MAIS.ToString() + ",";
