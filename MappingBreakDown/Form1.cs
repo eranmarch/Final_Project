@@ -293,7 +293,7 @@ namespace MappingBreakDown
                     FPGAOpts.DataSource = tbMan.getFPGAOpts();
                     //
                     PathToFileLabel.Text = "Path: " + tbMan.getPathToFile();
-                    Text = "MappingBreakDown" + Path.GetFileName(tbMan.getPathToFile());
+                    Text = "MappingBreakDown" + " - " + Path.GetFileName(tbMan.getPathToFile());
                     //
                     SetTable();
                 }

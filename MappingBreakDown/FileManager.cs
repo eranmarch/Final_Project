@@ -287,7 +287,8 @@ namespace MappingBreakDown
                 return false;
 
             // if no comma - then this entry is the last - raise the flag
-            last_flag = !fields[10].Success;
+            if (!last_flag)
+                last_flag = !fields[10].Success;
 
             if (fields[11].Success)
                 comment = fields[11].ToString();
