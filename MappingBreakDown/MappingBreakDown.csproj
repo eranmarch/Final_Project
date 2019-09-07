@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{85299E5D-C955-464C-8B0B-E344C951C11A}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>MappingBreakDown</RootNamespace>
     <AssemblyName>MappingBreakDown</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
@@ -53,7 +53,6 @@
     <Compile Include="DataGridSource.cs" />
     <Compile Include="DataRowComparator.cs" />
     <Compile Include="FileManager.cs" />
-    <Compile Include="FileValidator.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -74,7 +73,6 @@
     <Compile Include="Interval.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RegisterEntry.cs" />
     <Compile Include="TableManager.cs" />
     <Compile Include="TreeGridCell.cs" />
     <Compile Include="TreeGridEvents.cs" />
@@ -98,9 +96,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="mapping_package.vhd">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -117,7 +112,6 @@
     <None Include="help.png" />
     <None Include="close.png" />
     <None Include="expand.bmp" />
-    <Content Include="test.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

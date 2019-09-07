@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MappingBreakDown
@@ -14,21 +8,8 @@ namespace MappingBreakDown
     {
         public int Chosen_address { get; set; }
         public int Index { get; set; }
-        RegisterEntry[] registers;
 
         DataRowCollection regs;
-
-        public ChooseAddressPrompt(RegisterEntry[] registers)
-        {
-            InitializeComponent();
-            this.registers = registers;
-            this.Chosen_address = 0;
-            foreach (RegisterEntry reg in registers)
-            {
-                if (!reg.GetRegType().Equals("FIELD"))
-                    AddressOpts.Items.Add(reg.GetName());
-            }
-        }
 
         public ChooseAddressPrompt(DataRowCollection registers)
         {

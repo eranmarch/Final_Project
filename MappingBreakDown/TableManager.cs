@@ -28,6 +28,7 @@ namespace MappingBreakDown
             else
             {
                 flMan = new FileManager();
+                flMan.dbMan = this;
                 ReadDatabase();
             }
         }

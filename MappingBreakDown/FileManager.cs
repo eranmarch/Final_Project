@@ -22,10 +22,11 @@ namespace MappingBreakDown
         public bool file_opened { get; set; }
         public bool file_saved { get; set; }
 
-        private TableManager dbMan;
+        public TableManager dbMan { get; set; }
 
         public FileManager()
         {
+            path_to_file = "";
             valid_type = new List<string> { "RD", "WR", "RD_WR", "FIELD" };
             valid_fpga = new List<string> { "G", "D", "A", "B", "C", "ABC", "ABCG" };
         }
@@ -50,17 +51,6 @@ namespace MappingBreakDown
         {
             return dbMan.dsDataset;
         }
-
-        //public void saveFilePath()
-        //{
-        //    File.WriteAllText(@"file_path.txt", path_to_file);
-        //}
-
-        //public void saveFilePath(string new_path)
-        //{
-        //    path_to_file = new_path;
-        //    File.WriteAllText(@"file_path.txt", path_to_file);
-        //}
 
         private void saveTemplate(string all_text)
         {
@@ -226,11 +216,7 @@ namespace MappingBreakDown
                         continue;
                     }
 
-                    match = Regex.Match(string_entries[i], @"^\s*--\s*(.*)\s*");
-                    if (match.Success)
-                        dbMan.AddComment(group, match.Groups[1].ToString());
-
-                    else
+                    if (!entryParse(string_entries[i],group,true))
                     {
                         MessageBox.Show("COMPILATION 2: invalid format of last entry, check for '),' ");
                         return false;
@@ -255,7 +241,7 @@ namespace MappingBreakDown
             return true;
         }
 
-        private bool entryParse(string str_entry, string cur_group)
+        private bool entryParse(string str_entry, string cur_group, bool past_last = false)
         {
             // Check if line is a simple comment
             Match match = Regex.Match(str_entry, @"^\s*--([Rr])?\s*(.*)\s*");
@@ -264,8 +250,12 @@ namespace MappingBreakDown
                 dbMan.AddComment(cur_group, match.Groups[2].ToString());
                 return true;
             }
-            
-            string entry_pattern = @"\s*(--[Rr])?\s*\(";        // is reserved (1)
+            string entry_pattern;
+            if (!past_last)
+                entry_pattern = @"\s*(--[Rr])?\s*\(";        // is reserved (1)
+            else
+                entry_pattern = @"\s*(--[Rr])\s*\(";        // is reserved (1)
+
             entry_pattern += @"([A-Za-z][A-Za-z0-9_]*)\s*,";    // name (2)
             entry_pattern += @"\s*(\d+)\s*,";                   // addres (3)
             entry_pattern += @"\s*([0-4])\s*,";                 // MAIS (4)
@@ -287,6 +277,10 @@ namespace MappingBreakDown
 
             GroupCollection fields = match.Groups;
             string comment = "";
+
+            // past the last and not a comment
+            if (past_last && !fields[1].Success)
+                return false;
 
             if (!valid_type.Contains(fields[7].ToString().ToUpper()) ||
                 !valid_fpga.Contains(fields[8].ToString().ToUpper()))
@@ -312,44 +306,6 @@ namespace MappingBreakDown
                 int.Parse(fields[3].ToString()),
                 true,
                 fields[1].Success);
-            //if (!fields[1].Success)
-            //{
-            //    if (!fields[7].ToString().ToUpper().Equals("FIELD"))
-            //        dbMan.AddRegister(
-            //            fields[2].ToString(),
-            //            int.Parse(fields[3].ToString()),
-            //            fields[4].ToString(),
-            //            fields[5].ToString(),
-            //            fields[6].ToString(),
-            //            fields[7].ToString(),
-            //            fields[8].ToString(),
-            //            fields[9].ToString(),
-            //            comment,
-            //            cur_group);
-            //    else
-            //        dbMan.AddField(
-            //            fields[2].ToString(),
-            //            fields[4].ToString(),
-            //            fields[5].ToString(),
-            //            fields[6].ToString(),
-            //            fields[8].ToString(),
-            //            fields[9].ToString(),
-            //            comment,
-            //            dbMan.regsCount() - 1);
-            //}
-            //// if --[Rr] succeded, add as reserved register
-            //else
-            //    dbMan.AddReserved(
-            //        fields[2].ToString(),
-            //        int.Parse(fields[3].ToString()),
-            //        fields[4].ToString(),
-            //        fields[5].ToString(),
-            //        fields[6].ToString(),
-            //        fields[7].ToString(),
-            //        fields[8].ToString(),
-            //        fields[9].ToString(),
-            //        comment,
-            //        cur_group);
 
             return true;
         }
