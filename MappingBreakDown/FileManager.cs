@@ -447,12 +447,12 @@ namespace MappingBreakDown
                     foreach (DataRow f in r.GetChildRows("GroupsFieldsRelation"))
                     {
                         if (f.Field<bool>("IsComment"))
-                            res += "\t\t\t-- " + r.Field<string>("Comment") + "\n";
+                            res += "\t\t\t-- " + f.Field<string>("Comment") + "\n";
 
                         if (f.Field<bool>("IsReserved"))
                             res += "--R";
 
-                        res += "\t\t\t\t\t\t" + r.Field<string>("Name") + ",\n";
+                        res += "\t\t\t\t\t\t" + f.Field<string>("Name") + ",\n";
                     }
                 }
             }
