@@ -36,7 +36,7 @@ namespace MappingBreakDown
             ErrorMessage.Text = "Message: ";
             InitDispColumns();
 
-            tbMan = new TableManager();
+            tbMan = new TableManager(true);
             //
             TypeOpts.DataSource = tbMan.getTypeOpts();
             FPGAOpts.DataSource = tbMan.getFPGAOpts();
@@ -449,7 +449,6 @@ namespace MappingBreakDown
 
             InitFields();
             SetTable();
-            //tbMan.UpdateDatabase();
         }
 
         private void TextBox2_TextChanged(object sender, EventArgs e)
@@ -486,9 +485,8 @@ namespace MappingBreakDown
         private void Clear_Click(object sender, EventArgs e)
         {
             InitFields();
-            tbMan = new TableManager();
+            tbMan = new TableManager(false);
             SetTable();
-            tbMan.UpdateDatabase();
             //
             Text = "MappingBreakDown";
         }

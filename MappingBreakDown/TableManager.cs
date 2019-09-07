@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Xml.Serialization;
 
 
 namespace MappingBreakDown
@@ -17,10 +18,18 @@ namespace MappingBreakDown
 
         public bool saved { get; set; }
 
-        public TableManager(bool only_for_table)
+        public TableManager(bool read_database)
         {
-            InitGroupTable();
-            InitDataBasesParams();
+            if (!read_database)
+            {
+                InitGroupTable();
+                InitDataBasesParams();
+            }
+            else
+            {
+                flMan = new FileManager();
+                ReadDatabase();
+            }
         }
 
         public TableManager()
@@ -93,6 +102,7 @@ namespace MappingBreakDown
             DataRelation regsFieldsRelation = new DataRelation("GroupsFieldsRelation", dsDataset.Tables[1].Columns["Index"], dsDataset.Tables[2].Columns["Index"], true);
             groupsRegsRelation.Nested = true;
             regsFieldsRelation.Nested = true;
+            
             dsDataset.Relations.Add(groupsRegsRelation);
             dsDataset.Relations.Add(regsFieldsRelation);
         }
@@ -149,36 +159,62 @@ namespace MappingBreakDown
 
         public void UpdateDatabase()
         {
-            //validateAddressDup();
-            //FileStream fs = new FileStream(@"registers.txt", FileMode.Create, FileAccess.Write);
-            //dsDataset.WriteXml(fs);//, XmlWriteMode.WriteSchema);
-
-            //File.WriteAllText(@"registers.txt", dsDataset.GetXml());
-            //fs.Close();
-
-            flMan.saveFilePath();
+            using (FileStream fs = new FileStream(@"registers.xml", FileMode.Create, FileAccess.Write))
+            {
+                //dsDataset.WriteXml(fs);//, XmlWriteMode.WriteSchema);
+                XmlSerializer xs = new XmlSerializer(typeof(DataSet));
+                xs.Serialize(fs, dsDataset);
+                //File.WriteAllText(@"registers.txt", dsDataset.GetXml());
+            }
+            
+            //flMan.saveFilePath();
         }
 
-        public void ReadDatabase()
+        public void ReadDatabase_temp()
         {
             FileStream fs;
             try
             {
-                fs = new FileStream(@"registers.txt", FileMode.Open, FileAccess.Read);
-                throw new IOException();
-                dsDataset = new DataSet();
-                dsDataset.ReadXml(fs, XmlReadMode.InferSchema);
+                fs = new FileStream(@"registers.xml", FileMode.Open, FileAccess.Read);
+                XmlSerializer xs = new XmlSerializer(typeof(DataSet));
+                dsDataset = (DataSet)xs.Deserialize(fs);//new DataSet();
+                //dsDataset.ReadXml(fs);
+                //fs.Close();
                 dtgroups = dsDataset.Tables[0];
                 dtregisters = dsDataset.Tables[1];
                 dtfields = dsDataset.Tables[2];
-                fs.Close();
+                //dsDataset.Relations[0].RelationName = "GroupsRegistersRelation";
+                //dsDataset.Relations[1].RelationName = "GroupsFieldsRelation";
             }
             catch (IOException e)
             {
                 InitGroupTable();
                 InitDataBasesParams();
             }
-            
+            catch (IndexOutOfRangeException e)
+            {
+                // No registers or fields anyway
+            }
+        }
+
+        public void ReadDatabase()
+        {
+            if (File.Exists(@"registers.xml"))
+            {
+                using (FileStream fs = new FileStream(@"registers.xml", FileMode.Open, FileAccess.Read))
+                {
+                    XmlSerializer xs = new XmlSerializer(typeof(DataSet));
+                    this.dsDataset = (DataSet)xs.Deserialize(fs);
+                    this.dtgroups = dsDataset.Tables[0];
+                    this.dtregisters = dsDataset.Tables[1];
+                    this.dtfields = dsDataset.Tables[2];
+                }
+            }
+            else
+            {
+                InitGroupTable();
+                InitDataBasesParams();
+            }
         }
 
         public void AddGroup(string group)

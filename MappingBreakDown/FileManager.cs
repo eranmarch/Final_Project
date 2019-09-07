@@ -35,7 +35,7 @@ namespace MappingBreakDown
 
             path_to_file = path;
 
-            dbMan = new TableManager(true);
+            dbMan = new TableManager(false);
             if (!IsFileValid())
             {
                 valid_type = new List<string> { "RD", "WR", "RD_WR", "FIELD" };
@@ -51,16 +51,16 @@ namespace MappingBreakDown
             return dbMan.dsDataset;
         }
 
-        public void saveFilePath()
-        {
-            File.WriteAllText(@"file_path.txt", path_to_file);
-        }
+        //public void saveFilePath()
+        //{
+        //    File.WriteAllText(@"file_path.txt", path_to_file);
+        //}
 
-        public void saveFilePath(string new_path)
-        {
-            path_to_file = new_path;
-            File.WriteAllText(@"file_path.txt", path_to_file);
-        }
+        //public void saveFilePath(string new_path)
+        //{
+        //    path_to_file = new_path;
+        //    File.WriteAllText(@"file_path.txt", path_to_file);
+        //}
 
         private void saveTemplate(string all_text)
         {

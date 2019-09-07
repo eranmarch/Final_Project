@@ -165,9 +165,18 @@ namespace HierarchicalGrid
                 DataRelationCollection dsRelations = _dtSource.DataSet.Relations;
                 HierarchicalGridNode curNode;
 
-                Dictionary<DataRow, HierarchicalGridNode> map = new Dictionary<DataRow, HierarchicalGridNode>();
-                foreach (DataRelation curRelation in dsRelations)
+                Dictionary<DataRow, HierarchicalGridNode> map = new Dictionary<DataRow, HierarchicalGridNode>(new DataRowComparator());
+                DataRelation[] rel_lst = new DataRelation[2];
+                foreach(DataRelation r in dsRelations)
                 {
+                    if (r.RelationName.Equals("GroupsRegistersRelation"))
+                        rel_lst[0] = r;
+                    if (r.RelationName.Equals("GroupsFieldsRelation"))
+                        rel_lst[1] = r;
+                }
+                for (int rel_index = 0; rel_index < rel_lst.Length; rel_index++)
+                {
+                    DataRelation curRelation = rel_lst[rel_index];
                     DataTable dtParent = curRelation.ParentTable;
                     DataTable dtChild = curRelation.ChildTable;
                     foreach (DataRow curRow in dtParent.Rows)
