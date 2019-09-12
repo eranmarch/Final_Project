@@ -111,7 +111,6 @@
     <None Include="open.png" />
     <None Include="help.png" />
     <None Include="close.png" />
-    <None Include="expand.bmp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

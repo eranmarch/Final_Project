@@ -41,7 +41,7 @@ namespace MappingBreakDown
             TypeOpts.DataSource = tbMan.getTypeOpts();
             FPGAOpts.DataSource = tbMan.getFPGAOpts();
             SetTable();
-            PathToFileLabel.Text = "Path: " + tbMan.getPathToFile();
+            PathToFileLabel.Text = "Path: ";
         }
 
         private void InitDispColumns()
@@ -81,6 +81,7 @@ namespace MappingBreakDown
             hierarchicalGridView1.Columns["IsValid"].Visible = false;
             hierarchicalGridView1.Columns["Index"].Visible = false;
             hierarchicalGridView1.Columns["SecondaryIndex"].Visible = false;
+            expandNodes();
             reColorNodes();
         }
 
@@ -95,7 +96,7 @@ namespace MappingBreakDown
             InitText.Text = "";
             RegNameText.Text = "";
             CommentText.Text = "";
-            NewGroupText.Text = "";
+            //NewGroupText.Text = "";
             searchBox.Text = "";
         }
 
@@ -233,21 +234,6 @@ namespace MappingBreakDown
             }
         }
 
-        /*
-        private void colapseNodes()
-        {
-            foreach (HierarchicalGridNode group_node in hierarchicalGridView1.Nodes)
-            {
-                foreach (HierarchicalGridNode register_node in group_node.Nodes)
-                {
-                    foreach (HierarchicalGridNode field_node in register_node.Nodes)
-                        field_node.Collapse();
-                    register_node.Collapse();
-                }
-                group_node.Collapse();
-            }
-        }*/
-
         /* Check the register can be added to the chart */
         private bool InputValidator()
         {
@@ -292,7 +278,7 @@ namespace MappingBreakDown
                     TypeOpts.DataSource = tbMan.getTypeOpts();
                     FPGAOpts.DataSource = tbMan.getFPGAOpts();
                     //
-                    PathToFileLabel.Text = "Path: " + tbMan.getPathToFile();
+                    PathToFileLabel.Text = "Path: " + Path.GetFileName(tbMan.getPathToFile());
                     Text = "MappingBreakDown" + " - " + Path.GetFileName(tbMan.getPathToFile());
                     //
                     SetTable();
@@ -489,6 +475,7 @@ namespace MappingBreakDown
             SetTable();
             //
             Text = "MappingBreakDown";
+            PathToFileLabel.Text = "Path: ";
         }
 
         private void RegNameText_KeyUp(object sender, KeyEventArgs e)
@@ -661,8 +648,12 @@ namespace MappingBreakDown
 
         private void About_MenuButtonClick(object senedr, EventArgs e)
         {
-            MessageBox.Show(
-                    "MappingPackageAutomation Version 2.0\nCreated By Eran Marchesky and Eli Zeltser as a final project\n\nAdvisors: Dan Shalom and Eli Parente");
+            string text = "MappingPackageAutomation Version 2.0\n";
+            text += "Created By Eran Marchesky and Eli Zeltser as a final project\n\n";
+            text += "Advisors: Dan Shalom and Eli Parente\n";
+            text += "Eli Zeltser: elizeltser97 @gmail.com\n";
+            text += "Eran Marchesky: eranmarch@gmail.com";
+            MessageBox.Show(text);
         }
 
         private void MappingBreakDown_FormClosing(object sender, FormClosingEventArgs e)
@@ -670,14 +661,62 @@ namespace MappingBreakDown
             tbMan.UpdateDatabase();
         }
 
-        private void TypeOpts_DataSourceChanged(object sender, EventArgs e)
+        private void CommentButton_MouseHover(object sender, EventArgs e)
         {
-
+            ToolTip ToolTip1 = new ToolTip();
+            ToolTip1.SetToolTip(this.CommentButton, "Comment selected rows");
         }
 
-        private void ExpandAll_Click(object sender, EventArgs e)
+        private void UnCommentButton_MouseHover(object sender, EventArgs e)
         {
-            expandNodes();
+            ToolTip ToolTip1 = new ToolTip();
+            ToolTip1.SetToolTip(this.UnCommentButton, "Un-Comment selected rows");
+        }
+
+        private void ClearButton_MouseHover(object sender, EventArgs e)
+        {
+            ToolTip ToolTip1 = new ToolTip();
+            ToolTip1.SetToolTip(this.ClearButton, "Clear table");
+        }
+
+        private void PathToFileLabel_MouseHover(object sender, EventArgs e)
+        {
+            if (tbMan.getPathToFile().Equals(""))
+                return;
+
+            ToolTip ToolTip1 = new ToolTip();
+            string tip = "Full path: " + tbMan.getPathToFile();
+            ToolTip1.SetToolTip(this.PathToFileLabel, tip);
+        }
+
+        private void IsCommentCheckBox_MouseHover(object sender, EventArgs e)
+        {
+            ToolTip ToolTip1 = new ToolTip();
+            ToolTip1.SetToolTip(this.IsCommentCheckBox, "Set as comment");
+        }
+
+        private void InsertButton_MouseHover(object sender, EventArgs e)
+        {
+            ToolTip ToolTip1 = new ToolTip();
+            ToolTip1.SetToolTip(this.InsertButton, "Insert entry");
+        }
+
+        private void Delete_MouseHover(object sender, EventArgs e)
+        {
+            ToolTip ToolTip1 = new ToolTip();
+            ToolTip1.SetToolTip(this.Delete, "Delete selected entries");
+        }
+
+        private void Load_MouseHover(object sender, EventArgs e)
+        {
+            ToolTip ToolTip1 = new ToolTip();
+            ToolTip1.SetToolTip(this.Load, "Change selected entry");
+        }
+
+        private void label10_MouseHover(object sender, EventArgs e)
+        {
+            ToolTip ToolTip1 = new ToolTip();
+            ToolTip1.SetToolTip(this.label10, "Search entries by name");
         }
     }
 }

@@ -286,8 +286,9 @@ namespace MappingBreakDown
                 !valid_fpga.Contains(fields[8].ToString().ToUpper()))
                 return false;
 
-            // if no comma - then this entry is the last - raise the flag
-            if (!last_flag)
+            // if no comma - then this entry is the last
+            //              - raise the flag, ignore comments
+            if (!last_flag && !fields[1].Success)
                 last_flag = !fields[10].Success;
 
             if (fields[11].Success)
@@ -611,7 +612,7 @@ namespace MappingBreakDown
                 for (int i = 0; i < regs.Length; i++)
                 {
                     res += entryToXML(regs[i]);
-                    DataRow[] fields = regs[i].GetChildRows("GroupsRegistersRelation");
+                    DataRow[] fields = regs[i].GetChildRows("GroupsFieldsRelation");
 
                     for (int j = 0; j < fields.Length; j++)
                         res += entryToXML(fields[j]);

@@ -171,33 +171,6 @@ namespace MappingBreakDown
             //flMan.saveFilePath();
         }
 
-        public void ReadDatabase_temp()
-        {
-            FileStream fs;
-            try
-            {
-                fs = new FileStream(@"registers.xml", FileMode.Open, FileAccess.Read);
-                XmlSerializer xs = new XmlSerializer(typeof(DataSet));
-                dsDataset = (DataSet)xs.Deserialize(fs);//new DataSet();
-                //dsDataset.ReadXml(fs);
-                //fs.Close();
-                dtgroups = dsDataset.Tables[0];
-                dtregisters = dsDataset.Tables[1];
-                dtfields = dsDataset.Tables[2];
-                //dsDataset.Relations[0].RelationName = "GroupsRegistersRelation";
-                //dsDataset.Relations[1].RelationName = "GroupsFieldsRelation";
-            }
-            catch (IOException e)
-            {
-                InitGroupTable();
-                InitDataBasesParams();
-            }
-            catch (IndexOutOfRangeException e)
-            {
-                // No registers or fields anyway
-            }
-        }
-
         public void ReadDatabase()
         {
             if (File.Exists(@"registers.xml"))
@@ -398,25 +371,31 @@ namespace MappingBreakDown
 
         public void validateLogic()
         {
-            foreach(DataRow r in getRegisters())
+            dtregisters.AcceptChanges();
+            dtfields.AcceptChanges();
+            for(int i = 0; i < getRegisters().Count;i++)
             {
-                if (r.Field<bool>("IsComment") || r.Field<bool>("IsReserved"))
+                DataRow r = getRegisters()[i];
+                if (r.Field<bool>("IsComment"))// || r.Field<bool>("IsReserved"))
                     continue;
 
                 validateRegBits(r);
+                dtregisters.AcceptChanges();
+                dtfields.AcceptChanges();
             }
             validateAddressDup();
             validateNameDup();
+            dtregisters.AcceptChanges();
+            dtfields.AcceptChanges();
         }
 
         private void validateAddressDup()
         {
             string address, name;
-            bool set_ok;
+            string other_address, other_name;
 
             for (int i = 0; i < regsCount(); i++)
             {
-                set_ok = true;
                 if (dtregisters.Rows[i].Field<bool>("IsComment") ||
                     dtregisters.Rows[i].Field<bool>("IsReserved"))
                     continue;
@@ -432,29 +411,18 @@ namespace MappingBreakDown
                         dtregisters.Rows[j].Field<bool>("IsReserved"))
                         continue;
 
-                    if (address.Equals(dtregisters.Rows[j].Field<string>("Address")))
+                    other_address = getRegisters()[j].Field<string>("Address");
+                    other_name = getRegisters()[j].Field<string>("Name");
+                    if (address.Equals(other_address))
                     {
                         dtregisters.Rows[i].SetField("IsValid", false);
                         dtregisters.Rows[j].SetField("IsValid", false);
 
-                        dtregisters.Rows[i].SetField("Reason",
-                            "Address " + address + " is already in the list at register " +
-                            dtregisters.Rows[j].Field<string>("Name"));
+                        dtregisters.Rows[i].SetField("Reason", "Address " + address + " is already in the list at register " + other_name);
 
-                        dtregisters.Rows[j].SetField("Reason",
-                            "Address " + address + " is already in the list at register " +
-                            dtregisters.Rows[i].Field<string>("Name"));
-
-                        set_ok = false;
-                        continue;
+                        dtregisters.Rows[j].SetField("Reason", "Address " + address + " is already in the list at register " + name);
                     }
-                    dtregisters.Rows[j].SetField("IsValid", true);
-                    dtregisters.Rows[j].SetField("Reason", "");
-                }
-                if (set_ok)
-                {
-                    dtregisters.Rows[i].SetField("IsValid", true);
-                    dtregisters.Rows[i].SetField("Reason", "");
+                    dtregisters.AcceptChanges();
                 }
             }
         }
@@ -521,10 +489,16 @@ namespace MappingBreakDown
 
         public bool validateRegBits(DataRow reg)
         {
-            int lsb = int.Parse(reg.Field<string>("LSB"));
-            int msb = int.Parse(reg.Field<string>("MSB"));
+            int i_lsb, i_msb;
+            if (!int.TryParse(reg.Field<string>("LSB"),out i_lsb) ||
+                !int.TryParse(reg.Field<string>("MSB"), out i_msb))
+            {
+                throw new InvalidCastException();
+            }
 
-            if (validateMSBLSB(lsb,msb))
+            if ((i_lsb > i_msb) ||
+                (i_lsb < 0) ||
+                (i_msb > 31))
             {
                 reg.SetField("IsValid", false);
                 reg.SetField("Reason", "MSB and LSB are invalid");
@@ -565,9 +539,10 @@ namespace MappingBreakDown
         {
             int min_lsb = int.Parse(father_reg.Field<string>("LSB"));
             int max_msb = int.Parse(father_reg.Field<string>("MSB"));
-
-            // check if in required range
-            if (!validateMSBLSB(lsb, msb, min_lsb, max_msb))
+            
+            if ((lsb > msb) ||
+                (lsb < min_lsb) ||
+                (lsb > max_msb))
                 return false;
 
             DataRow[] fields = father_reg.GetChildRows("GroupsFieldsRelation");
