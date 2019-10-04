@@ -470,12 +470,23 @@ namespace MappingBreakDown
 
         private void Clear_Click(object sender, EventArgs e)
         {
-            InitFields();
+            if (!tbMan.saved)
+            {
+                DialogResult dialogResult = MessageBox.Show("Are you sure you want to clear?\nTable wasn't saved", "Clear click", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.No)
+                {
+                    InitFields();
+                    ErrorMessage.Text = "Message: Clear was canceled";
+                    return;
+                }
+            }
+            
             tbMan = new TableManager(false);
             SetTable();
             //
             Text = "MappingBreakDown";
             PathToFileLabel.Text = "Path: ";
+            ErrorMessage.Text = "Message: Table cleared";
         }
 
         private void RegNameText_KeyUp(object sender, KeyEventArgs e)
@@ -502,24 +513,21 @@ namespace MappingBreakDown
                 InsertButton_Click(sender, e);
         }
 
+        private void MappingBreakDown_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            tbMan.UpdateDatabase();
+        }
+
         private void CloseButton_Click(object sender, EventArgs e)
         {
-            if (tbMan.getPathToFile().Equals(""))
-                Close();
             if (tbMan.saved)
-            {
-                //tbMan.path_to_file = "";
-                File.WriteAllText(@"file_path.txt", "");
                 Close();
-            }
+
             else
             {
                 DialogResult dialogResult = MessageBox.Show("Are you sure you want to close the file without saving?", "Warning", MessageBoxButtons.YesNo);
                 if (dialogResult == DialogResult.Yes)
                 {
-                    //SaveButton_Click(sender, e);
-                    //tbMan.path_to_file = "";
-                    File.WriteAllText(@"file_path.txt", "");
                     Close();
                 }
                 else if (dialogResult == DialogResult.No)
@@ -654,11 +662,6 @@ namespace MappingBreakDown
             text += "Eli Zeltser: elizeltser97 @gmail.com\n";
             text += "Eran Marchesky: eranmarch@gmail.com";
             MessageBox.Show(text);
-        }
-
-        private void MappingBreakDown_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            tbMan.UpdateDatabase();
         }
 
         private void CommentButton_MouseHover(object sender, EventArgs e)

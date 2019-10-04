@@ -218,7 +218,7 @@ namespace MappingBreakDown
 
                     if (!entryParse(string_entries[i],group,true))
                     {
-                        MessageBox.Show("COMPILATION 2: invalid format of last entry, check for '),' ");
+                        MessageBox.Show("COMPILATION 3: invalid format of last entry, check for '),' ");
                         return false;
                     }
                 }

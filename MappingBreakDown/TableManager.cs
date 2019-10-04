@@ -31,12 +31,14 @@ namespace MappingBreakDown
                 flMan.dbMan = this;
                 ReadDatabase();
             }
+            saved = false;
         }
 
         public TableManager()
         {
             flMan = new FileManager();
             ReadDatabase();
+            saved = false;
         }
 
         public TableManager(string file_name)
@@ -47,7 +49,7 @@ namespace MappingBreakDown
             dtgroups = dsDataset.Tables[0];
             dtregisters = dsDataset.Tables[1];
             dtfields = dsDataset.Tables[2];
-
+            saved = true;
         }
 
         private void InitGroupTable()
@@ -155,6 +157,7 @@ namespace MappingBreakDown
         public bool createAndDocument(string path)
         {
             flMan.saveToFile(path);
+            saved = flMan.file_saved;
             return flMan.file_saved;
         }
 
@@ -196,6 +199,7 @@ namespace MappingBreakDown
             try
             {
                 dtgroups.Rows.Add(group);
+                saved = false;
             }
             catch (ConstraintException c)
             {
@@ -258,6 +262,7 @@ namespace MappingBreakDown
             new_row["IsValid"] = true;
 
             collection.Rows.Add(new_row);
+            saved = false;
         }
 
         // Add as a register
@@ -281,6 +286,7 @@ namespace MappingBreakDown
             new_row["IsReserved"] = false;
             new_row["IsValid"] = true;
             dtregisters.Rows.Add(new_row);
+            saved = false;
         }
 
         public bool nameValid(string new_name)
@@ -323,6 +329,7 @@ namespace MappingBreakDown
             dtregisters.Rows[index].SetField("Init", init);
             dtregisters.Rows[index].SetField("Comment", comment);
             dtregisters.Rows[index].SetField("Group", group);
+            saved = false;
         }
 
         public void editFields(Tuple<int,int> pair,
@@ -350,11 +357,13 @@ namespace MappingBreakDown
                     r.SetField("Group", group);
                 }
             }
+            saved = false;
         }
 
         public void editReason(int index, string reason)
         {
             dtregisters.Rows[index].SetField("Reason", reason);
+            saved = false;
         }
 
         public void editReason(Tuple<int, int> pair, string reason)
@@ -367,6 +376,7 @@ namespace MappingBreakDown
                     r.SetField("Reason", reason);
                 }
             }
+            saved = false;
         }
 
         public void validateLogic()
@@ -631,6 +641,7 @@ namespace MappingBreakDown
                     }
                 }
             }
+            saved = false;
         }
 
         public void setRowsType(List<Tuple<int,int>> lst, string is_what)
@@ -674,6 +685,7 @@ namespace MappingBreakDown
                     }
                 }
             }
+            saved = false;
         }
 
         public void setRow(DataRow row, string Name, string Comment, string Init, 
@@ -688,6 +700,7 @@ namespace MappingBreakDown
             row.SetField("FPGA", FPGA);
             row.SetField("Group", Group);
             row.SetField("IsValid", true);
+            saved = false;
         }
 
         public void RemoveEntries(List<Tuple<int, int>> index_pairs, List<int> indices)
@@ -703,6 +716,7 @@ namespace MappingBreakDown
             dtfields.AcceptChanges();
 
             reIndexTable();
+            saved = false;
         }
 
         private void RemoveEntries(List<Tuple<int, int>> index_pairs)
@@ -717,6 +731,7 @@ namespace MappingBreakDown
                         break;
                     }
             }
+            saved = false;
         }
 
         private void RemoveEntries(List<int> indices)
@@ -737,6 +752,7 @@ namespace MappingBreakDown
                     }
                 }
             }
+            saved = false;
         }
 
         private void reIndexTable()
